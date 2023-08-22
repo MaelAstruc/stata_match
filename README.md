@@ -21,37 +21,37 @@ sysuse auto, clear
 
 // Usual way with 'replace newvar = value if condition'
 gen test_repif = ""
-replace test_repif = "low" 		if rep78 == 1
-replace test_repif = "mid" 		if rep78 == 3
+replace test_repif = "low" 	if rep78 == 1
+replace test_repif = "mid" 	if rep78 == 3
 replace test_repif = "high" 	if rep78 == 4
 
 // With the match command: match var, replace(newvar) branches(condition @ value; ...)
 gen test_match = ""
 match_branches rep78, replace(test_match) branches( 	///
-	rep78 == 1		@ "low"; 		            		///
-	rep78 == 3		@ "mid"; 		            		///
-	rep78 == 4		@ "high" 			        		///
+	rep78 == 1		@ "low"; 		///
+	rep78 == 3		@ "mid"; 		///
+	rep78 == 4		@ "high"		///
 )
 
 assert test_repif == test_match
 
-// A bit of syntactic sugar: '$' replace var in all the conditions and values
+// A bit of syntactic sugar: '$' replaces var in all the conditions and values
 gen test_dol = ""
 match_branches rep78, replace(test_dol) branches( 	///
-	$ == 1		@ "low"; 			        		///
-	$ == 3		@ "mid"; 			        		///
-	$ == 4		@ "high" 		        			///
+	$ == 1		@ "low";			///
+	$ == 3		@ "mid";			///
+	$ == 4		@ "high" 		        ///
 )
 
 assert test_repif == test_dol
 
-// More syntactic sugar: $1 replaces the first var, $2 the second, etc
+// More syntactic sugar: $1 replaces the first variable, $2 the second, etc
 gen test_dols = ""
 match_branches rep78 price, replace(test_dols) branches( 	///
-	$1 == 1	& $2 <= 5000	@ "low and cheap"; 			    ///
-	$1 == 1	& $2  > 5000	@ "low and expensive"; 		    ///
-	$1 == 3					@ "mid"; 					    ///
-	$1 == 4					@ "high" 					    ///
+	$1 == 1	& $2 <= 5000	@ "low and cheap"; 		///
+	$1 == 1	& $2  > 5000	@ "low and expensive"; 		///
+	$1 == 3			@ "mid"; 			///
+	$1 == 4			@ "high" 			///
 )
 
 // Check if of the possibilities are covered
@@ -60,12 +60,12 @@ check_levelsof rep78, replace(test_match) noerror
 * Warning: missing level '5' for variable 'rep78': 11 observations.
 * Found 2 errors for variable rep78.
 
-// Fianlly, all at once
+// Finally, all at once
 gen test_match_levels = ""
-match rep78, replace(test_match_levels) noerror branches( 	///
-	rep78 == 1		@ "low"; 								///
-	rep78 == 3		@ "mid"; 								///
-	rep78 == 4		@ "high" 								///
+match rep78, replace(test_match_levels) branches( 	///
+	$ == 1		@ "low"; 			///
+	$ == 3		@ "mid"; 			///
+	$ == 4		@ "high" 			///
 )
 * Warning: missing level '2' for variable 'rep78': 8 observations.
 * Warning: missing level '5' for variable 'rep78': 11 observations.
@@ -77,10 +77,6 @@ match rep78, replace(test_match_levels) noerror branches( 	///
     * Any string with these characters will create a bug (if it does not, it's another bug)
 	* These characters are not too common so it should be ok
 	* This is because the code uses regex to split and replace characters
-* Does not check for overlaping conditions
-	* Doing this with final data and dummies is computationally expensive
-	* The last branch is the one that matters if there are collisions
-	* Just like with replace if statements
 * check_levelsof checks if all the levels have values in a loop
 	* it does not check if they are covered in the conditions
 	* this means that there is a warning even if missing values are intended in the conditions
@@ -88,6 +84,10 @@ match rep78, replace(test_match_levels) noerror branches( 	///
 	* this also implies that the checks are done after all the data is generated
 	* this might be an issue for large datasets where you wait a long time
 	* add the 'noerror' parameter to keep the partial results
+* check_levelsof does not check for overlaping conditions
+	* Doing this with final data and dummies is computationally expensive
+	* The last branch is the one that matters if there are collisions
+	* Just like replace if statements
 
 ## Futhermore
 
@@ -97,8 +97,8 @@ My ideal syntax to match two variables 'var1' (string with value "a", "b", "c") 
 
 ```Stata
 gen newvar = match var1 var2 {
-	$1 == "a"						=> 1,
-	$1 == "b" & $2 <= 4				=> 2,
+	$1 == "a"			=> 1,
+	$1 == "b" & $2 <= 4		=> 2,
 	$1 == "b" & $2 >= 4 & $2 < 8	=> 3,
 	$1 == "b" & $2 > 9 & $2 <= 10	=> 4,
 }
@@ -112,7 +112,7 @@ This would return these issues:
 * Case not covered: `var1 == ""`
 * Case not covered: `var2 == .`
 
-A proper parser would be the solution of most of the previous problems:
+A proper parser would be the solution for most of the previous problems:
 
 * This would allow to handle the special characters in strings
 * With a clearly defined syntax, the logic of the conditions could be extracted
