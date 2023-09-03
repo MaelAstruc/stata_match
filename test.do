@@ -6,12 +6,12 @@ do "match.ado"
 
 sysuse auto, clear
 
-************************************************************ Test match_branches
+******************************************************************** Test switch
 
 // Test match with a string
 
 gen test = ""
-capture match_branches price, replace(test) b( 				///
+capture switch test = price, b( 				///
 	price < 4000	  					@ "cheap"; 			///
 	price >= 4000 & price < 8000 		@ "medium"; 		///
 	price > 8000	 					@ "expensive" 		///
@@ -25,7 +25,7 @@ drop test
 // Test match with a numeric
 
 gen test = .
-capture match_branches price, replace(test) b( 		///
+capture switch test = price, b( 		///
 	price < 4000	  					@ 1; 		///
 	price >= 4000 & price < 8000 		@ 2; 		///
 	price > 8000	 					@ 3 		///
@@ -39,7 +39,7 @@ drop test
 // Test the '$' replacement with a string
 
 gen test = ""
-capture match_branches price, replace(test) b( 		///
+capture switch test = price, b( 		///
 	$ < 4000	  				@ "cheap"; 			///
 	$ >= 4000 & $ < 8000 		@ "medium"; 		///
 	$ > 8000	 				@ "expensive" 		///
@@ -53,7 +53,7 @@ drop test
 // Test the '$' replacement with a numeric
 
 gen test = .
-capture match_branches price, replace(test) b( 	///
+capture switch test = price, b( 	///
 	$ < 4000	  			@ 1; 				///
 	$ >= 4000 & $ < 8000 	@ 2; 				///
 	$ > 8000	 			@ 3					///
@@ -67,7 +67,7 @@ drop test
 // Test the '$' replacement with two variables
 
 gen test = ""
-capture match_branches rep78 price, replace(test) b( 	///
+capture switch test = rep78 + price, b( 	///
 	$1 == 1	& $2 <= 5000	@ "low and cheap"; 			///
 	$1 == 1	& $2  > 5000	@ "low and expensive"; 		///
 	$1 == 3					@ "mid"; 					///
@@ -83,7 +83,7 @@ drop test
 // Test empty branch at the end
 
 gen test = .
-capture match_branches price, replace(test) b( 	///
+capture switch test = price, b( 	///
 	$ < 4000	  				@ 1; 			///
 	$ >= 4000 & $ < 8000 		@ 2; 			///
 	$ > 8000	 				@ 3;			///
@@ -98,7 +98,7 @@ drop test
 // Test empty branch in the middle
 
 gen test = .
-capture match_branches price, replace(test) b( 	///
+capture switch test = price, b( 	///
 	$ < 4000	  				@ 1; 			///
 								   ;			///
 	$ >= 4000 & $ < 8000 		@ 2; 			///
@@ -112,7 +112,7 @@ drop test
 // Test missing condition in branch 2
 
 gen test = .
-capture match_branches price, replace(test) b( 	///
+capture switch test = price, b( 	///
 	$ < 4000	  			@ 1; 				///
 							@ 2; 				///
 	$ > 8000	 			@ 3					///
@@ -125,7 +125,7 @@ drop test
 // Test missing '@' in branch 2
 
 gen test = .
-capture match_branches price, replace(test) b( 	///
+capture switch test = price, b( 	///
 	$ < 4000	  				@ 1; 			///
 	$ >= 4000 & $ < 8000		  2; 			///
 	$ > 8000	 				@ 3				///
@@ -138,7 +138,7 @@ drop test
 // Test missing value in branch 2
 
 gen test = .
-capture match_branches price, replace(test) b( 	///
+capture switch test = price, b( 	///
 	$ < 4000	  				@ 1; 			///
 	$ >= 4000 & $ < 8000		@  ; 			///
 	$ > 8000	 				@ 3				///
@@ -151,7 +151,7 @@ drop test
 // Test extra '@' at the beginning of branch 2
 
 gen test = .
-capture match_branches price, replace(test) b( 	///
+capture switch test = price, b( 	///
 	$ < 4000	  				@ 1; 			///
 	@ $ >= 4000 & $ < 8000		@@ 2; 			///
 	$ > 8000	 				@ 3				///
@@ -164,7 +164,7 @@ drop test
 // Test extra '@' in the middle og branch 2
 
 gen test = .
-capture match_branches price, replace(test) b( 	///
+capture switch test = price, b( 	///
 	$ < 4000	  				@ 1; 			///
 	$ >= 4000 & $ < 8000		@@ 2; 			///
 	$ > 8000	 				@ 3				///
@@ -177,7 +177,7 @@ drop test
 // Test extra '@' at the end of branch 2
 
 gen test = .
-capture match_branches price, replace(test) b( 	///
+capture switch test = price, b( 	///
 	$ < 4000	  				@ 1; 			///
 	$ >= 4000 & $ < 8000		@ 2@;	 		///
 	$ > 8000	 				@ 3				///
@@ -192,7 +192,7 @@ drop test
 // Test match_levelsof (the replacements are done)
 
 gen test = ""
-capture match rep78, replace(test) b( 		///
+capture match test = rep78, b( 		///
 	rep78 == 1 | rep78 == 2 	@ "low"; 	///
 	rep78 == 3 					@ "mid"; 	///
 	rep78 == 4 				 	@ "high"	///
@@ -206,7 +206,7 @@ drop test
 // Test match_levelsof with noerror
 
 gen test = ""
-capture match rep78, replace(test) noerror b( 	///
+capture match test = rep78, noerror b( 	///
 	rep78 == 1 | rep78 == 2 	@ "low"; 		///
 	rep78 == 3 					@ "mid"; 		///
 	rep78 == 4 					@ "high" 		///

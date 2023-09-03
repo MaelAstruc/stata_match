@@ -1,35 +1,57 @@
 capture program drop match
 
 program define match
-	syntax varlist, REPlace(varlist) Branches(str) [NOERROR NOWARNING]
+	syntax varlist =/ exp, Branches(str) [NOERROR NOWARNING]
 	
-	match_branches `varlist', replace(`replace') branches(`branches')
+	switch `varlist' = `exp', branches(`branches')
 	
-	check_levelsof `varlist', replace(`replace') `noerror' `nowarning'
+	check_levelsof `exp', replace(`varlist') `noerror' `nowarning'
 end
 
-capture program drop match_branches
+capture program drop switch
 
-program define match_branches
-	syntax varlist, REPlace(varlist) Branches(str)
+program define switch
+	syntax varlist =/ exp, Branches(str)
 	
-	local n_var: word count `varlist'
+	// Check left hand side
+	local n_var_l: word count `varlist'
 	
-	if `n_var' == 1 {
-		local branches = ustrregexra("`branches'", "\\$", "`varlist'")
+	if (`n_var_l' == 0) {
+		dis "Expect a variable name before '='."
+		error 102
+	}
+	if (`n_var_l' > 1) {
+		dis "Expect only one variable name before '='."
+		error 102
+	}
+	
+	// Check right end side
+	local exp = regexr("`exp'", "\+", "")
+	dis "`exp'"
+	local n_var_r: word count `exp'
+	
+	if `n_var_r' == 0 {
+		dis "Expect at least one variable name after '='."
+		error 102
+	}
+	
+	// Replace variable reference by the name
+	if `n_var_r' == 1 {
+		local branches = ustrregexra("`branches'", "\\$", "`exp'")
 	}
 	else {
 		local i = 0
-		foreach var of local varlist {
+		foreach var of local exp {
 			local i = `i' + 1
+			confirm variable `var'
 			local branches = ustrregexra("`branches'", "\\$`i'", "`var'")
 		}
 	}
 	
-	// tokenize the branches
+	// Tokenize the branches
 	tokenize "`branches'", parse(";")
 	
-	// execute each branch
+	// Execute each branch
 	forvalues i = 1(2)1000 {
 		if ("``i''" == ";") {
 			local id = (`i' + 1) / 2
@@ -41,7 +63,8 @@ program define match_branches
 			error 197
 		}
 		if ("``i''" == "") continue, break
-		match_branch `replace', branch(``i'')
+	
+		match_branch `varlist', branch(``i'')
 	}
 	
 end

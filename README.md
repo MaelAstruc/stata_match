@@ -2,9 +2,9 @@
 
 The purpose of this `match` commands is to ensure that all the possible cases are covered when creating a variable. This might be useful when, after some time, you discover that an issue in your results comes from the second missing value '98', which exists only for 3 variables, while all the others use only '99'. This is a simple mistake easily avoided but sometimes not.
 
-The `match` command combines two commands: `match_branches` and `check_levelsof`.
+The `match` command combines two commands: `switch` and `check_levelsof`.
 
-The `match_branches` command is a simple replacement of the `replace ... = ... if ...` statements. It also adds a `$` replacement character for the matched variables.
+The `switch` command is a simple replacement of the `replace ... = ... if ...` statements. It also adds a `$` replacement character for the matched variables.
 
 The `check_levelsof` command ensures that all levels of the variable have a corresponding value. It raises an error if any is missing and tells you which. It works with a list of variables and the error can be suppressed with the `noerror` option.
 
@@ -27,31 +27,31 @@ replace test_repif = "high" 	if rep78 == 4
 
 // With the match command: match var, replace(newvar) branches(condition @ value; ...)
 gen test_match = ""
-match_branches rep78, replace(test_match) branches( 	///
-	rep78 == 1		@ "low"; 		///
-	rep78 == 3		@ "mid"; 		///
-	rep78 == 4		@ "high"		///
+switch test_match = rep78, branches( 	///
+	rep78 == 1	@ "low"; 	///
+	rep78 == 3	@ "mid"; 	///
+	rep78 == 4	@ "high"	///
 )
 
 assert test_repif == test_match
 
 // A bit of syntactic sugar: '$' replaces var in all the conditions and values
 gen test_dol = ""
-match_branches rep78, replace(test_dol) branches( 	///
-	$ == 1		@ "low";			///
-	$ == 3		@ "mid";			///
-	$ == 4		@ "high" 		        ///
+switch test_dol = rep78, branches( 	///
+	$ == 1	@ "low";		///
+	$ == 3	@ "mid";		///
+	$ == 4	@ "high" 		///
 )
 
 assert test_repif == test_dol
 
 // More syntactic sugar: $1 replaces the first variable, $2 the second, etc
 gen test_dols = ""
-match_branches rep78 price, replace(test_dols) branches( 	///
-	$1 == 1	& $2 <= 5000	@ "low and cheap"; 		///
-	$1 == 1	& $2  > 5000	@ "low and expensive"; 		///
-	$1 == 3			@ "mid"; 			///
-	$1 == 4			@ "high" 			///
+switch test_dols = rep78 + price, branches( 		///
+	$1 == 1	& $2 <= 5000	@ "low and cheap"; 	///
+	$1 == 1	& $2  > 5000	@ "low and expensive"; 	///
+	$1 == 3			@ "mid"; 		///
+	$1 == 4			@ "high" 		///
 )
 
 // Check if of the possibilities are covered
@@ -62,10 +62,10 @@ check_levelsof rep78, replace(test_match) noerror
 
 // Finally, all at once
 gen test_match_levels = ""
-match rep78, replace(test_match_levels) branches( 	///
-	$ == 1		@ "low"; 			///
-	$ == 3		@ "mid"; 			///
-	$ == 4		@ "high" 			///
+match test_match_levels = rep78, branches(	///
+	$ == 1		@ "low"; 		///
+	$ == 3		@ "mid"; 		///
+	$ == 4		@ "high" 		///
 )
 * Warning: missing level '2' for variable 'rep78': 8 observations.
 * Warning: missing level '5' for variable 'rep78': 11 observations.
