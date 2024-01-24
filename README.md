@@ -246,7 +246,7 @@ Missing types
 
 Performance
 
-- Because Stata is a dynamically type language, the levels of the variables are checked at runtime
+- Because Stata is a dynamically typed language, the levels of the variables are checked at runtime
 - The exhaustiveness and usefulness are also checked at run time.
 - While it does not have a large impact on small databases, checking the levels is costly in large databases.
 - According to a quick profiling, the checks are less important compared to getting the levels.
