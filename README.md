@@ -23,33 +23,33 @@ Before presenting the magic of usefulness and exhaustiveness, I need to introduc
 A simple case where the `match` command could be used is when creating a variable from another one with the constant pattern (also called literal).
 
 ```Stata
-	sysuse auto, clear
+    sysuse auto, clear
 
 * Usual way with 'replace newvar = value if condition'
 
-	gen var_1 = ""
-	replace var_1 = "very low"	if rep78 == 1
-	replace var_1 = "low" 		if rep78 == 2
-	replace var_1 = "mid" 		if rep78 == 3
-	replace var_1 = "high" 		if rep78 == 4
-	replace var_1 = "very high"	if rep78 == 5
-	replace var_1 = "missing"	if rep78 == .
+    gen var_1 = ""
+    replace var_1 = "very low"      if rep78 == 1
+    replace var_1 = "low"           if rep78 == 2
+    replace var_1 = "mid"           if rep78 == 3
+    replace var_1 = "high"          if rep78 == 4
+    replace var_1 = "very high"     if rep78 == 5
+    replace var_1 = "missing"       if rep78 == .
 
 * With the match command: match var, variables(newvar) body(condition => value)
 
-	gen var_2 = ""
-	match var_2, variables(rep78) body( ///
-		1 => "very low",				///
-		2 => "low", 	 				///
-		3 => "mid", 	 				///
-		4 => "high", 					///
-		5 => "very high",				///
-		. => "missing",					///
-	)
+    gen var_2 = ""
+    match var_2, variables(rep78) body( ///
+        1 => "very low",                ///
+        2 => "low",                     ///
+        3 => "mid",                     ///
+        4 => "high",                    ///
+        5 => "very high",               ///
+        . => "missing",                 ///
+    )
 
-	assert var_1 == var_2
+    assert var_1 == var_2
 
-	drop var_1 var_2
+    drop var_1 var_2
 ```
 
 In this example we match the simplest pattern: the constant. It can be a number, a string or a missing value. No other types are supported for now. The values in the pattern constant must have the same type as the variable.
@@ -59,23 +59,23 @@ In this example we match the simplest pattern: the constant. It can be a number,
 To define a default value, the wildcard pattern `_` can be used. It covers all the values not called in the previous arms. This means that any arm included after a wildcard are ignored.
 
 ```Stata
-	sysuse auto, clear
+    sysuse auto, clear
 
-	gen var_1 = ""
-	replace var_1 = "very low"	if rep78 == 1
-	replace var_1 = "low" 		if rep78 == 2
-	replace var_1 = "other" 	if var_1 == ""
+    gen var_1 = ""
+    replace var_1 = "very low"      if rep78 == 1
+    replace var_1 = "low"           if rep78 == 2
+    replace var_1 = "other"         if var_1 == ""
 
-	gen var_2 = ""
-	match var_2, variables(rep78) body( ///
-		1 => "very low", 				///
-		2 => "low", 	 				///
-		_ => "other",					///
-	)
+    gen var_2 = ""
+    match var_2, variables(rep78) body( ///
+        1 => "very low",                ///
+        2 => "low",                     ///
+        _ => "other",                   ///
+    )
 
-	assert var_1 == var_2
+    assert var_1 == var_2
 
-	drop var_1 var_2
+    drop var_1 var_2
 ```
 
 ## Range pattern
@@ -83,25 +83,25 @@ To define a default value, the wildcard pattern `_` can be used. It covers all t
 The constant pattern is simple but not practical once we have many values or decimals. In such cases we can us the range pattern.
 
 ```Stata
-	sysuse auto, clear
+    sysuse auto, clear
 
-	gen var_1 = ""
-	replace var_1 = "cheap"		if price >= 0 & price < 6000
-	replace var_1 = "normal" 	if price >= 6000 & price < 9000
-	replace var_1 = "expensive"	if price >= 9000 & price <= 16000
-	replace var_1 = "missing"	if price == .
+    gen var_1 = ""
+    replace var_1 = "cheap"         if price >= 0    & price < 6000
+    replace var_1 = "normal"        if price >= 6000 & price < 9000
+    replace var_1 = "expensive"     if price >= 9000 & price <= 16000
+    replace var_1 = "missing"       if price == .
 
-	gen var_2 = ""
-	match var_2, variables(price) body( ///
-		0~!6000 	=> "cheap",	 		///
-		6000~!9000 	=> "normal", 		///
-		9000~16000	=> "expensive",		///
-		.	 		=> "missing", 		///
-	)
+    gen var_2 = ""
+    match var_2, variables(price) body( ///
+        0~!6000     => "cheap",         ///
+        6000~!9000  => "normal",        ///
+        9000~16000  => "expensive",     ///
+        .           => "missing",       ///
+    )
 
-	assert var_1 == var_2
+    assert var_1 == var_2
 
-	drop var_1 var_2
+    drop var_1 var_2
 ```
 
 A range pattern is composed of three parts. A minimum value on the left hand side, a symbol in the middle and a maximum value on the right hand side. The symbol can be:
@@ -120,25 +120,25 @@ A range pattern is composed of three parts. A minimum value on the left hand sid
 The or pattern is used to combine multiple patterns with the `|` syntax.
 
 ```Stata
-	sysuse auto, clear
+    sysuse auto, clear
 
-	gen var_1 = ""
-	replace var_1 = "low"		if rep78 == 1 | rep78 == 2
-	replace var_1 = "mid" 		if rep78 == 3
-	replace var_1 = "high" 		if rep78 == 4 | rep78 == 5
-	replace var_1 = "missing"	if rep78 == .
+    gen var_1 = ""
+    replace var_1 = "low"           if rep78 == 1 | rep78 == 2
+    replace var_1 = "mid"           if rep78 == 3
+    replace var_1 = "high"          if rep78 == 4 | rep78 == 5
+    replace var_1 = "missing"       if rep78 == .
 
-	gen var_2 = ""
-	match var_2, variables(rep78) body( ///
-		1 | 2 => "low",	 				///
-		3 => "mid", 	 				///
-		4 | 5 => "high",				///
-		. => "missing",					///
-	)
+    gen var_2 = ""
+    match var_2, variables(rep78) body( ///
+        1 | 2   => "low",               ///
+        3       => "mid",               ///
+        4 | 5   => "high",              ///
+        .       => "missing",           ///
+    )
 
-	assert var_1 == var_2
+    assert var_1 == var_2
 
-	drop var_1 var_2
+    drop var_1 var_2
 ```
 
 ## Tuple
@@ -146,25 +146,25 @@ The or pattern is used to combine multiple patterns with the `|` syntax.
 Replacing a variable depending on another is useful but sometimes a variable depends on two other variable. In this case you can use a tuple pattern with the syntax `(y1, y2, ...)` to match multiple variables.
 
 ```Stata
-	sysuse auto, clear
+    sysuse auto, clear
 
-	gen var_1 = ""
-	replace var_1 = "case 1"		if rep78 < 3 & price < 10000
-	replace var_1 = "case 2"		if rep78 < 3 & price >= 10000
-	replace var_1 = "case 3"		if rep78 >= 3
-	replace var_1 = "missing"		if rep78 == . | price == .
+    gen var_1 = ""
+    replace var_1 = "case 1"        if rep78 < 3 & price < 10000
+    replace var_1 = "case 2"        if rep78 < 3 & price >= 10000
+    replace var_1 = "case 3"        if rep78 >= 3
+    replace var_1 = "missing"       if rep78 == . | price == .
 
-	gen var_2 = ""
-	match var_2, variables(rep78, price) body(	///
-		(~!3, ~!10000) 	=> "case 1", 			///
-		(~!3, 10000~) 	=> "case 2", 			///
-		(3~, _) 		=> "case 3", 			///
-		(., _) | (_, .) => "missing",	 		///
-	)
+    gen var_2 = ""
+    match var_2, variables(rep78, price) body(  ///
+        (~!3, ~!10000)      => "case 1",        ///
+        (~!3, 10000~)       => "case 2",        ///
+        (3~, _)             => "case 3",        ///
+        (., _) | (_, .)     => "missing",       ///
+    )
 
-	assert var_1 == var_2
+    assert var_1 == var_2
 
-	drop var_1 var_2
+    drop var_1 var_2
 ```
 
 # Exhaustiveness and usefulness
@@ -174,65 +174,61 @@ Even if the previous examples are simple, we can see that it's easy to mess up s
 To come back to the first example, if we forget to cover the missing value:
 
 ```Stata
-	sysuse auto, clear
+    sysuse auto, clear
 
-	* Usual way with 'replace newvar = value if condition'
+    gen var_1 = ""
+    replace var_1 = "very low"      if rep78 == 1
+    replace var_1 = "low"           if rep78 == 2
+    replace var_1 = "mid"           if rep78 == 3
+    replace var_1 = "high"          if rep78 == 4
+    replace var_1 = "very high"     if rep78 == 5
 
-	gen var_1 = ""
-	replace var_1 = "very low"	if rep78 == 1
-	replace var_1 = "low" 		if rep78 == 2
-	replace var_1 = "mid" 		if rep78 == 3
-	replace var_1 = "high" 		if rep78 == 4
-	replace var_1 = "very high"	if rep78 == 5
-
-	* With the match command: match var, variables(newvar) body(condition => value)
-
-	gen var_2 = ""
-	match var_2, variables(rep78) body( ///
-		1 => "very low",	 			///
-		2 => "low", 		 			///
-		3 => "mid", 		 			///
-		4 => "high", 					///
-		5 => "very high",				///
-	)
+    gen var_2 = ""
+    match var_2, variables(rep78) body( ///
+        1 => "very low",                ///
+        2 => "low",                     ///
+        3 => "mid",                     ///
+        4 => "high",                    ///
+        5 => "very high",               ///
+    )
 ```
 
 Here, we will receive a warning:
 
 ```
-	Warning : Missing values
+    Warning : Missing values
         .
 ```
 
-Including a wildcard pattern or a tuple of wildcard patterns covers all the cases by default. 
+Including a wildcard pattern or a tuple of wildcard patterns covers all the cases by default.
 
 Looking at the range example, we can also mess up the ranges and cover some cases multiple times.
 
 ```Stata
-	sysuse auto, clear
+    sysuse auto, clear
 
-	gen var_1 = ""
-	replace var_1 = "cheap"		if price >= 0 & price <= 6000
-	replace var_1 = "normal" 	if price >= 6000 & price <= 9000
-	replace var_1 = "expensive"	if price >= 9000 & price <= 15000
-	replace var_1 = "missing"	if price == .
+    gen var_1 = ""
+    replace var_1 = "cheap"         if price >= 0    & price <= 6000
+    replace var_1 = "normal"        if price >= 6000 & price <= 9000
+    replace var_1 = "expensive"     if price >= 9000 & price <= 15000
+    replace var_1 = "missing"       if price == .
 
-	gen var_2 = ""
-	match var_2, variables(rep78) body( ///
-		0~6000 	=> "cheap",	 			///
-		6000~9000 	=> "normal", 		///
-		9000~15000	=> "expensive",		///
-		.	 		=> "missing", 		///
-	)
+    gen var_2 = ""
+    match var_2, variables(rep78) body( ///
+        0~6000      => "cheap",         ///
+        6000~9000   => "normal",        ///
+        9000~15000  => "expensive",     ///
+        .           => "missing",       ///
+    )
 ```
 
 In this case we will receive another warning:
 
 ```
-	Warning : Arm 2 has overlaps
-		Arm 1: 6000
-	Warning : Arm 3 has overlaps
-		Arm 2: 9000
+    Warning : Arm 2 has overlaps
+        Arm 1: 6000
+    Warning : Arm 3 has overlaps
+        Arm 2: 9000
 ```
 
 ## Limitations
