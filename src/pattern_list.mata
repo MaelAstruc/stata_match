@@ -185,10 +185,19 @@ void PatternList::trim() {
 }
 
 // Replace a value at a given index
-void PatternList::replace(pointer scalar value, real scalar index) {
+void PatternList::replace(transmorphic scalar value, real scalar index) {
+    transmorphic scalar new_value
+    
     check_range(index, "replace")
 
-    this.patterns[index] = value
+    if (eltype(value) == "pointer") {
+        this.patterns[index] = value
+    }
+    else {
+        new_value = value // Copy value before reference
+        this.patterns[index] = &new_value
+    }
+    
 }
 
 // Get the pointer at a given index
