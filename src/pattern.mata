@@ -617,30 +617,30 @@ void POr::insert(transmorphic scalar pattern, | real scalar check_includes) {
 
 transmorphic scalar POr::compress() {
     class POr scalar por
-    class Pattern scalar pattern
+    class Pattern scalar pattern, new_pattern
     real scalar i
 
     for (i = 1; i <= this.len(); i++) {
         pattern = this.patterns.get_pat(i)
-        pattern = pattern.compress()
-        if (classname(pattern) == "PEmpty") {
-            this.patterns.swap_remove(i)
-            i--
+        new_pattern = pattern.compress()
+        if (classname(new_pattern) == "PEmpty") {
+            continue
         }
-        else if (classname(pattern) == "PWild") {
-            return(pattern)
+        else if (classname(new_pattern) == "PWild") {
+            return(new_pattern)
+        }
+        else {
+            por.insert(new_pattern, 1) 
         }
     }
 
-    if (this.len() == 0) {
+    if (por.len() == 0) {
         return(PEmpty())
     }
-    if (this.len() == 1) {
-        return(this.patterns.get_pat(1))
+    if (por.len() == 1) {
+        return(por.patterns.get_pat(1))
     }
     else {
-        por = this
-        por.patterns.trim()
         return(por)
     }
 }
