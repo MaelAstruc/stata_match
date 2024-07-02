@@ -726,6 +726,7 @@ real scalar POr::includes(transmorphic scalar pattern) {
     class PRange scalar prange
     class POr scalar por
     transmorphic scalar new_pattern
+    pointer vector difference
     real scalar i
 
     check_pattern(pattern)
@@ -734,12 +735,12 @@ real scalar POr::includes(transmorphic scalar pattern) {
         return(1)
     }
     else {
-        por = POr()
-        por.define(difference_list(pattern, this.patterns))
-
-        new_pattern = por.compress()
-
-        if (classname(new_pattern) == "PEmpty") {
+        difference = difference_list(pattern, this.patterns)
+    
+        if (length(difference) > 1) {
+            return(0)
+        }
+        else if (classname(*difference[1]) == "PEmpty") {
             return(1)
         }
         else {
@@ -850,7 +851,7 @@ pointer vector difference_list(class Pattern scalar pattern, class PatternList s
     class PatternList scalar differences, new_differences
     class Pattern scalar pattern_i, difference_j
     real scalar i, j
-
+    
     differences = PatternList()
     differences.push(&pattern)
 
