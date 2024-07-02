@@ -6,9 +6,7 @@ class Arm vector function parse_string( ///
     ) {
     pointer scalar t
 
-    t = tokeninitstata()
-    tokenpchars(t, ("=>", ",", "~", "!~", "~!", "!!", "(", ")"))
-    tokenset(t, str)
+    t = tokenize(str)
 
     return(parse_arms(&t, variables))
 }
@@ -272,6 +270,16 @@ string scalar function parse_value(pointer t) {
 }
 
 ////////////////////////////////////////////////////////////////////////// Utils
+
+pointer scalar function tokenize(string scalar str) {
+    pointer scalar t
+    
+    t = tokeninitstata()
+    tokenpchars(t, ("=>", ",", "~", "!~", "~!", "!!", "(", ")"))
+    tokenset(t, str)
+    
+    return(t)
+}
 
 string scalar function consume(pointer t, string scalar str) {
     pointer scalar _
