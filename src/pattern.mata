@@ -122,7 +122,13 @@ string scalar PConstant::to_string() {
     if (isstring(this.value)) {
         return(sprintf("%s", this.value))
     }
-    if (isreal(this.value)) return(strofreal(this.value))
+    else if (isreal(this.value)) {
+        return(strofreal(this.value))
+    }
+    else {
+        errprintf("Constant pattern value should be real or string")
+        error(_error(3254))
+    }
 }
 
 string scalar PConstant::to_expr(string scalar variable) {
