@@ -48,11 +48,23 @@ pointer scalar PEmpty::difference(transmorphic scalar pattern) {
 
 ////////////////////////////////////////////////////////////////////////// PWild
 
-string scalar PWild::to_string() {
-    return("_")
 void PWild::define(class Variable scalar variable) { 
     this.values = &variable.values
 }
+
+string scalar PWild::to_string(| real scalar all) {
+    class Pattern scalar patterns
+    
+    if (args() == 0) {
+        return("_")
+    }
+    else if (this.values == NULL) {
+        return("")
+    }
+    else {
+        patterns = *this.values
+        return(patterns.to_string())
+    }
 }
 
 void PWild::print() {
