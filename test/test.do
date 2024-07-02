@@ -33,7 +33,7 @@ run "./test/utils.do"
 ////////////////////////////////////////////////////////////////////// RUN TESTS
 
 // TODO: run "./test/test_variables.do"
-// TODO: run "./test/test_patterns.do"
+run "./test/test_patterns.do"
 // TODO: run "./test/test_arm.do"
 // TODO: run "./test/test_parser.do"
 // TODO: run "./test/test_algorithm.do"
