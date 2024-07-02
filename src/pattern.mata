@@ -574,32 +574,43 @@ void POr::define(pointer vector patterns, | real scalar check_includes) {
 
 void POr::insert(transmorphic scalar pattern, | real scalar check_includes) {
     class POr scalar por
+    transmorphic scalar pattern_copy
+    pointer scalar pattern_ref
     real scalar i
+    
+    pattern_copy = pattern // To avoid bad references
 
-    check_pattern(*pattern)
+    if (eltype(pattern) != "pointer") {
+        pattern_ref = &pattern_copy
+    }
+    else {
+        pattern_ref = pattern_copy
+    }
+    
+    check_pattern(*pattern_ref)
 
     if (args() == 1) {
         check_includes = 0
     }
 
-    if (classname(*pattern) == "PEmpty") {
+    if (classname(*pattern_ref) == "PEmpty") {
         // Ignore
     }
-    else if (classname(*pattern) == "POr") {
+    else if (classname(*pattern_ref) == "POr") {
         // Flatten the Or pattern
-        por = *pattern
+        por = *pattern_ref
         for (i = 1; i <= por.len(); i++) {
             this.insert(por.patterns.get(i), check_includes)
         }
     }
     else {
         if (check_includes) {
-            if (this.includes(*pattern) == 0) {
-                this.patterns.push(pattern)
+            if (this.includes(*pattern_ref) == 0) {
+                this.patterns.push(pattern_ref)
             }
         }
         else {
-            this.patterns.push(pattern)
+            this.patterns.push(pattern_ref)
         }
     }
 }
