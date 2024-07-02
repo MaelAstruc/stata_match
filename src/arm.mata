@@ -6,7 +6,7 @@ string scalar Arm::to_string() {
     pattern = *this.lhs.pattern
     return(
         sprintf(
-            "Arm %f: Tuple: %s  /  Value: %s\n",
+            "Arm %f: Tuple: %s / Value: %s",
             this.id, pattern.to_string(), this.value
         )
     )
