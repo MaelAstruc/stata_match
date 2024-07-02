@@ -6,7 +6,7 @@ mata clear
 
 // The parent class for all patterns
 class Pattern {
-    virtual void print()
+    virtual void define(), print()
     virtual string scalar to_string(), to_expr()
     virtual transmorphic overlap()
     virtual transmorphic scalar compress()
@@ -16,7 +16,7 @@ class Pattern {
 
 // Empty pattern
 class PEmpty extends Pattern {
-    virtual void print()
+    virtual void define(), print()
     virtual string scalar to_string(), to_expr()
     virtual transmorphic overlap()
     virtual transmorphic scalar compress()
@@ -28,7 +28,7 @@ class PEmpty extends Pattern {
 class PWild extends Pattern {
     pointer scalar values
 
-    virtual void print()
+    virtual void define(), print()
     virtual string scalar to_string(), to_expr()
     virtual transmorphic overlap()
     virtual transmorphic scalar compress()
@@ -125,7 +125,7 @@ class Variable {
     void print(), init(), init_type(), init_values()
 }
 
-/////////////////////////////////////////////////////////////////////////// Arm
+//////////////////////////////////////////////////////////////////////////// Arm
 
 struct LHS {
     real scalar arm_id

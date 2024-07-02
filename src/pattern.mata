@@ -2,6 +2,10 @@ mata
 
 ///////////////////////////////////////////////////////////////////////// PEmpty
 
+void PEmpty::define() { 
+    // Does nothing, it's empty
+}
+
 string scalar PEmpty::to_string() {
     return("Empty")
 }
@@ -46,6 +50,9 @@ pointer scalar PEmpty::difference(transmorphic scalar pattern) {
 
 string scalar PWild::to_string() {
     return("_")
+void PWild::define(class Variable scalar variable) { 
+    this.values = &variable.values
+}
 }
 
 void PWild::print() {

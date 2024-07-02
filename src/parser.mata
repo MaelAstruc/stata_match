@@ -129,7 +129,7 @@ class PWild scalar function parse_wild(class Variable scalar variable) {
     class PWild scalar pwild
 
     pwild = PWild()
-    pwild.values = &variable.values
+    pwild.define(variable)
     return(pwild)
 }
 
