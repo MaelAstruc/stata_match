@@ -251,25 +251,6 @@ void PRange::define( ///
         real scalar in_max, ///
         real scalar discrete ///
 ) {
-    this.min = min
-    this.max = max
-
-    if (isbool(in_min)) {
-        this.in_min = in_min
-    }
-    else {
-        errprintf("Range pattern min inclusion should be 0 or 1\n")
-        exit(_error(3498))
-    }
-
-    if (isbool(in_max)) {
-        this.in_max = in_max
-    }
-    else {
-        errprintf("Range pattern max inclusion should be 0 or 1\n")
-        exit(_error(3498))
-    }
-
     if (isbool(discrete)) {
         this.discrete = discrete
     }
@@ -277,6 +258,47 @@ void PRange::define( ///
         errprintf("Range discrete field should be 0 or 1\n")
         exit(_error(3498))
     }
+
+    if (isbool(in_min) & isbool(in_max)) {
+        this.in_min = in_min
+        this.in_max = in_max
+    }
+    else {
+        errprintf("Range pattern min and max inclusion should be 0 or 1\n")
+        exit(_error(3498))
+    }
+    
+    if (min == . | max == .) {
+        errprintf("Range boundaries should be non-missing reals\n")
+        exit(_error(3253))
+    }
+    
+    // TODO: Decide where to check it in rest of code
+    // if (min > max) {
+    //     errprintf("Range minimum (%s) should be smaller than its maximum (%s)\n", min, max)
+    //     exit(_error(3498))
+    // }
+    
+    if (this.discrete == 1) {
+        if (!isint(min) | !isint(max)) {
+            errprintf("Range is discrete but boundaries are not integers\n")
+            exit(_error(3498))
+        }
+    }
+    
+    this.min = min
+    this.max = max
+}
+
+string scalar PRange::to_string() {
+    string scalar sym
+
+    if (in_min == 0 & in_max == 0) sym = "!!"
+    if (in_min == 0 & in_max == 1) sym = "!~"
+    if (in_min == 1 & in_max == 0) sym = "~!"
+    if (in_min == 1 & in_max == 1) sym = "~"
+
+    return(sprintf("%f%s%f", this.min, sym, this.max))
 }
 
 transmorphic scalar PRange::compress() {
@@ -311,17 +333,6 @@ transmorphic scalar PRange::compress() {
     else {
         return(this)
     }
-}
-
-string scalar PRange::to_string() {
-    string scalar sym
-
-    if (in_min == 0 & in_max == 0) sym = "!!"
-    if (in_min == 0 & in_max == 1) sym = "!~"
-    if (in_min == 1 & in_max == 0) sym = "~!"
-    if (in_min == 1 & in_max == 1) sym = "~"
-
-    return(sprintf("%f%s%f", this.min, sym, this.max))
 }
 
 string scalar PRange::to_expr(string scalar variable) {
@@ -763,6 +774,10 @@ transmorphic function por_difference( ///
 
 real scalar function isbool(real scalar x) {
     return(x == 0 | x == 1)
+}
+
+real scalar function isint(real scalar x) {
+    return(x == trunc(x))
 }
 
 real scalar function ispattern(transmorphic x) {
