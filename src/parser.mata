@@ -36,17 +36,19 @@ class Arm scalar function parse_arm ( ///
         class Variable vector variables ///
     ) {
     class Arm scalar arm
-    class Tuple scalar tuple
-    pointer scalar _
-    real scalar i
 
     arm     = Arm()
     arm.id = arm_id
     arm.lhs.arm_id = arm_id
 
-    arm.lhs.pattern = &parse_or(t, variables, arm_id)
+    if (length(variables) == 1) {
+        arm.lhs.pattern = &parse_or(t, variables, arm_id)
+    }
+    else {
+        arm.lhs.pattern = &parse_tuples(t, variables, arm_id)
+    }
 
-    check_next(t, "=>")
+    check_next(t, "=>", arm_id)
 
     arm.value = parse_value(t)
 
@@ -205,15 +207,13 @@ class POr scalar function parse_or( ///
 ) {
     class POr scalar por
     real scalar check_includes
-    string scalar _
 
     check_includes = 1
 
     por = POr()
     por.insert(&parse_pattern(t, variables, arm_id), check_includes)
 
-    while (tokenpeek(*t) == "|") {
-        _ = tokenget(*t)
+    while (match_next(t, "|")) {
         por.insert(&parse_pattern(t, variables, arm_id), check_includes)
     }
 
@@ -226,13 +226,14 @@ class Tuple scalar function parse_tuple( ///
     real scalar arm_id ///
 ) {
     class Tuple scalar tuple
-    string scalar _
     real scalar i
 
     tuple = Tuple()
     tuple.patterns = J(1, length(variables), NULL)
 
     i = 0
+    
+    check_next(t, "(", arm_id)
 
     do {
         i++
@@ -243,11 +244,11 @@ class Tuple scalar function parse_tuple( ///
             )
             exit(_error(3300))
         }
-        _ = tokenget(*t)
+        
         tuple.patterns[i] = &parse_or(t, variables[i], arm_id)
-    } while (tokenpeek(*t) == ",")
+    } while (match_next(t, ","))
 
-    check_next(t, ")")
+    check_next(t, ")", arm_id)
 
     if (i != length(variables)) {
         errprintf(
@@ -258,6 +259,26 @@ class Tuple scalar function parse_tuple( ///
     }
 
     return(tuple)
+}
+
+class POr scalar function parse_tuples( ///
+    pointer t, ///
+    class Variable vector variables, ///
+    real scalar arm_id ///
+) {
+    class POr scalar por
+    real scalar check_includes
+
+    check_includes = 1
+
+    por = POr()
+    por.insert(&parse_tuple(t, variables, arm_id), check_includes)
+
+    while (match_next(t, "|")) {
+        por.insert(&parse_tuple(t, variables, arm_id), check_includes)
+    }
+
+    return(por)
 }
 
 //////////////////////////////////////////////////////////////////// Parse Value
@@ -297,12 +318,27 @@ string scalar function consume(pointer t, string scalar str) {
     return(value)
 }
 
-void function check_next(pointer t, string scalar str) {
+real scalar function match_next(pointer t, string scalar str) {
+    string scalar next, _
+
+    next = tokenpeek(*t)
+    
+    if (next == str) {
+        _ = tokenget(*t)
+        return(1)
+    }
+    else {
+        return(0)
+    }
+}
+
+void function check_next(pointer t, string scalar str, real scalar arm_id) {
     string scalar next
 
     next = tokenget(*t)
+    
     if (next != str) {
-        errprintf("Expect '%s', found: '%s'\n", str, next)
+        errprintf("Expect '%s' in arm %f, found: '%s'\n", str, arm_id, next)
         exit(_error(3499))
     }
 }
