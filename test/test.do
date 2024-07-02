@@ -14,6 +14,17 @@ as I add new features.
 
 ///////////////////////////////////////////////////////////////////////// SET-UP
 
+* Set up environment
+
+clear all
+
+mata
+mata clear
+end
+
+mata set matastrict on
+mata set matalnum off
+
 * Charge the package
 
 run "main.do"
@@ -37,7 +48,7 @@ run "./test/test_patterns.do"
 // TODO: run "./test/test_arm.do"
 // TODO: run "./test/test_parser.do"
 // TODO: run "./test/test_algorithm.do"
-// TODO: run "./test/test_end_to_end.do"
+// TODO: run do "./test/test_end_to_end.do"
 
 mata: mata drop test_*()
 
