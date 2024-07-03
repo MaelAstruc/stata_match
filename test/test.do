@@ -20,10 +20,9 @@ clear all
 
 mata
 mata clear
-end
-
 mata set matastrict on
 mata set matalnum off
+end
 
 * Charge the package
 
@@ -48,7 +47,7 @@ run "./test/test_patterns.do"
 // TODO: run "./test/test_arm.do"
 // TODO: run "./test/test_parser.do"
 // TODO: run "./test/test_algorithm.do"
-// TODO: run do "./test/test_end_to_end.do"
+run "./test/test_end_to_end.do"
 
 mata: mata drop test_*()
 
