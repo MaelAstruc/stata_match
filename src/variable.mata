@@ -45,7 +45,8 @@ void Variable::init_values() {
     real vector selection
     class PRange scalar prange
     class PConstant scalar pconstant
-    real scalar i, min, max, n_miss
+    real scalar i, min, max, n_miss, precision
+    real matrix data
 
     // We don't need to check if value is already included in POr pattern
     check_includes = 0
@@ -68,22 +69,26 @@ void Variable::init_values() {
         }
     }
     else if (this.type == "int" | this.type == "float") {
-        //st_sview(x="", ., this.name)
-        stata(sprintf("quietly summarize %s", this.name))
-        stata("local minimum = r(min)")
-        stata("local maximum = r(max)")
-        min = strtoreal(st_local("minimum"))
-        max = strtoreal(st_local("maximum"))
+        st_view(data=., ., this.name)
+        
+        min = min(data)
+        max = max(data)
+        
+        if (this.type == "float") {
+        	// Due to rounding approximations, we need to extend the boundaries
+            precision = 0.00000001
+            
+        	min = min - precision
+        	max = max + precision
+        }
+        
         timer_off(24)
 
         prange = PRange()
         prange.define(min, max, 1, 1, this.type == "int")
         this.values.insert(&prange, check_includes)
 
-        stata(sprintf("quietly count if missing(%s)", this.name))
-
-        stata("local n_miss = r(N)")
-        n_miss = strtoreal(st_local("n_miss"))
+        n_miss = missing(data)
         if (n_miss > 0) {
             pconstant = PConstant()
             pconstant.define(.)

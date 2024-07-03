@@ -154,14 +154,17 @@ class PRange scalar function parse_range( ///
 ) {
     class PRange scalar prange
     string scalar next, _
-    real scalar number, max, in_min, in_max
-
-    stata(sprintf("quietly summarize %s", variable.name))
-    stata("local minimum = r(min)")
-    stata("local maximum = r(max)")
-
+    real scalar number, max, in_min, in_max, precision
+    real matrix data
+    
+    st_view(data=., ., variable.name)
+    precision = 0.00000001
+    
     if (min == .) {
-        min = strtoreal(st_local("minimum"))
+        min = min(data)
+        if (variable.type == "float") {
+        	min = min - precision
+        }
     }
 
     next = tokenpeek(*t)
@@ -171,7 +174,10 @@ class PRange scalar function parse_range( ///
         max = number
     }
     else {
-        max = strtoreal(st_local("maximum"))
+        max = max(data)
+        if (variable.type == "float") {
+            max = max + precision
+        }
     }
 
     if (symbole == "~") {
