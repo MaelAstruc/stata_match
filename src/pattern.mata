@@ -98,7 +98,7 @@ pointer scalar PWild::difference(transmorphic scalar pattern) {
     check_pattern(pattern)
 
     values = *this.get_values()
-
+    
     return(values.difference(pattern))
 }
 
@@ -492,11 +492,11 @@ pointer scalar PRange::difference(transmorphic scalar pattern) {
     transmorphic scalar overlap
     pointer vector differences, new_differences
     class PEmpty scalar pempty
-    class PConstant scalar pconstant
+    class PConstant scalar pconstant, pconstant_min, pconstant_max
     class PRange scalar prange
     class POr scalar por, result
     class PRange scalar prange_1, prange_2
-    real scalar i, j
+    real scalar i, j, new_in_min, new_in_max
 
     check_pattern(pattern)
 
@@ -513,34 +513,86 @@ pointer scalar PRange::difference(transmorphic scalar pattern) {
     else if (classname(overlap) == "PConstant") {
         pconstant = overlap
 
-        prange_1 = PRange()
-        prange_2 = PRange()
-
-        prange_1.define(this.min, pconstant.value, this.in_min, 0, this.discrete)
-        prange_2.define(pconstant.value, this.max, 0, this.in_max, this.discrete)
-
+        if (pconstant.value < this.min | pconstant.value > this.max) {
+            return(&this)
+        }
+        
         result = POr()
-
-        result.insert(&prange_1.compress(), 1)
-        result.insert(&prange_2.compress(), 1)
-
-        return(&result)
+        
+        if (pconstant.value != this.min) {
+            prange_1 = PRange()
+            prange_1.define(this.min, pconstant.value, this.in_min, 0, this.discrete)
+            result.insert(&prange_1)
+        }
+        
+        if (pconstant.value != this.max) {
+            prange_2 = PRange()
+            prange_2.define(pconstant.value, this.max, 0, this.in_max, this.discrete)
+            result.insert(&prange_2)
+        }
+        
+        return(&result.compress())
     }
     else if (classname(overlap) == "PRange") {
         prange = overlap
 
-        prange_1 = PRange()
-        prange_2 = PRange()
-
-        prange_1.define(this.min, prange.min, this.in_min, !prange.in_min, this.discrete)
-        prange_2.define(prange.max, this.max, !prange.in_max, this.in_max, this.discrete)
-
+        if (prange.max < this.min | prange.min > this.max) {
+            return(&this)
+        }
+        
         result = POr()
-
-        result.insert(&prange_1.compress(), 1)
-        result.insert(&prange_2.compress(), 1)
-
-        return(&result)
+        
+        // First half
+        if (prange.min < this.min) {
+            // Nothing there is no first half
+        }
+        if (prange.min == this.min) {
+            // Only possible value: the min if included in this but not in other
+            if (this.in_min & !prange.in_min) {
+                pconstant_min = PConstant()
+                pconstant_min.define(this.min)
+                result.insert(&pconstant_min)
+            }
+        }
+        else {
+            if (prange.min == this.max) {
+                new_in_max = this.in_max & !prange.in_min
+            }
+            else {
+                new_in_max = !prange.in_min
+            }
+            
+            prange_1 = PRange()
+            prange_1.define(this.min, prange.min, this.in_min, new_in_max, this.discrete)
+            result.insert(&prange_1)
+        }
+        
+        // Second half
+        if (prange.max > this.max) {
+            // Nothing there is no second half
+        }
+        if (prange.max == this.max) {
+            // Only possible value: the max if included in this but not in other
+            if (this.in_max & !prange.in_max) {
+                pconstant_max = PConstant()
+                pconstant_max.define(this.max)
+                result.insert(&pconstant_max)
+            }
+        }
+        else {
+            if (prange.max == this.min) {
+                new_in_min = this.in_min & !prange.in_max
+            }
+            else {
+                new_in_min = !prange.in_max
+            }
+            
+            prange_2 = PRange()
+            prange_2.define(prange.max, this.max, new_in_min, this.in_max, this.discrete)
+            result.insert(&prange_2)
+        }
+        
+        return(&result.compress())
     }
     else if (classname(overlap) == "POr") {
         por = overlap
@@ -755,12 +807,12 @@ pointer scalar POr::difference(transmorphic scalar pattern) {
     real scalar i
 
     differences = POr()
-
+    
     // Loop over all patterns in Or and compute the difference
     for (i = 1; i <= this.len(); i++) {
         differences.insert(por_difference(this, i, pattern))
     }
-
+    
     if (differences.len() == 0) {
         pempty = PEmpty()
         return(&pempty)
@@ -776,7 +828,6 @@ transmorphic function por_difference( ///
     class Pattern scalar pattern ///
 ) {
     class Pattern scalar pattern_i
-
 
     pattern_i = por.patterns.get_pat(i)
     return(pattern_i.difference(pattern))
