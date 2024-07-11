@@ -728,23 +728,255 @@ function test_por_overlap() {
 
 // PEmpty
 
-// TODO
+function test_pempty_includes() {
+    class PEmpty scalar pempty, pempty_1
+    class PConstant scalar pconstant
+    real scalar included
+    
+    pempty = PEmpty()
+    
+    pempty_1 = PEmpty()
+    
+    included = pempty.includes(pempty_1)
+    test_result("Test PEmpty::includes() empty", strofreal(included), "1")
+    
+    pconstant = PConstant()
+    pconstant.define(1)
+    
+    included = pempty.includes(pconstant)
+    test_result("Test PEmpty::includes() constant", strofreal(included), "0")
+}
 
 // PWild
 
-// TODO
+function test_pwild_includes() {
+    class PWild scalar pwild
+    class PEmpty scalar pempty
+    class PConstant scalar pconstant
+    class PRange scalar prange
+    class POr scalar por
+    real scalar included
+    
+    pwild = PWild()
+    
+    pempty = PEmpty()
+    included = pwild.includes(pempty)
+    test_result("Test PWild::includes() empty", strofreal(included), "1")
+    
+    pconstant = PConstant()
+    pconstant.define(1)
+    included = pwild.includes(pconstant)
+    test_result("Test PWild::includes() constant", strofreal(included), "1")
+    
+    prange = PRange()
+    prange.define(0, 2, 1, 1, 1)
+    included = pwild.includes(prange)
+    test_result("Test PWild::includes() range", strofreal(included), "1")
+    
+    por = POr()
+    por.insert(pconstant)
+    por.insert(prange)
+    included = pwild.includes(por)
+    test_result("Test PWild::includes() or", strofreal(included), "1")
+}
 
 // PConstant
 
-// TODO
+function test_pconstant_includes() {
+    class PConstant scalar pconstant, pconstant_1, pconstant_2
+    class PEmpty scalar pempty
+    class PRange scalar prange_1, prange_2, prange_3
+    class POr scalar por
+    class Pattern scalar overlap
+    real scalar included
+    
+    pconstant = PConstant()
+    pconstant.define(1)
+    
+    pempty = PEmpty()
+    included = pconstant.includes(pempty)
+    test_result("Test PConstant::includes() empty", strofreal(included), "1")
+    
+    // PWild is equivalent to POr on its values
+    
+    pconstant_1 = PConstant()
+    pconstant_1.define(1)
+    included = pconstant.includes(pconstant_1)
+    test_result("Test PConstant::includes() same constant", strofreal(included), "1")
+    
+    pconstant_2 = PConstant()
+    pconstant_2.define(2)
+    included = pconstant.includes(pconstant_2)
+    test_result("Test PConstant::includes() other constant", strofreal(included), "0")
+    
+    prange_1 = PRange()
+    prange_1.define(1, 1, 1, 1, 1)
+    included = pconstant.includes(prange_1)
+    test_result("Test PConstant::includes() range constant", strofreal(included), "1")
+    
+    prange_2 = PRange()
+    prange_2.define(0, 2, 1, 1, 1)
+    included = pconstant.includes(prange_2)
+    test_result("Test PConstant::includes() range in", strofreal(included), "0")
+    
+    prange_3 = PRange()
+    prange_3.define(2, 3, 1, 1, 1)
+    included = pconstant.includes(prange_3)
+    test_result("Test PConstant::includes() range out", strofreal(included), "0")
+    
+    por = POr()
+    
+    por.insert(pconstant_1)
+    included = pconstant.includes(por)
+    test_result("Test PConstant::includes() or in", strofreal(included), "1")
+    
+    por.insert(pconstant_2)
+    included = pconstant.includes(por)
+    test_result("Test PConstant::includes() or out", strofreal(included), "0")
+}
 
 // PRange
 
-// TODO
+function test_prange_includes() {
+    class PRange scalar prange, prange_1, prange_2, prange_3, prange_4, prange_5, prange_6, prange_7
+    class PEmpty scalar pempty
+    class PConstant scalar pconstant_1, pconstant_2
+    class POr scalar por
+    class Pattern scalar overlap
+    real scalar included
+    
+    prange = PRange()
+    prange.define(0, 3, 1, 1, 1)
+    
+    pempty = PEmpty()
+    included = prange.includes(pempty)
+    test_result("Test PRange::includes() empty", strofreal(included), "1")
+    
+    pconstant_1 = PConstant()
+    pconstant_1.define(1)
+    included = prange.includes(pconstant_1)
+    test_result("Test PRange::includes() constant in", strofreal(included), "1")
+    
+    pconstant_2 = PConstant()
+    pconstant_2.define(5)
+    included = prange.includes(pconstant_2)
+    test_result("Test PRange::includes() constant out", strofreal(included), "0")
+    
+    // PWild is equivalent to POr on its values
+    
+    prange_1 = PRange()
+    prange_1.define(0, 3, 1, 1, 1)
+    included = prange.includes(prange_1)
+    test_result("Test PRange::includes() same range", strofreal(included), "1")
+    
+    prange_2 = PRange()
+    prange_2.define(1, 2, 1, 1, 1)
+    included = prange.includes(prange_2)
+    test_result("Test PRange::includes() range in", strofreal(included), "1")
+    
+    prange_3 = PRange()
+    prange_3.define(10, 20, 1, 1, 1)
+    included = prange.includes(prange_3)
+    test_result("Test PRange::includes() range out", strofreal(included), "0")
+    
+    prange_4 = PRange()
+    prange_4.define(0, 3, 0, 1, 1)
+    included = prange_4.includes(prange) // reverse
+    test_result("Test PRange::includes() min out", strofreal(included), "0")
+    
+    prange_5 = PRange()
+    prange_5.define(0, 3, 1, 0, 1)
+    included = prange_5.includes(prange) // reverse
+    test_result("Test PRange::includes() max out", strofreal(included), "0")
+    
+    prange_6 = PRange()
+    prange_6.define(-1, 1, 1, 1, 1)
+    included = prange.includes(prange_6)
+    test_result("Test PRange::includes() low", strofreal(included), "0")
+    
+    prange_7 = PRange()
+    prange_7.define(2, 4, 1, 1, 1)
+    included = prange.includes(prange_7)
+    test_result("Test PRange::includes() high", strofreal(included), "0")
+    
+    por = POr()
+    por.insert(pconstant_1)
+    included = prange.includes(por)
+    test_result("Test PRange::includes() or in", strofreal(included), "1")
+    
+    por.insert(pconstant_2)
+    included = prange.includes(por)
+    test_result("Test PRange::includes() or out", strofreal(included), "0")
+}
 
 // POr
 
-// TODO
+function test_por_includes() {
+    class POr scalar por, por_1
+    class PConstant scalar pconstant_1, pconstant_2, pconstant_3
+    class PRange scalar prange_1, prange_2, prange_3, prange_4
+    real scalar included
+    
+    // POr : (0 | 1~4)
+    
+    por = POr()
+    
+    pconstant_1 = PConstant()
+    pconstant_1.define(0)
+    
+    prange_1 = PRange()
+    prange_1.define(1, 4, 1, 1, 1)
+    
+    por.insert(pconstant_1)
+    por.insert(prange_1)
+    
+    included = por.includes(pconstant_1)
+    test_result("Test POr::includes() constant in", strofreal(included), "1")
+    
+    pconstant_2 = PConstant()
+    pconstant_2.define(2)
+    
+    included = por.includes(pconstant_2)
+    test_result("Test POr::includes() constant in 2", strofreal(included), "1")
+    
+    pconstant_3 = PConstant()
+    pconstant_3.define(-1)
+    
+    included = por.includes(pconstant_3)
+    test_result("Test POr::includes() constant out", strofreal(included), "0")
+    
+    prange_2 = PRange()
+    prange_2.define(2, 3, 1, 1, 1)
+    
+    included = por.includes(prange_2)
+    test_result("Test POr::includes() range in", strofreal(included), "1")
+    
+    prange_3 = PRange()
+    prange_3.define(-3, -1, 1, 1, 1)
+    
+    included = por.includes(prange_3)
+    test_result("Test POr::includes() range out", strofreal(included), "0")
+    
+    prange_4 = PRange()
+    prange_4.define(0, 2, 1, 1, 1) // = (0 | 1 | 2) in (0 | 1~4)
+    
+    included = por.includes(prange_4)
+    test_result("Test POr::includes() range in across patterns", strofreal(included), "1")
+    
+    por_1 = POr()
+    
+    por_1.insert(pconstant_1)
+    included = por.includes(por_1)
+    test_result("Test POr::includes() or in 1 element", strofreal(included), "1")
+    
+    por_1.insert(prange_2)
+    included = por.includes(por_1)
+    test_result("Test POr::includes() or in 2 elements", strofreal(included), "1")
+    
+    por_1.insert(pconstant_2)
+    included = por.includes(por_1)
+    test_result("Test POr::includes() or out", strofreal(included), "1")    
+}
 
 /////////////////////////////////////////////////////////////////// difference()
 
@@ -831,11 +1063,11 @@ test_por_overlap()
 
 // includes()
 
-// test_pempty_includes()
-// test_pwild_includes()
-// test_pconstant_includes()
-// test_prange_includes()
-// test_por_includes()
+test_pempty_includes()
+test_pwild_includes()
+test_pconstant_includes()
+test_prange_includes()
+test_por_includes()
 // test_ptuple_includes()
 
 // difference()

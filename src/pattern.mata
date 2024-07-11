@@ -220,7 +220,7 @@ real scalar PConstant::includes(transmorphic scalar pattern) {
     else if (classname(pattern) == "POr") {
         por = pattern
         for (i = 1; i <= por.len(); i++) {
-            if (!this.includes(por.patterns.get(i))) {
+            if (!this.includes(*por.patterns.get(i))) {
                 return(0)
             }
         }
@@ -480,7 +480,7 @@ real scalar PRange::includes(transmorphic scalar pattern) {
         por = pattern
 
         for (i = 1; i <= por.len(); i++) {
-            if (!this.includes(por.patterns.get(i))) {
+            if (!this.includes(*por.patterns.get(i))) {
                 return(0)
             }
         }
