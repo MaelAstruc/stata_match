@@ -9,24 +9,50 @@ capture: program drop test_variables
 mata
 
 /*
+A simple function to concatenate and display errors
+*/
+function display_errors(string rowvector errors) {
+    string scalar str
+    real scalar i, n
+
+    if (length(errors) == 0) {
+        return
+    }
+
+    str = "{err}" + errors[1]
+
+    n = length(errors)
+
+    for (i = 2; i <= n; i = i + 1) {
+        str = str + "\n" + errors[i]
+    }
+
+    printf(str)
+}
+
+/*
 Wrapper function to compare two results in string format and keep track of the
 number of tests that passed or failed and the corresponding errors.
 */
 function test_result(string scalar test_name, string scalar result, string scalar expected) {
-    string scalar new_error, all_errors
-    real scalar passed, failed
+    pointer(real scalar) PASSED, FAILED
+    pointer(string scalar) ERRORS
+    string scalar new_error
     
     if (result == expected) {
         "TESTING PASSED"
     
-        passed = st_global("PASSED")
-        passed = strtoreal(passed)
-        
-        st_global("PASSED", strofreal(passed + 1))
+        PASSED = findexternal("PASSED")
+        *PASSED = *PASSED + 1
     }
     else {
         "TESTING FAILED"
     
+        FAILED = findexternal("FAILED")
+        *FAILED = *FAILED + 1
+
+        ERRORS = findexternal("ERRORS")
+
         new_error = sprintf(
             "'%s':\n\tExpected '%s'\n\tFound '%s'",
             test_name,
@@ -34,20 +60,7 @@ function test_result(string scalar test_name, string scalar result, string scala
             result
         )
         
-        all_errors = st_global("ERRORS")
-        
-        failed = st_global("FAILED")
-        failed = strtoreal(failed)
-
-        if (failed > 0) {
-            all_errors = sprintf("%s\n", all_errors)
-        }
-        
-        all_errors = sprintf("%s%s", all_errors, new_error)
-        
-        st_global("ERRORS", all_errors)
-        
-        st_global("FAILED", strofreal(strtoreal(failed) + 1))
+        *ERRORS = *ERRORS, new_error
     }
 }
 
@@ -58,18 +71,17 @@ program test_variables
     
     quietly: count if `expected' != `result'
     
-    if (`r(N)' == 0) {
-        global PASSED = $PASSED + 1
-    }
-    else {
-        local new_error = "`testname':\n\t`r(N)' difference"
-        
-        if ($FAILED > 0) {
-            global ERRORS = "$ERRORS\n"
+    mata {
+        if (`r(N)' == 0) {
+            PASSED = PASSED + 1
         }
-        
-        global ERRORS = `"$ERRORS`new_error'"'
-        
-        global FAILED = $FAILED + 1
+        else {
+            FAILED = FAILED + 1
+
+            testname = st_local("testname")
+            new_error = sprintf("%s\n\t%f differences", testname, `r(N)')
+
+            ERRORS = ERRORS, new_error
+        }
     }
 end

@@ -30,9 +30,9 @@ run "main.do"
 
 * Global variables to keep track of the results
 
-global PASSED = 0
-global FAILED = 0
-global ERRORS = "{err}"
+mata: PASSED = 0
+mata: FAILED = 0
+mata: ERRORS = J(1, 0, "")
 
 ////////////////////////////////////////////////////////////////////////// UTILS
 
@@ -53,6 +53,6 @@ mata: mata drop test_*()
 
 ////////////////////////////////////////////////////////////////// PRINT RESULTS
 
-mata: printf(st_global("ERRORS"))
-dis "TEST PASSED: $PASSED"
-dis "TEST FAILED: $FAILED"
+mata: display_errors(ERRORS)
+mata: printf("TEST PASSED: %f", PASSED)
+mata: printf("TEST FAILED: %f", FAILED)
