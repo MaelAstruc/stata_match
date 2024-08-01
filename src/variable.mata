@@ -40,55 +40,58 @@ void Variable::init_type() {
 
 void Variable::init_values() {
     real scalar check_includes
-    string scalar quoted
-    string vector x, xsort, levels
-    real vector selection
+    string vector x_str, levels_str
+    real vector x_num, levels_int
     class PRange scalar prange
     class PConstant scalar pconstant
     real scalar i, min, max, n_miss, precision
-    real matrix data
 
-    // We don't need to check if value is already included in POr pattern
+    // All the levels are unique by definition
     check_includes = 0
 
     // TODO: improve depending on syntax and adapt to other types
 
     if (this.type == "string") {
-        st_sview(x = "", ., this.name)
+        st_sview(x_str = "", ., this.name)
 
-        // Getting the levels is a bottleneck of the algorithm
-        // When the sample size grows
-        // Simplified code from 'uniqrows.mata'
-        xsort = sort(x, 1)
-        selection = 1 \ (xsort[|2,.\.,.|] :!= xsort[|1,.\(rows(x)-1),.|])
-        levels = select(xsort, selection)
+        levels_str = uniqrowssort(x_str)
 
-        for (i = 1; i <= length(levels); i++) {
-            quoted = `"""' + levels[i] + `"""'
-            this.values.insert(&parse_constant(quoted), check_includes)
+        for (i = 1; i <= length(levels_str); i++) {
+            pconstant = PConstant()
+            pconstant.value = `"""' + levels_str[i] + `"""'
+            this.values.insert(pconstant, check_includes)
         }
     }
-    else if (this.type == "int" | this.type == "float") {
-        st_view(data=., ., this.name)
+    else if (this.type == "int") {
+        st_view(x_num = ., ., this.name)
+
+        levels_int = uniqrowsofinteger(x_num)
+
+        for (i = 1; i <= length(levels_int); i++) {
+            pconstant = PConstant()
+            pconstant.value = levels_int[i]
+            this.values.insert(pconstant, check_includes)
+        }
+    }
+    else if (this.type == "float") {
+        st_view(x_num = ., ., this.name)
         
-        min = min(data)
-        max = max(data)
+        min = min(x_num)
+        max = max(x_num)
         
         if (this.type == "float") {
-        	// Due to rounding approximations, we need to extend the boundaries
+            // Due to rounding approximations, we need to extend the boundaries
             precision = 0.00000001
             
-        	min = min - precision
-        	max = max + precision
+            min = min - precision
+            max = max + precision
         }
         
-        timer_off(24)
-
         prange = PRange()
         prange.define(min, max, 1, 1, this.type == "int")
         this.values.insert(&prange, check_includes)
 
-        n_miss = missing(data)
+        n_miss = missing(x_num)
         if (n_miss > 0) {
             pconstant = PConstant()
             pconstant.define(.)
