@@ -22,6 +22,30 @@ match y2, v(x1) b( ///
 
 test_variables, expected(y1) result(y2) test("End to end: one integer")
 
+///////////////////////////////////////////////// One variable integer with gaps
+
+clear
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 7)) // [1, 6]
+replace x1 = x1 * 2                // {2, 4, 6, 8, 10, 12}
+
+gen y1 = ""
+replace y1 = "a" if x1 == 2
+replace y1 = "b" if x1 == 4 | x1 == 6
+replace y1 = "c" if x1 >= 8 & x1 <= 12
+
+gen y2 = ""
+
+match y2, v(x1) b( ///
+    2      => "a",  ///
+    4 | 6  => "b",  ///
+    8~12   => "c",  ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: one integer with gaps")
+
 ///////////////////////////////////////////////////////////// One variable float
 
 clear
