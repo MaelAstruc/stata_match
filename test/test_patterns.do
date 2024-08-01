@@ -1040,8 +1040,8 @@ function test_pempty_difference() {
 
 // PWild
 
-function test_wild_difference() {
-	// Equivalent to POr with values
+function test_pwild_difference() {
+    // Equivalent to POr with values
 }
 
 // PConstant
