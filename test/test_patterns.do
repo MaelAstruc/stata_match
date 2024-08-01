@@ -973,32 +973,371 @@ function test_por_includes() {
     included = por.includes(por_1)
     test_result("Test POr::includes() or in 2 elements", strofreal(included), "1")
     
-    por_1.insert(pconstant_2)
+    por_1.insert(pconstant_3)
     included = por.includes(por_1)
-    test_result("Test POr::includes() or out", strofreal(included), "1")    
+    test_result("Test POr::includes() or out", strofreal(included), "0")    
 }
 
 /////////////////////////////////////////////////////////////////// difference()
 
 // PEmpty
 
-// TODO
+function test_pempty_difference() {
+    class PEmpty scalar pempty
+    class Pattern scalar difference
+    class PEmpty scalar pempty_1
+    class PWild scalar pwild
+    class PConstant scalar pconstant_1
+    class PRange scalar prange_1
+    class POr scalar por
+    
+    pempty = PEmpty()
+    
+    // PEmpty
+
+    pempty_1 = PEmpty()
+    
+    difference = *pempty.difference(pempty_1)
+
+    test_result("Test PEmpty::difference() empty", difference.to_string(), "Empty")
+
+    // PWild
+
+    pwild = PWild()
+    
+    difference = *pempty.difference(pwild)
+
+    test_result("Test PEmpty::difference() wild", difference.to_string(), "Empty")
+
+    // PConstant
+
+    pconstant_1 = PConstant()
+    pconstant_1.define(1)
+    
+    difference = *pempty.difference(pconstant_1)
+
+    test_result("Test PEmpty::difference() constant", difference.to_string(), "Empty")
+
+    // PRange
+
+    prange_1 = PRange()
+    prange_1.define(0, 2, 1, 1, 1)
+    
+    difference = *pempty.difference(prange_1)
+
+    test_result("Test PEmpty::difference() range", difference.to_string(), "Empty")
+
+    // POr
+
+    por = POr()
+    por.insert(pconstant_1)
+    por.insert(prange_1)
+    
+    difference = *pempty.difference(por)
+
+    test_result("Test PEmpty::difference() or", difference.to_string(), "Empty")
+}
 
 // PWild
 
-// TODO
+function test_wild_difference() {
+	// Equivalent to POr with values
+}
 
 // PConstant
 
-// TODO
+function test_pconstant_difference() {
+    class PConstant scalar pconstant
+    class Pattern scalar difference
+    class PEmpty scalar pempty
+    class PWild scalar pwild
+    class PConstant scalar pconstant_1, pconstant_2
+    class PRange scalar prange_1, prange_2
+    class POr scalar por
+    
+    pconstant = PConstant()
+    pconstant.define(1)
+    
+    // PEmpty
+
+    pempty = PEmpty()
+    
+    difference = *pconstant.difference(pempty)
+
+    test_result("Test PConstant::difference() empty", difference.to_string(), "1")
+
+    // PWild
+
+    pwild = PWild()
+    
+    difference = *pconstant.difference(pwild)
+
+    test_result("Test PConstant::difference() wild", difference.to_string(), "Empty")
+
+    // PConstant
+
+    pconstant_1 = PConstant()
+    pconstant_1.define(1)
+    
+    difference = *pconstant.difference(pconstant_1)
+
+    test_result("Test PConstant::difference() constant same", difference.to_string(), "Empty")
+
+    pconstant_2 = PConstant()
+    pconstant_2.define(2)
+    
+    difference = *pconstant.difference(pconstant_2)
+
+    test_result("Test PConstant::difference() constant different", difference.to_string(), "1")
+
+    // PRange
+
+    prange_1 = PRange()
+    prange_1.define(0, 2, 1, 1, 1)
+    
+    difference = *pconstant.difference(prange_1)
+
+    test_result("Test PConstant::difference() range in", difference.to_string(), "Empty")
+
+    prange_2 = PRange()
+    prange_2.define(-2, 0, 1, 1, 1)
+    
+    difference = *pconstant.difference(prange_2)
+
+    test_result("Test PConstant::difference() range out", difference.to_string(), "1")
+
+    // POr
+
+    por = POr()
+    por.insert(pconstant_2)
+    por.insert(prange_2)
+    
+    difference = *pconstant.difference(por)
+
+    test_result("Test PConstant::difference() range in", difference.to_string(), "1")
+
+    por.insert(pconstant_1)
+    
+    difference = *pconstant.difference(por)
+
+    test_result("Test PConstant::difference() range out", difference.to_string(), "Empty")
+}
 
 // PRange
 
-// TODO
+function test_prange_difference() {
+    class PRange scalar prange
+    class Pattern scalar difference
+    class PEmpty scalar pempty
+    class PWild scalar pwild
+    class PConstant scalar pconstant_1, pconstant_2, pconstant_3
+    class PRange scalar prange_1, prange_2, prange_3
+    class POr scalar por
+    
+    prange = PRange()
+    prange.define(0, 3, 1, 1, 1)
+    
+    // PEmpty
+
+    pempty = PEmpty()
+    
+    difference = *prange.difference(pempty)
+
+    test_result("Test PRange::difference() empty", difference.to_string(), "0~3")
+
+    // PWild
+
+    pwild = PWild()
+    
+    difference = *prange.difference(pwild)
+
+    test_result("Test PRange::difference() wild", difference.to_string(), "Empty")
+
+    // PConstant
+
+    pconstant_1 = PConstant()
+    pconstant_1.define(-1)
+    
+    difference = *prange.difference(pconstant_1)
+
+    test_result("Test PRange::difference() constant out", difference.to_string(), "0~3")
+
+    pconstant_2 = PConstant()
+    pconstant_2.define(2)
+    
+    difference = *prange.difference(pconstant_2)
+
+    test_result("Test PRange::difference() constant middle", difference.to_string(), "0~1 | 3")
+
+    pconstant_3 = PConstant()
+    pconstant_3.define(3)
+    
+    difference = *prange.difference(pconstant_3)
+
+    test_result("Test PRange::difference() constant boundary", difference.to_string(), "0~2")
+
+    // PRange
+
+    prange_1 = PRange()
+    prange_1.define(-2, -1, 1, 1, 1)
+    
+    difference = *prange.difference(prange_1)
+
+    test_result("Test PRange::difference() range out", difference.to_string(), "0~3")
+    
+    prange_2 = PRange()
+    prange_2.define(1, 2, 1, 1, 1)
+    
+    difference = *prange.difference(prange_2)
+
+    test_result("Test PRange::difference() range in", difference.to_string(), "0 | 3")
+    
+    prange_3 = PRange()
+    prange_3.define(0, 3, 1, 1, 1)
+    
+    difference = *prange.difference(prange_3)
+
+    test_result("Test PRange::difference() range same", difference.to_string(), "Empty")
+    
+    // POr
+    
+    por = POr()
+    por.insert(pconstant_1)
+    por.insert(prange_1)
+    
+    difference = *prange.difference(por)
+
+    test_result("Test PRange::difference() or out", difference.to_string(), "0~3")
+    
+    por.insert(pconstant_3)
+    
+    difference = *prange.difference(por)
+
+    test_result("Test PRange::difference() or in 1", difference.to_string(), "0~2")
+    
+    por.insert(prange_2)
+    
+    difference = *prange.difference(por)
+
+    test_result("Test PRange::difference() or in 2", difference.to_string(), "0")
+}
 
 // POr
 
-// TODO
+function test_por_difference() {
+    class POr scalar por
+    class Pattern scalar difference
+    class PEmpty scalar pempty
+    class PWild scalar pwild
+    class PConstant scalar pconstant_1, pconstant_2, pconstant_3
+    class PRange scalar prange_1, prange_2, prange_3, prange_4
+    class POr scalar por_1
+    
+    por = POr()
+    
+    pconstant_1 = PConstant()
+    pconstant_1.define(1)
+    
+    prange_1 = PRange()
+    prange_1.define(3, 7, 1, 1, 1)
+    
+    por.insert(&pconstant_1)
+    por.insert(&prange_1)
+    
+    // PEmpty
+    
+    pempty = PEmpty()
+    
+    difference = *por.difference(pempty)
+
+    test_result("Test POr::difference() empty", difference.to_string(), "1 | 3~7")
+    
+    // PWild
+    
+    pwild = PWild()
+    
+    difference = *por.difference(pwild)
+
+    test_result("Test POr::difference() wild", difference.to_string(), "Empty")
+    
+    // PConstant
+    
+    difference = *por.difference(pconstant_1)
+
+    test_result("Test POr::difference() constant in 1", difference.to_string(), "3~7")
+    
+    pconstant_2 = PConstant()
+    pconstant_2.define(5)
+    
+    difference = *por.difference(pconstant_2)
+
+    test_result("Test POr::difference() constant in 2", difference.to_string(), "1 | 3~4 | 6~7")
+    
+    pconstant_3 = PConstant()
+    pconstant_3.define(8)
+    
+    difference = *por.difference(pconstant_3)
+
+    test_result("Test POr::difference() constant out", difference.to_string(), "1 | 3~7")
+    
+    // PRange
+    
+    difference = *por.difference(prange_1)
+
+    test_result("Test POr::difference() range in", difference.to_string(), "1")
+    
+    prange_2 = PRange()
+    prange_2.define(1, 4, 1, 1, 1)
+    
+    difference = *por.difference(prange_2)
+
+    test_result("Test POr::difference() range across", difference.to_string(), "5~7")
+    
+    prange_3 = PRange()
+    prange_3.define(-5, 0, 1, 1, 1)
+    
+    difference = *por.difference(prange_3)
+
+    test_result("Test POr::difference() range out", difference.to_string(), "1 | 3~7")
+    
+    prange_4 = PRange()
+    prange_4.define(0, 8, 1, 1, 1)
+    
+    difference = *por.difference(prange_4)
+
+    test_result("Test POr::difference() ranger all", difference.to_string(), "Empty")
+    
+    // POr
+    
+    por_1 = POr()
+    por_1.insert(pconstant_3)
+    por_1.insert(prange_3)
+    
+    difference = *por.difference(por_1)
+    
+    por.to_string()
+    por_1.to_string()
+
+    test_result("Test POr::difference() or out", difference.to_string(), "1 | 3~7")
+    
+    por_1.insert(pconstant_2)
+    
+    difference = *por.difference(por_1)
+
+    test_result("Test POr::difference() or in 1", difference.to_string(), "1 | 3~4 | 6~7")
+    
+    por_1.insert(prange_2)
+    
+    difference = *por.difference(por_1)
+
+    test_result("Test POr::difference() or in 2", difference.to_string(), "6~7")
+    
+    por_1.insert(prange_4)
+    
+    difference = *por.difference(por_1)
+
+    test_result("Test POr::difference() or all", difference.to_string(), "Empty")
+}
 
 ////////////////////////////////////////////////////////////////////// to_expr()
 
@@ -1072,11 +1411,11 @@ test_por_includes()
 
 // difference()
 
-// test_pempty_difference()
-// test_pwild_difference()
-// test_pconstant_difference()
-// test_prange_difference()
-// test_por_difference()
+test_pempty_difference()
+test_pwild_difference()
+test_pconstant_difference()
+test_prange_difference()
+test_por_difference()
 // test_ptuple_difference()
 
 // to_expr()
