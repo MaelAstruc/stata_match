@@ -136,6 +136,7 @@ class Arm {
     struct LHS scalar lhs
     string scalar value
     real scalar id
+    real scalar has_wildcard
 
     string scalar to_string()
     void print()
@@ -146,6 +147,7 @@ class Arm {
 
 class Usefulness {
     real scalar useful // 1 if the pattern is useful, 0 if not
+    real scalar has_wildcard // 1 if the arm includes wild_cards
     real scalar any_overlap
     pointer scalar tuple
     real scalar arm_id

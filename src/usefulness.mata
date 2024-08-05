@@ -2,6 +2,7 @@ mata
 
 void Usefulness::define(class Usefulness usefulness) {
     this.useful = usefulness.useful
+    this.has_wildcard = usefulness.has_wildcard
     this.any_overlap = usefulness.any_overlap
     this.tuple = usefulness.tuple
     this.arm_id = usefulness.arm_id
@@ -17,6 +18,11 @@ string vector Usefulness::to_string() {
 
     if (this.useful == 0) {
         str = sprintf("Warning : Arm %f is not useful", this.arm_id)
+    }
+    
+    if (this.has_wildcard == 1) {
+        // Don't print overlaps if the arm includes wildcards
+        return(str)
     }
 
     if (this.any_overlap == 1) {

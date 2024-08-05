@@ -51,6 +51,8 @@ class Arm scalar function parse_arm ( ///
     check_next(t, "=>", arm_id)
 
     arm.value = parse_value(t)
+    
+    arm.has_wildcard = check_wildcard(arm.lhs.pattern)
 
     return(arm)
 }
@@ -163,7 +165,7 @@ class PRange scalar function parse_range( ///
     if (min == .) {
         min = min(data)
         if (variable.type == "float") {
-        	min = min - precision
+            min = min - precision
         }
     }
 
@@ -359,6 +361,49 @@ real scalar function isquoted(string scalar str) {
 
 real scalar function israngesym(str) {
     return(str == "~" | str == "!~" | str == "~!" | str == "!!")
+}
+
+real scalar function check_wildcard(transmorphic scalar pattern) {
+    transmorphic scalar pattern_copy
+    class POr scalar por
+    class Tuple scalar tuple
+    real scalar i
+    
+    if (eltype(pattern) == "pointer") {
+        pattern_copy = *pattern
+        return(check_wildcard(pattern_copy))
+    }
+    else if (classname(pattern) == "PEmpty") {
+        return(0)
+    }
+    else if (classname(pattern) == "PWild") {
+        return(1)
+    }
+    else if (classname(pattern) == "PConstant") {
+        return(0)
+    }
+    else if (classname(pattern) == "PRange") {
+        return(0)
+    }
+    else if (classname(pattern) == "POr") {
+        por = pattern
+        
+        for (i = 1; i <= por.len(); i = i + 1) {
+            if (check_wildcard(por.patterns.get_pat(i)) == 1) {
+                return(1)
+            }
+        }
+        return(0)
+    }
+    else if (classname(pattern) == "Tuple") {
+        tuple = pattern
+        for (i = 1; i <= length(tuple.patterns); i = i + 1) {
+            if (check_wildcard(tuple.patterns[i]) == 1) {
+                return(1)
+            }
+        }
+        return(0)
+    }
 }
 
 end

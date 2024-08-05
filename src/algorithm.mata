@@ -114,6 +114,7 @@ function check_useful(class Arm vector arms) {
     for (i = 1; i <= n_arms; i++) {
         usefulness = is_useful(arms[i], useful_arms)
         usefulness.arm_id = i
+        usefulness.has_wildcard = arms[i].has_wildcard
 
         if (usefulness.useful == 1) {
             new_arm = arms[i]
