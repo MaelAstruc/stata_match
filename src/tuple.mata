@@ -2,26 +2,29 @@ mata
 
 string scalar Tuple::to_string() {
     class Pattern scalar pattern
+    string vector strings
     string scalar str
-    real scalar i
+    real scalar i, n_pat
+    
+    n_pat = length(this.patterns)
 
-    if (length(this.patterns) == 0) {
+    if (n_pat == 0) {
         return("Empty Tuple: Error")
     }
+    
+    strings = J(1, n_pat, "")
+    
+    for (i = 1; i <= n_pat; i++) {
+        pattern = *patterns[i]
+        strings[i] = pattern.to_string()
+    }
+    
+    str = invtokens(strings, ", ")
 
-    pattern = *this.patterns[1]
-
-    str = pattern.to_string()
-
-    if (length(this.patterns) > 1) {
-        for (i = 2; i <= length(this.patterns); i++) {
-            pattern = *patterns[i]
-            str = str + ", " + pattern.to_string()
-        }
-
+    if (n_pat > 1) {
         str = "(" + str + ")"
     }
-
+    
     return(str)
 }
 
@@ -32,29 +35,38 @@ void Tuple::print() {
 
 string scalar Tuple::to_expr(class Variable vector variables) {
     class Pattern scalar pattern
-    string scalar str
-    real scalar i
+    string vector exprs
+    real scalar i, k, n_pat
 
-    if (length(this.patterns) != length(variables)) {
+    n_pat = length(this.patterns)
+    
+    if (n_pat != length(variables)) {
         errprintf(
             "The tuples and variables have different sizes %f and %f",
             length(this.patterns), length(variables)
         )
         exit(_error(3300))
     }
+    
+    exprs = J(1, n_pat, "")
 
-    pattern = *this.patterns[1]
-    str = pattern.to_expr(variables[1].name)
-
-    for (i = 2; i <= length(this.patterns); i++) {
+    k = 0
+    for (i = 1; i <= n_pat; i++) {
         pattern = *this.patterns[i]
         pattern = pattern.compress()
-        if (classname(pattern) != "PWild") {
-            str = str + " & " + pattern.to_expr(variables[i].name)
+        if (classname(pattern) != "PWild" & classname(pattern) != "PEmpty") {
+            k = k + 1
+			exprs[k] = pattern.to_expr(variables[i].name)
         }
     }
-
-    return(str)
+	
+	if (k > 1) {
+		for (i = 1; i <= k; i = i + 1) {
+			exprs[i] = "(" + exprs[i] + ")"
+		}
+	}
+    
+    return(invtokens(exprs[1..k], " & "))
 }
 
 transmorphic scalar Tuple::compress() {

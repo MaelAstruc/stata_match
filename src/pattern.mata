@@ -77,7 +77,7 @@ transmorphic scalar PWild::compress() {
 }
 
 string scalar PWild::to_expr(string scalar variable) {
-    return(sprintf("1==1"))
+    return("1==1")
 }
 
 transmorphic PWild::overlap(transmorphic scalar pattern) {
@@ -699,39 +699,38 @@ transmorphic scalar POr::compress() {
 
 string scalar POr::to_string() {
     class Pattern scalar pattern
-    string scalar str
+    string vector str
     real scalar i
 
-    if (this.len() == 0) {
-        return("")
-    }
-
-    pattern = this.patterns.get_pat(1)
-
-    str = pattern.to_string()
-
-    for (i = 2; i <= this.len(); i++) {
+    str = J(1, this.len(), "")
+    
+    for (i = 1; i <= this.len(); i++) {
         pattern = this.patterns.get_pat(i)
-        str = str + " | " + pattern.to_string()
+        str[i] = pattern.to_string()
     }
 
-    return(str)
+    return(invtokens(str, " | "))
 }
 
 string scalar POr::to_expr(string vector variable) {
     class Pattern scalar pattern
-    string scalar str
+    string scalar expr
+    string vector exprs
     real scalar i
 
-    pattern = this.patterns.get_pat(1)
-    str = pattern.to_expr(variable)
-
-    for (i = 2; i <= this.len(); i++) {
+    exprs = J(1, this.len(), "")
+    
+    for (i = 1; i <= this.len(); i++) {
         pattern = this.patterns.get_pat(i)
-        str = str + " | " + pattern.to_expr(variable)
+        if (this.len() > 1) {
+            exprs[i] = "(" + pattern.to_expr(variable) + ")"
+        }
+        else {
+            exprs[i] = pattern.to_expr(variable)
+        }
     }
-
-    return(sprintf("(%s)", str))
+    
+    return(invtokens(exprs, " | "))
 }
 
 void POr::print() {

@@ -54,7 +54,7 @@ function test_result(string scalar test_name, string scalar result, string scala
         ERRORS = findexternal("ERRORS")
 
         new_error = sprintf(
-            "'%s':\n\tExpected '%s'\n\tFound '%s'",
+            "'%s':\n\tExpected '%s'\n\tFound    '%s'",
             test_name,
             expected,
             result
