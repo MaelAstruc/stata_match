@@ -236,21 +236,28 @@ class Tuple vector function check_completeness( ///
         class Variable vector variables ///
     ) {
     class Arm scalar wild_arm
+    class PWild vector pwilds
     class Tuple scalar tuple
     class Usefulness scalar usefulness
     real scalar i
 
     wild_arm = Arm()
 
+    pwilds = PWild(length(variables))
+
+    for (i = 1; i <= length(variables); i++) {
+        pwilds[i].define(variables[i])
+    }
+
     if (length(variables) == 1) {
-        wild_arm.lhs.pattern = &variables[1].values
+        wild_arm.lhs.pattern = &pwilds[1].values
     }
     else {
         tuple = Tuple()
         tuple.patterns = J(1, length(variables), NULL)
 
         for (i = 1; i <= length(variables); i++) {
-            tuple.patterns[i] = &variables[i].values
+            tuple.patterns[i] = &pwilds[i].values
         }
 
         wild_arm.lhs.pattern = &tuple

@@ -126,3 +126,91 @@ match y2, v(x1, x2) b( ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: two variables")
+
+/////////////////////////////////////////////////////////// Integer min constant
+
+clear
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 5))
+
+gen y1 = "c"
+replace y1 = "a" if x1 == 1
+replace y1 = "b" if x1 == 2 | x1 == 3
+
+gen y2 = ""
+
+match y2, v(x1) b( ///
+    min    => "a",  ///
+    2 | 3  => "b",  ///
+    _      => "c"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: 'min' as constant")
+
+/////////////////////////////////////////////////////////// Integer max constant
+
+clear
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 5))
+
+gen y1 = ""
+replace y1 = "a" if x1 == 1
+replace y1 = "b" if x1 == 2 | x1 == 3
+replace y1 = "c" if x1 == 4
+
+gen y2 = ""
+
+match y2, v(x1) b( ///
+    1      => "a",  ///
+    2 | 3  => "b",  ///
+    max    => "c"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: 'max' as constant")
+
+////////////////////////////////////////////////////////////// Integer min range
+
+clear
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 5))
+
+gen y1 = "c"
+replace y1 = "a" if x1 == 1 | x1 == 2
+replace y1 = "b" if x1 == 3
+
+gen y2 = ""
+
+match y2, v(x1) b( ///
+    min~2  => "a",  ///
+    3      => "b",  ///
+    _      => "c"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: 'min' in range")
+
+////////////////////////////////////////////////////////////// Integer max range
+
+clear
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 5))
+
+gen y1 = ""
+replace y1 = "a" if x1 == 1 | x1 == 2
+replace y1 = "b" if x1 >= 3 & x1 <= 4
+
+gen y2 = ""
+
+match y2, v(x1) b( ///
+    1 | 2   => "a",  ///
+    3~max   => "b"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: 'max' in range")

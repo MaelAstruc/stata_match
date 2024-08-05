@@ -209,17 +209,10 @@ function test_pwild_define() {
     class Variable scalar variable
     class PConstant scalar pconstant_1, pconstant_2
     
-    pconstant_1 = PConstant()
-    pconstant_1.value = 1
-    
-    pconstant_2 = PConstant()
-    pconstant_2.value = 2
-    
     variable = Variable()
-    variable.values = POr()
-    variable.values.patterns.patterns[1] = &pconstant_1
-    variable.values.patterns.patterns[2] = &pconstant_2
-    variable.values.patterns.length = 2
+    variable.name = "test_var"
+    variable.type = "int"
+    variable.levels = 1, 2
     
     pwild = PWild()
     pwild.define(variable)
@@ -1345,9 +1338,9 @@ function test_por_difference() {
 
 function test_pempty_to_expr() {
     class PEmpty scalar pempty
-	string scalar var_name
-	
-	var_name = "test_var"
+    string scalar var_name
+
+    var_name = "test_var"
 
     pempty = PEmpty()
 
@@ -1358,9 +1351,9 @@ function test_pempty_to_expr() {
 
 function test_pwild_to_expr() {
     class PWild scalar pwild
-	string scalar var_name
-	
-	var_name = "test_var"
+    string scalar var_name
+
+    var_name = "test_var"
 
     pwild = PWild()
 
@@ -1371,17 +1364,17 @@ function test_pwild_to_expr() {
 
 function test_pconstant_to_expr() {
     class PConstant scalar pconstant
-	string scalar var_name
-	
-	var_name = "test_var"
-	
+    string scalar var_name
+
+    var_name = "test_var"
+
     pconstant = PConstant()
-	pconstant.value = 1
+    pconstant.value = 1
 
     test_result("Test PConstant::to_expr() real", pconstant.to_expr(var_name), "test_var == 1")
-	
-	pconstant.value = `""a""'
-	pconstant.value
+
+    pconstant.value = `""a""'
+    pconstant.value
 
     test_result("Test PConstant::to_expr() string", pconstant.to_expr(var_name), `"test_var == "a""')
 }
@@ -1390,22 +1383,22 @@ function test_pconstant_to_expr() {
 
 function test_prange_to_expr() {
     class PRange scalar prange
-	string scalar var_name
-	
-	var_name = "test_var"
-	
+    string scalar var_name
+
+    var_name = "test_var"
+
     prange = PRange()
-	
-	prange.define(0, 2, 1, 1, 1)
+
+    prange.define(0, 2, 1, 1, 1)
     test_result("Test PRange::to_expr() [0, 2]", prange.to_expr(var_name), "test_var >= 0 & test_var <= 2")
-	
-	prange.define(0, 2, 0, 1, 1)
+
+    prange.define(0, 2, 0, 1, 1)
     test_result("Test PRange::to_expr() ]0, 2]", prange.to_expr(var_name), "test_var > 0 & test_var <= 2")
-	
-	prange.define(0, 2, 1, 0, 1)
+
+    prange.define(0, 2, 1, 0, 1)
     test_result("Test PRange::to_expr() [0, 2[", prange.to_expr(var_name), "test_var >= 0 & test_var < 2")
-	
-	prange.define(0, 2, 0, 0, 1)
+
+    prange.define(0, 2, 0, 0, 1)
     test_result("Test PRange::to_expr() ]0, 2[", prange.to_expr(var_name), "test_var > 0 & test_var < 2")
 }
 
@@ -1413,28 +1406,28 @@ function test_prange_to_expr() {
 
 function test_por_to_expr() {
     class POr scalar por
-	class PConstant scalar pconstant
-	class PRange scalar prange
-	string scalar var_name
-	
-	var_name = "test_var"
-	
+    class PConstant scalar pconstant
+    class PRange scalar prange
+    string scalar var_name
+
+    var_name = "test_var"
+
     por = POr()
-	
+
     test_result("Test POr::to_expr() empty", por.to_expr(var_name), "")
-	
-	pconstant = PConstant()
-	pconstant.value = 1
-	
-	por.insert(pconstant)
-	
+
+    pconstant = PConstant()
+    pconstant.value = 1
+
+    por.insert(pconstant)
+
     test_result("Test POr::to_expr()", por.to_expr(var_name), "test_var == 1")
-	
+
     prange = PRange()
-	prange.define(2, 3, 1, 1, 1)
-	
-	por.insert(prange)
-	
+    prange.define(2, 3, 1, 1, 1)
+
+    por.insert(prange)
+
     test_result("Test POr::to_expr()", por.to_expr(var_name), "(test_var == 1) | (test_var >= 2 & test_var <= 3)")
 }
 
@@ -1444,76 +1437,76 @@ function test_ptuple_to_expr() {
     class Tuple scalar tuple_1, tuple_2
     class PConstant scalar pconstant
     class PRange scalar prange
-	class PWild scalar pwild
-	class POr scalar por_1, por_2
-	class Variable vector variables
-    
+    class PWild scalar pwild
+    class POr scalar por_1, por_2
+    class Variable vector variables
+
     tuple_1 = Tuple()
-    
-	// 1
-	 
+
+    // 1
+
     pconstant = PConstant()
     pconstant.define(1)
-    
+
     tuple_1.patterns = J(1, 1, NULL)
     tuple_1.patterns[1] = &pconstant
-    
-	variables = Variable(1)
-	variables[1].name = "test_var_1"
-	
+
+    variables = Variable(1)
+    variables[1].name = "test_var_1"
+
     test_result("Test Tuple::to_expr(): one element", tuple_1.to_expr(variables), "test_var_1 == 1")
-    
-	// (1, 1~3)
-	 
+
+    // (1, 1~3)
+ 
     prange = PRange()
     prange.min = 1
     prange.max = 3
     prange.in_min = 1
     prange.in_max = 1
     prange.discrete = 1
-    
+
     tuple_1.patterns = J(2, 1, NULL)
     tuple_1.patterns[1] = &pconstant
     tuple_1.patterns[2] = &prange
-	
-	variables = Variable(2)
-	variables[1].name = "test_var_1"
-	variables[2].name = "test_var_2"
-	
+
+    variables = Variable(2)
+    variables[1].name = "test_var_1"
+    variables[2].name = "test_var_2"
+
     test_result("Test Tuple::to_expr(): two elements", tuple_1.to_expr(variables), "(test_var_1 == 1) & (test_var_2 >= 1 & test_var_2 <= 3)")
-	
-	// (1 | 1~3, _)
-	
-	por_1 = POr()
-	por_1.insert(pconstant)
-	por_1.insert(prange)
-	
-	pwild = PWild()
-	
+
+    // (1 | 1~3, _)
+
+    por_1 = POr()
+    por_1.insert(pconstant)
+    por_1.insert(prange)
+
+    pwild = PWild()
+
     tuple_1.patterns = J(2, 1, NULL)
     tuple_1.patterns[1] = &por_1
     tuple_1.patterns[2] = &pwild
-	
-	variables = Variable(2)
-	variables[1].name = "test_var_1"
-	variables[2].name = "test_var_2"
-	
+
+    variables = Variable(2)
+    variables[1].name = "test_var_1"
+    variables[2].name = "test_var_2"
+
     test_result("Test Tuple::to_expr(): wildcard", tuple_1.to_expr(variables), "(test_var_1 == 1) | (test_var_1 >= 1 & test_var_1 <= 3)")
-	
-	// (1 | 1~3, _) | (1, 1~3)
-	
+
+    // (1 | 1~3, _) | (1, 1~3)
+    
     tuple_2.patterns = J(2, 1, NULL) 
     tuple_2.patterns[1] = &pconstant
     tuple_2.patterns[2] = &prange
-	
-	por_2 = POr()
-	por_2.insert(tuple_1)
-	por_2.insert(tuple_2)
-	
-	variables = Variable(2)
-	variables[1].name = "test_var_1"
-	variables[2].name = "test_var_2"
-	
+    
+    por_2 = POr()
+    por_2.insert(tuple_1)
+    por_2.insert(tuple_2)
+    
+    variables = Variable(2)
+    variables[1].name = "test_var_1"
+    variables[2].name = "test_var_2"
+    
     test_result("Test Tuple::to_expr(): POr of tuples", por_2.to_expr(variables), "((test_var_1 == 1) | (test_var_1 >= 1 & test_var_1 <= 3)) | ((test_var_1 == 1) & (test_var_2 >= 1 & test_var_2 <= 3))")
 }
 

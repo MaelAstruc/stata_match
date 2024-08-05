@@ -26,7 +26,7 @@ class PEmpty extends Pattern {
 
 // Wild card '_'
 class PWild extends Pattern {
-    pointer scalar values
+    class POr scalar values
 
     virtual void define(), print()
     virtual string scalar to_string(), to_expr()
@@ -119,10 +119,10 @@ class Variable {
     string scalar name
     string scalar type
     string scalar stata_type
-    class POr scalar values
+    transmorphic rowvector levels
 
     string scalar to_string()
-    void print(), init(), init_type(), init_values()
+    void print(), init(), init_type(), init_levels()
 }
 
 //////////////////////////////////////////////////////////////////////////// Arm

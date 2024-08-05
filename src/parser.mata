@@ -94,19 +94,17 @@ class Pattern scalar function parse_pattern( ///
         if (tok == "_") {
             return(parse_wild(variable))
         }
-        else if (israngesym(tok)) {
-            return(parse_range(t, tok, ., variable))
+        else if (tok == "min") {
+            number = min(variable.levels)
+            return(parse_number(t, number, arm_id, variable))
+        }
+        else if (tok == "max") {
+            number = max(variable.levels)
+            return(parse_number(t, number, arm_id, variable))
         }
         else if (isnumber(tok)) {
             number = strtoreal(tok)
-            next = tokenpeek(*t)
-            if (israngesym(next)) {
-                _ = tokenget(*t)
-                return(parse_range(t, next, number, variable))
-            }
-            else {
-                return(parse_constant(number))
-            }
+            return(parse_number(t, number, arm_id, variable))
         }
         else {
             errprintf(
@@ -122,6 +120,24 @@ class Pattern scalar function parse_pattern( ///
             variable.name, arm_id, variable.type
         )
         exit(_error(3250))
+    }
+}
+
+class Pattern scalar function parse_number( ///
+    pointer t, ///
+    real scalar number, ///
+    real scalar arm_id,
+    class Variable scalar variable ///
+) {
+    string scalar _, next
+
+    next = tokenpeek(*t)
+    if (israngesym(next)) {
+        _ = tokenget(*t)
+        return(parse_range(t, next, number, arm_id, variable))
+    }
+    else {
+        return(parse_constant(number))
     }
 }
 
@@ -152,33 +168,26 @@ class PRange scalar function parse_range( ///
     pointer scalar t, ///
     string scalar symbole, ///
     real scalar min, ///
-    class Variable scalar variable
+    real scalar arm_id, ///
+    class Variable scalar variable ///
 ) {
     class PRange scalar prange
     string scalar next, _
     real scalar number, max, in_min, in_max, precision
-    real matrix data
     
-    st_view(data=., ., variable.name)
-    precision = 0.00000001
+    next = tokenget(*t)
     
-    if (min == .) {
-        min = min(data)
-        if (variable.type == "float") {
-            min = min - precision
-        }
+    if (next == "max") {
+        max = max(variable.levels)
     }
-
-    next = tokenpeek(*t)
-    number = strtoreal(next)
-    if (number != .) {
-        _ = tokenget(*t)
-        max = number
-    }
-    else {
-        max = max(data)
-        if (variable.type == "float") {
-            max = max + precision
+    else  {
+        max = strtoreal(next)
+        if (max == .) {
+            errprintf(
+                "Error in range pattern in arm %f: expected a number or max, found %s\n",
+                arm_id, next
+            )
+            exit(_error(3498))
         }
     }
 

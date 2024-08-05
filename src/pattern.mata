@@ -49,21 +49,61 @@ pointer scalar PEmpty::difference(transmorphic scalar pattern) {
 ////////////////////////////////////////////////////////////////////////// PWild
 
 void PWild::define(class Variable scalar variable) { 
-    this.values = &variable.values
+    real scalar check_includes
+    real vector x_num, levels_int
+    class PRange scalar prange
+    class PConstant scalar pconstant
+    real scalar i, min, max, n_miss, precision
+
+    // All the levels are unique by definition
+    check_includes = 0
+
+    // TODO: improve depending on syntax and adapt to other types
+
+    if (variable.type == "string") {
+        for (i = 1; i <= length(variable.levels); i++) {
+            pconstant = PConstant()
+            pconstant.value = variable.levels[i]
+            this.values.insert(pconstant, check_includes)
+        }
+    }
+    else if (variable.type == "int") {
+        for (i = 1; i <= length(variable.levels); i++) {
+            pconstant = PConstant()
+            pconstant.value = variable.levels[i]
+            this.values.insert(pconstant, check_includes)
+        }
+    }
+    else if (variable.type == "float") {
+        prange = PRange()
+        prange.define(variable.levels[1], variable.levels[2], 1, 1, 0)
+        this.values.insert(&prange, check_includes)
+
+        if (length(variable.levels) == 3) {
+            pconstant = PConstant()
+            pconstant.define(.)
+            this.values.insert(&pconstant, check_includes)
+        }
+    }
+    else {
+        errprintf(
+            "Unexpected variable type for variable '%s': '%s'\n",
+            variable.name, variable.stata_type
+        )
+        exit(_error(3256))
+    }
 }
 
 string scalar PWild::to_string(| real scalar all) {
-    class Pattern scalar patterns
     
     if (args() == 0) {
         return("_")
     }
-    else if (this.values == NULL) {
+    else if (this.values.len() == 0) {
         return("")
     }
     else {
-        patterns = *this.values
-        return(patterns.to_string())
+        return(this.values.to_string())
     }
 }
 
@@ -93,17 +133,9 @@ real scalar PWild::includes(transmorphic scalar pattern) {
 }
 
 pointer scalar PWild::difference(transmorphic scalar pattern) {
-    class Pattern scalar values
-
     check_pattern(pattern)
 
-    values = *this.get_values()
-    
-    return(values.difference(pattern))
-}
-
-pointer scalar PWild::get_values() {
-    return(this.values)
+    return(this.values.difference(pattern))
 }
 
 ////////////////////////////////////////////////////////////////////// PConstant
@@ -202,7 +234,7 @@ real scalar PConstant::includes(transmorphic scalar pattern) {
     }
     else if (classname(pattern) == "PWild") {
         pwild = pattern
-        this.includes(pwild.get_values())
+        this.includes(pwild.values)
     }
     else if (classname(pattern) == "PConstant") {
         pconstant = pattern
@@ -448,7 +480,7 @@ real scalar PRange::includes(transmorphic scalar pattern) {
     }
     else if (classname(pattern) == "PWild") {
         pwild = pattern
-        return(this.includes(*pwild.get_values()))
+        return(this.includes(pwild.values))
     }
     else if (classname(pattern) == "PConstant") {
         pconstant = pattern

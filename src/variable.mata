@@ -1,7 +1,28 @@
 mata
 
 string scalar Variable::to_string() {
-    return(sprintf("'%s' (%s): %s", name, type, values.to_string()))
+    string rowvector levels_str
+    real scalar i
+
+    levels_str = J(1, length(this.levels), "")
+
+    for (i = 1; i <= length(this.levels); i = i + 1) {
+        if (this.type == "int" | this.type == "float") {
+            levels_str[i] = strofreal(this.levels[i])
+        }
+        else {
+            levels_str[i] = this.levels[i]
+        }
+    }
+
+    return(
+        sprintf(
+            "'%s' (%s): (%s)",
+            this.name,
+            this.type,
+            invtokens(levels_str)
+        )
+    )
 }
 
 void Variable::print() {
@@ -11,7 +32,7 @@ void Variable::print() {
 void Variable::init(string scalar variable) {
     this.name = variable
     this.init_type()
-    this.init_values()
+    this.init_levels()
 }
 
 void Variable::init_type() {
@@ -38,7 +59,7 @@ void Variable::init_type() {
     }
 }
 
-void Variable::init_values() {
+void Variable::init_levels() {
     real scalar check_includes
     string vector x_str, levels_str
     real vector x_num, levels_int
@@ -54,48 +75,28 @@ void Variable::init_values() {
     if (this.type == "string") {
         st_sview(x_str = "", ., this.name)
 
-        levels_str = uniqrowssort(x_str)
+        this.levels = uniqrowssort(x_str)
 
-        for (i = 1; i <= length(levels_str); i++) {
-            pconstant = PConstant()
-            pconstant.value = `"""' + levels_str[i] + `"""'
-            this.values.insert(pconstant, check_includes)
+        for (i = 1; i <= length(this.levels); i++) {
+            this.levels[i] = `"""' + this.levels[i] + `"""'
         }
     }
     else if (this.type == "int") {
         st_view(x_num = ., ., this.name)
 
-        levels_int = uniqrowsofinteger(x_num)
-
-        for (i = 1; i <= length(levels_int); i++) {
-            pconstant = PConstant()
-            pconstant.value = levels_int[i]
-            this.values.insert(pconstant, check_includes)
-        }
+        this.levels = uniqrowsofinteger(x_num)
     }
     else if (this.type == "float") {
         st_view(x_num = ., ., this.name)
         
-        min = min(x_num)
-        max = max(x_num)
-        
-        if (this.type == "float") {
-            // Due to rounding approximations, we need to extend the boundaries
-            precision = 0.00000001
-            
-            min = min - precision
-            max = max + precision
-        }
-        
-        prange = PRange()
-        prange.define(min, max, 1, 1, this.type == "int")
-        this.values.insert(&prange, check_includes)
+        precision = 0.00000001
 
-        n_miss = missing(x_num)
-        if (n_miss > 0) {
-            pconstant = PConstant()
-            pconstant.define(.)
-            this.values.insert(&pconstant, check_includes)
+        this.levels = minmax(x_num)
+        this.levels[1] = this.levels[1] - precision
+        this.levels[2] = this.levels[2] + precision
+
+        if (hasmissing(x_num) > 0) {
+            this.levels = this.levels, .
         }
     }
     else {
