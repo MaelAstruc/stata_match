@@ -233,10 +233,6 @@ In this case we will receive another warning:
 
 ## Limitations
 
-False warnings
-
-- The wildcard pattern gives overlap warnings while it's his purpose, I need to fix it
-
 Missing types
 
 - I haven't checked any type apart from numerics and strings.
@@ -252,7 +248,3 @@ Performance
 - According to a quick profiling, the checks are less important compared to getting the levels.
 - Getting the levels from encoded values should decrease the performance cost.
 - I need to implement a proper profiling suite.
-
-Test
-
-- I have some tests but a proper test suite would be better.
