@@ -182,10 +182,7 @@ function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
         overlaps[i].pattern = get_and_compress(overlaps, i)
         if (classname(*overlaps[i].pattern) != "PEmpty") {
             k++
-            if (k != i) {
-                overlaps[k].arm_id = overlaps[i].arm_id
-                overlaps[k].pattern = overlaps[i].pattern
-            }
+            overlaps[k] = overlaps[i]
         }
     }
 

@@ -397,7 +397,7 @@ real scalar function check_wildcard(transmorphic scalar pattern) {
     else if (classname(pattern) == "POr") {
         por = pattern
         
-        for (i = 1; i <= por.len(); i = i + 1) {
+        for (i = 1; i <= por.len(); i++) {
             if (check_wildcard(por.patterns.get_pat(i)) == 1) {
                 return(1)
             }
@@ -406,7 +406,7 @@ real scalar function check_wildcard(transmorphic scalar pattern) {
     }
     else if (classname(pattern) == "Tuple") {
         tuple = pattern
-        for (i = 1; i <= length(tuple.patterns); i = i + 1) {
+        for (i = 1; i <= length(tuple.patterns); i++) {
             if (check_wildcard(tuple.patterns[i]) == 1) {
                 return(1)
             }

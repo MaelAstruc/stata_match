@@ -55,13 +55,13 @@ string scalar Tuple::to_expr(class Variable vector variables) {
         pattern = *this.patterns[i]
         pattern = pattern.compress()
         if (classname(pattern) != "PWild" & classname(pattern) != "PEmpty") {
-            k = k + 1
+            k++
 			exprs[k] = pattern.to_expr(variables[i].name)
         }
     }
 	
 	if (k > 1) {
-		for (i = 1; i <= k; i = i + 1) {
+		for (i = 1; i <= k; i++) {
 			exprs[i] = "(" + exprs[i] + ")"
 		}
 	}
