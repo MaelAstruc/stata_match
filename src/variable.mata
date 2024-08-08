@@ -6,7 +6,7 @@ string scalar Variable::to_string() {
 
     levels_str = J(1, length(this.levels), "")
 
-    for (i = 1; i <= length(this.levels); i = i + 1) {
+    for (i = 1; i <= length(this.levels); i++) {
         if (this.type == "int" | this.type == "float") {
             levels_str[i] = strofreal(this.levels[i])
         }
@@ -89,12 +89,8 @@ void Variable::init_levels() {
     else if (this.type == "float") {
         st_view(x_num = ., ., this.name)
         
-        precision = 0.00000001
-
         this.levels = minmax(x_num)
-        this.levels[1] = this.levels[1] - precision
-        this.levels[2] = this.levels[2] + precision
-
+        
         if (hasmissing(x_num) > 0) {
             this.levels = this.levels, .
         }

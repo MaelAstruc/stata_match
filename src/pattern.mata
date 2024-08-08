@@ -152,7 +152,7 @@ void PConstant::define(transmorphic scalar value) {
 
 string scalar PConstant::to_string() {
     if (isstring(this.value)) {
-        return(sprintf("%s", this.value))
+        return(this.value)
     }
     else if (isreal(this.value)) {
         return(strofreal(this.value))
@@ -165,7 +165,7 @@ string scalar PConstant::to_string() {
 
 string scalar PConstant::to_expr(string scalar variable) {
     if (isreal(this.value)) {
-        return(sprintf("%s == %f", variable, this.value))
+        return(sprintf("%s == %21x", variable, this.value))
     }
     else {
         return(sprintf("%s == %s", variable, this.value))
@@ -385,7 +385,7 @@ string scalar PRange::to_expr(string scalar variable) {
     }
 
     return(sprintf(
-        "%s %s %f & %s %s %f",
+        "%s %s %21x & %s %s %21x",
         variable, min_sym, this.min, variable, max_sym, this.max
     ))
 }

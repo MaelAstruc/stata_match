@@ -2,6 +2,12 @@
 Do-file to test the pattern classes and methods
 */
 
+// Representation of 0, 1, 2 and 3 in 21x format
+local zero_21x  = "+0.0000000000000X-3ff"
+local one_21x   = "+1.0000000000000X+000"
+local two_21x   = "+1.0000000000000X+001"
+local three_21x = "+1.8000000000000X+001"
+
 mata
 
 ////////////////////////////////////////////////////////// DEFINE TEST FUNCTIONS
@@ -1371,7 +1377,7 @@ function test_pconstant_to_expr() {
     pconstant = PConstant()
     pconstant.value = 1
 
-    test_result("Test PConstant::to_expr() real", pconstant.to_expr(var_name), "test_var == 1")
+    test_result("Test PConstant::to_expr() real", pconstant.to_expr(var_name), "test_var == `one_21x'")
 
     pconstant.value = `""a""'
     pconstant.value
@@ -1386,20 +1392,20 @@ function test_prange_to_expr() {
     string scalar var_name
 
     var_name = "test_var"
-
+    
     prange = PRange()
 
     prange.define(0, 2, 1, 1, 1)
-    test_result("Test PRange::to_expr() [0, 2]", prange.to_expr(var_name), "test_var >= 0 & test_var <= 2")
+    test_result("Test PRange::to_expr() [0, 2]", prange.to_expr(var_name), "test_var >= `zero_21x' & test_var <= `two_21x'")
 
     prange.define(0, 2, 0, 1, 1)
-    test_result("Test PRange::to_expr() ]0, 2]", prange.to_expr(var_name), "test_var > 0 & test_var <= 2")
+    test_result("Test PRange::to_expr() ]0, 2]", prange.to_expr(var_name), "test_var > `zero_21x' & test_var <= `two_21x'")
 
     prange.define(0, 2, 1, 0, 1)
-    test_result("Test PRange::to_expr() [0, 2[", prange.to_expr(var_name), "test_var >= 0 & test_var < 2")
+    test_result("Test PRange::to_expr() [0, 2[", prange.to_expr(var_name), "test_var >= `zero_21x' & test_var < `two_21x'")
 
     prange.define(0, 2, 0, 0, 1)
-    test_result("Test PRange::to_expr() ]0, 2[", prange.to_expr(var_name), "test_var > 0 & test_var < 2")
+    test_result("Test PRange::to_expr() ]0, 2[", prange.to_expr(var_name), "test_var > `zero_21x' & test_var < `two_21x'")
 }
 
 // POr
@@ -1421,14 +1427,14 @@ function test_por_to_expr() {
 
     por.insert(pconstant)
 
-    test_result("Test POr::to_expr()", por.to_expr(var_name), "test_var == 1")
+    test_result("Test POr::to_expr()", por.to_expr(var_name), "test_var == `one_21x'")
 
     prange = PRange()
     prange.define(2, 3, 1, 1, 1)
 
     por.insert(prange)
 
-    test_result("Test POr::to_expr()", por.to_expr(var_name), "(test_var == 1) | (test_var >= 2 & test_var <= 3)")
+    test_result("Test POr::to_expr()", por.to_expr(var_name), "(test_var == `one_21x') | (test_var >= `two_21x' & test_var <= `three_21x')")
 }
 
 // Tuple
@@ -1454,7 +1460,7 @@ function test_ptuple_to_expr() {
     variables = Variable(1)
     variables[1].name = "test_var_1"
 
-    test_result("Test Tuple::to_expr(): one element", tuple_1.to_expr(variables), "test_var_1 == 1")
+    test_result("Test Tuple::to_expr(): one element", tuple_1.to_expr(variables), "test_var_1 == `one_21x'")
 
     // (1, 1~3)
  
@@ -1473,7 +1479,7 @@ function test_ptuple_to_expr() {
     variables[1].name = "test_var_1"
     variables[2].name = "test_var_2"
 
-    test_result("Test Tuple::to_expr(): two elements", tuple_1.to_expr(variables), "(test_var_1 == 1) & (test_var_2 >= 1 & test_var_2 <= 3)")
+    test_result("Test Tuple::to_expr(): two elements", tuple_1.to_expr(variables), "(test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x')")
 
     // (1 | 1~3, _)
 
@@ -1491,7 +1497,7 @@ function test_ptuple_to_expr() {
     variables[1].name = "test_var_1"
     variables[2].name = "test_var_2"
 
-    test_result("Test Tuple::to_expr(): wildcard", tuple_1.to_expr(variables), "(test_var_1 == 1) | (test_var_1 >= 1 & test_var_1 <= 3)")
+    test_result("Test Tuple::to_expr(): wildcard", tuple_1.to_expr(variables), "(test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')")
 
     // (1 | 1~3, _) | (1, 1~3)
     
@@ -1507,7 +1513,7 @@ function test_ptuple_to_expr() {
     variables[1].name = "test_var_1"
     variables[2].name = "test_var_2"
     
-    test_result("Test Tuple::to_expr(): POr of tuples", por_2.to_expr(variables), "((test_var_1 == 1) | (test_var_1 >= 1 & test_var_1 <= 3)) | ((test_var_1 == 1) & (test_var_2 >= 1 & test_var_2 <= 3))")
+    test_result("Test Tuple::to_expr(): POr of tuples", por_2.to_expr(variables), "((test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')) | ((test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x'))")
 }
 
 ////////
