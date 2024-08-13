@@ -20,87 +20,65 @@ N_Arm = 0
 N_Match_report = 0
 N_Usefulness = 0
 
+void increase_class_count(transmorphic instance) {
+    pointer(real scalar) N
+    string scalar class_name
+    
+    class_name = classname(instance)
+    
+    N = findexternal("N_" + class_name)
+    *N = *N + 1
+    //"new " + class_name
+}
+
 mata drop PEmpty::new()
 void PEmpty::new() {
-	pointer(real scalar) N_PEmpty
-	
-    N_PEmpty = findexternal("N_PEmpty")
-	*N_PEmpty = *N_PEmpty + 1
+    increase_class_count(this)
 }
 
 void PWild::new() {
-    pointer(real scalar) N_PWild
-	
-    N_PWild = findexternal("N_PWild")
-	*N_PWild = *N_PWild + 1
+    increase_class_count(this)
 }
 
 void PConstant::new() {
-    pointer(real scalar) N_PConstant
-	
-    N_PConstant = findexternal("N_PConstant")
-	*N_PConstant = *N_PConstant + 1
+    increase_class_count(this)
 }
 
 void PRange::new() {
-    pointer(real scalar) N_PRange
-	
-    N_PRange = findexternal("N_PRange")
-	*N_PRange = *N_PRange + 1
+    increase_class_count(this)
 }
 
 void PatternList::new() {
-    pointer(real scalar) N_PatternList
-	
-	// The default capacity when created is 8
+    increase_class_count(this)
+    
+    // The default capacity when created is 8
     this.patterns = J(1, 8, NULL)
     this.capacity = 8
     this.length = 0
-	
-    N_PatternList = findexternal("N_PatternList")
-	*N_PatternList = *N_PatternList + 1
 }
 
 void POr::new() {
-    pointer(real scalar) N_POr
-	
-    N_POr = findexternal("N_POr")
-	*N_POr = *N_POr + 1
+    increase_class_count(this)
 }
 
 void Tuple::new() {
-    pointer(real scalar) N_Tuple
-	
-    N_Tuple = findexternal("N_Tuple")
-	*N_Tuple = *N_Tuple + 1
+    increase_class_count(this)
 }
 
 void Variable::new() {
-    pointer(real scalar) N_Variable
-	
-    N_Variable = findexternal("N_Variable")
-	*N_Variable = *N_Variable + 1
+    increase_class_count(this)
 }
 
 void Arm::new() {
-    pointer(real scalar) N_Arm
-	
-    N_Arm = findexternal("N_Arm")
-	*N_Arm = *N_Arm + 1
+    increase_class_count(this)
 }
 
 void Match_report::new() {
-    pointer(real scalar) N_Match_report
-	
-    N_Match_report = findexternal("N_Match_report")
-	*N_Match_report = *N_Match_report + 1
+    increase_class_count(this)
 }
 
 void Usefulness::new() {
-    pointer(real scalar) N_Usefulness
-	
-    N_Usefulness = findexternal("N_Usefulness")
-	*N_Usefulness = *N_Usefulness + 1
+    increase_class_count(this)
 }
 end
 
@@ -118,10 +96,10 @@ replace y_base = "c" if x >= 5 & x <= 9
 
 gen y = ""
 match y, v(x) b(    ///
-	1         => "a",  ///
-	2 | 3 | 4 => "b",  ///
-	5~9       => "c",  ///
-	_         => "d"   ///
+    1         => "a",  ///
+    2 | 3 | 4 => "b",  ///
+    5~9       => "c",  ///
+    _         => "d"   ///
 )
 
 assert y_base == y
