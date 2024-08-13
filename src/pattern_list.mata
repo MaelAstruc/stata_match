@@ -80,8 +80,6 @@ transmorphic PatternList::overlap(class Pattern scalar pattern) {
     class PatternList scalar overlap
     real scalar i
 
-    overlap = PatternList()
-
     for (i = 1; i <= this.length; i ++) {
         pattern_i = this.get_pat(i)
         overlap.push(&pattern_i.overlap(pattern))
@@ -94,8 +92,6 @@ pointer scalar PatternList::difference(class Pattern scalar pattern) {
     class Pattern scalar pattern_i, compressed
     class PatternList scalar differences
     real scalar i
-
-    differences = PatternList()
 
     for (i = 1; i <= this.length; i ++) {
         pattern_i = this.get_pat(i)

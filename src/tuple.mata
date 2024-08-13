@@ -102,7 +102,6 @@ transmorphic Tuple::overlap(transmorphic scalar pattern) {
 
     if (classname(pattern) == "Tuple") {
         tuple = pattern
-        tuple_overlap = Tuple()
         tuple_overlap.patterns = J(1, length(this.patterns), NULL)
 
         // We compute the overlap of each pattern in the tuple
@@ -115,7 +114,6 @@ transmorphic Tuple::overlap(transmorphic scalar pattern) {
     }
     else if (classname(pattern) == "POr") {
         por = pattern
-        por_overlap = POr()
 
         // We compute the overlap for each tuple in the Or pattern
         for (i = 1; i <= por.len(); i++) {
@@ -205,7 +203,6 @@ pointer scalar Tuple::difference( ///
     }
     else if (classname(pattern) == "POr") {
         por = pattern
-        por_result = POr()
 
         por_result.define(difference_list(this, por.patterns))
 
@@ -217,10 +214,6 @@ pointer scalar Tuple::difference( ///
     }
 
     tuple = pattern
-
-    // The two parts we will return
-    res_inter = POr()
-    res_diff = POr()
 
     // Compute the field difference
     main_pattern = *this.patterns[1]
@@ -244,10 +237,8 @@ pointer scalar Tuple::difference( ///
         // If the fields intersection is empty there is intersection part
         if (classname(field_inter) != "PEmpty") {
             // Build two tuples with the reaining patterns
-            new_main = Tuple()
             new_main.patterns = this.patterns[2..length(this.patterns)]
 
-            new_other = Tuple()
             new_other.patterns = tuple.patterns[2..length(this.patterns)]
 
             // Compute the difference
@@ -272,7 +263,6 @@ pointer scalar Tuple::difference( ///
         }
     }
 
-    result = POr()
     result.insert(&res_diff)
     result.insert(&res_inter)
 
@@ -282,7 +272,6 @@ pointer scalar Tuple::difference( ///
 pointer scalar function tuple_from_patterns(pointer vector patterns) {
     class Tuple scalar tuple
 
-    tuple = Tuple()
     tuple.patterns = patterns
     return(&tuple)
 }
@@ -304,7 +293,6 @@ transmorphic scalar function difference_vec( ///
     pointer scalar difference_p
     real scalar i, j, index
 
-    differences = PatternList()
     differences.push(&pattern)
 
 

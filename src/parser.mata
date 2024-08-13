@@ -37,7 +37,6 @@ class Arm scalar function parse_arm ( ///
     ) {
     class Arm scalar arm
 
-    arm     = Arm()
     arm.id = arm_id
     arm.lhs.arm_id = arm_id
 
@@ -146,7 +145,6 @@ class Pattern scalar function parse_number( ///
 class PWild scalar function parse_wild(class Variable scalar variable) {
     class PWild scalar pwild
 
-    pwild = PWild()
     pwild.define(variable)
     return(pwild)
 }
@@ -158,7 +156,6 @@ class PEmpty scalar function parse_empty() {
 class PConstant scalar function parse_constant(transmorphic scalar value) {
     class PConstant scalar pconstant
 
-    pconstant = PConstant()
     pconstant.define(value)
 
     return(pconstant)
@@ -211,7 +208,6 @@ class PRange scalar function parse_range( ///
         "Unexpected symbole: " + symbole
     }
 
-    prange = PRange()
     prange.define(min, max, in_min, in_max, variable.type == "int")
 
     return(prange)
@@ -227,7 +223,6 @@ class POr scalar function parse_or( ///
 
     check_includes = 1
 
-    por = POr()
     por.insert(&parse_pattern(t, variables, arm_id), check_includes)
 
     while (match_next(t, "|")) {
@@ -245,7 +240,6 @@ class Tuple scalar function parse_tuple( ///
     class Tuple scalar tuple
     real scalar i
 
-    tuple = Tuple()
     tuple.patterns = J(1, length(variables), NULL)
 
     i = 0
@@ -288,7 +282,6 @@ class POr scalar function parse_tuples( ///
 
     check_includes = 1
 
-    por = POr()
     por.insert(&parse_tuple(t, variables, arm_id), check_includes)
 
     while (match_next(t, "|")) {

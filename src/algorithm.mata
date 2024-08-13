@@ -14,8 +14,6 @@ class Arm vector function check_match( ///
     class POr scalar por
     real scalar i
 
-    report = Match_report()
-
     report.usefulness = check_useful(arms)
 
     useful_arms = Arm(0)
@@ -81,10 +79,6 @@ function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
     class PEmpty scalar pempty
     real scalar i, j, k, no_empty
 
-    result = Usefulness()
-    pempty = PEmpty()
-
-    lhs_empty = LHS()
     lhs_empty.pattern = &pempty
 
     overlaps = LHS(length(useful_arms))
@@ -180,8 +174,6 @@ class Tuple vector function check_completeness( ///
     class Usefulness scalar usefulness
     real scalar i
 
-    wild_arm = Arm()
-
     pwilds = PWild(length(variables))
 
     for (i = 1; i <= length(variables); i++) {
@@ -192,7 +184,6 @@ class Tuple vector function check_completeness( ///
         wild_arm.lhs.pattern = &pwilds[1].values
     }
     else {
-        tuple = Tuple()
         tuple.patterns = J(1, length(variables), NULL)
 
         for (i = 1; i <= length(variables); i++) {
