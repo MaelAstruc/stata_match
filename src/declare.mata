@@ -150,7 +150,6 @@ class Arm {
 
 ///////////////////////////////////////////////////////////////////// Usefulness
 
-
 class Usefulness {
     real scalar useful // 1 if the pattern is useful, 0 if not
     real scalar has_wildcard // 1 if the arm includes wild_cards
@@ -163,6 +162,15 @@ class Usefulness {
     void new()
     string vector to_string()
     void print(), define()
+}
+
+class Match_report {
+    class Usefulness vector usefulness
+    transmorphic scalar missings
+
+    void new()
+    string vector to_string()
+    void print()
 }
 
 end

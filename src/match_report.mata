@@ -1,14 +1,5 @@
 mata
 
-class Match_report {
-    class Usefulness vector usefulness
-    transmorphic scalar missings
-
-    void new()
-    string vector to_string()
-    void print()
-}
-
 void Match_report::new() {}
 
 string vector Match_report::to_string() {
