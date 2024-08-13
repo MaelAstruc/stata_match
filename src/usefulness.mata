@@ -1,5 +1,7 @@
 mata
 
+void Usefulness::new() {}
+
 void Usefulness::define(class Usefulness usefulness) {
     this.useful = usefulness.useful
     this.has_wildcard = usefulness.has_wildcard

@@ -1,5 +1,7 @@
 mata
 
+void Tuple::new() {}
+
 string scalar Tuple::to_string() {
     class Pattern scalar pattern
     string vector strings

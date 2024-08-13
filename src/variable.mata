@@ -1,5 +1,7 @@
 mata
 
+void Variable::new() {}
+
 string scalar Variable::to_string() {
     string rowvector levels_str
     real scalar i

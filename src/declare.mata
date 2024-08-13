@@ -14,6 +14,7 @@ class Pattern {
 
 // Empty pattern
 class PEmpty extends Pattern {
+    void new()
     virtual void define(), print()
     virtual string scalar to_string(), to_expr()
     virtual transmorphic overlap()
@@ -26,6 +27,7 @@ class PEmpty extends Pattern {
 class PWild extends Pattern {
     class POr scalar values
 
+    void new()
     virtual void define(), print()
     virtual string scalar to_string(), to_expr()
     virtual transmorphic overlap()
@@ -39,6 +41,7 @@ class PWild extends Pattern {
 class PConstant extends Pattern {
     transmorphic scalar value
 
+    void new()
     virtual void define(), print()
     virtual string scalar to_string(), to_expr()
     virtual transmorphic overlap()
@@ -51,6 +54,7 @@ class PConstant extends Pattern {
 class PRange extends Pattern {
     real scalar min, max, in_min, in_max, discrete
 
+    void new()
     virtual void define(), print()
     virtual string scalar to_string(), to_expr()
     virtual transmorphic overlap()
@@ -89,6 +93,7 @@ class PatternList extends Pattern {
 class POr extends Pattern {
     class PatternList scalar patterns
 
+    void new()
     virtual void define(), insert(), print()
     virtual string scalar to_string(), to_expr()
     virtual transmorphic overlap()
@@ -102,6 +107,7 @@ class Tuple extends Pattern {
     real scalar arm_id
     pointer vector patterns
 
+    void new()
     virtual void define(), insert(), print()
     virtual string scalar to_string(), to_expr()
     virtual transmorphic overlap()
@@ -119,6 +125,7 @@ class Variable {
     string scalar stata_type
     transmorphic rowvector levels
 
+    void new()
     string scalar to_string()
     void print(), init(), init_type(), init_levels()
 }
@@ -136,6 +143,7 @@ class Arm {
     real scalar id
     real scalar has_wildcard
 
+    void new()
     string scalar to_string()
     void print()
 }
@@ -152,6 +160,7 @@ class Usefulness {
     pointer scalar overlaps
     pointer scalar differences
 
+    void new()
     string vector to_string()
     void print(), define()
 }

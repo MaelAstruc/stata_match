@@ -2,6 +2,8 @@ mata
 
 ///////////////////////////////////////////////////////////////////////// PEmpty
 
+void PEmpty::new() {}
+
 void PEmpty::define() { 
     // Does nothing, it's empty
 }
@@ -47,6 +49,8 @@ pointer scalar PEmpty::difference(transmorphic scalar pattern) {
 }
 
 ////////////////////////////////////////////////////////////////////////// PWild
+
+void PWild::new() {}
 
 void PWild::define(class Variable scalar variable) { 
     real scalar check_includes
@@ -139,6 +143,8 @@ pointer scalar PWild::difference(transmorphic scalar pattern) {
 }
 
 ////////////////////////////////////////////////////////////////////// PConstant
+
+void PConstant::new() {}
 
 void PConstant::define(transmorphic scalar value) {
     if (isreal(value) | isstring(value)) {
@@ -275,6 +281,8 @@ pointer scalar PConstant::difference(class Pattern scalar pattern) {
 }
 
 ///////////////////////////////////////////////////////////////////////// PRange
+
+void PRange::new() {}
 
 void PRange::define( ///
         real scalar min, ///
@@ -637,6 +645,8 @@ pointer scalar PRange::difference(transmorphic scalar pattern) {
 }
 
 //////////////////////////////////////////////////////////////////////////// POr
+
+void POr::new() {}
 
 real scalar POr::len() {
     return(this.patterns.length)

@@ -1,5 +1,7 @@
 mata
 
+void Arm::new() {}
+
 string scalar Arm::to_string() {
     class Pattern scalar pattern
 
