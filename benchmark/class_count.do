@@ -28,7 +28,7 @@ void increase_class_count(transmorphic instance) {
     
     N = findexternal("N_" + class_name)
     *N = *N + 1
-    //"new " + class_name
+    // printf("new %s; ", class_name)
 }
 
 mata drop PEmpty::new()
@@ -105,6 +105,7 @@ match y, v(x) b(    ///
 assert y_base == y
 
 
+capture log close
 log using "benchmark/logs/class_count.log", replace
 
 dis "`c(current_date)'"

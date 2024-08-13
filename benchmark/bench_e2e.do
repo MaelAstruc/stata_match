@@ -51,7 +51,7 @@ program profile_obs_float
         set obs `obs'
         
         gen float x = floor(runiform(0, 15) + 1) // [1, 15]
-		
+        
         mata: bench_on("base")
         gen y_base = "d"
         replace y_base = "a" if x == 1
@@ -82,7 +82,7 @@ program profile_obs_string
         clear
         set obs `obs'
         
-		// Only to 10 because there is no range here
+        // Only to 10 because there is no range here
         gen str x = string(floor(runiform(0, 10) + 1)) // [1, 10]
         
         mata: bench_on("base")
@@ -104,6 +104,7 @@ program profile_obs_string
     mata: bench_print(BENCH)
 end
 
+capture log close
 log using "benchmark/logs/bench_e2e.log", replace
 
 dis "`c(current_date)'"

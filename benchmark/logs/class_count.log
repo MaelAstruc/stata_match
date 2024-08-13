@@ -2,41 +2,41 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\benchmark/logs/class_count.log
   log type:  text
- opened on:  13 Aug 2024, 20:09:57
+ opened on:  14 Aug 2024, 00:57:41
 
 . 
 . dis "`c(current_date)'"
-13 Aug 2024
+14 Aug 2024
 
 . dis "`c(current_time)'"
-20:09:57
+00:57:41
 
 . 
 . mata
 ------------------------------------------------- mata (type end to exit) ----------------------------------------------------------------------------------
 : N_PEmpty
-  288
+  244
 
 : N_PWild
-  418
+  2
 
 : N_PConstant
-  644
+  8
 
 : N_PRange
-  682
+  3
 
 : N_POr
-  1602
+  126
 
 : N_PatternList
-  2177
+  308
 
 : N_Tuple
-  16
+  13
 
 : N_Variable
-  13
+  1
 
 : N_Arm
   66
@@ -55,5 +55,5 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\benchmark/logs/class_count.log
   log type:  text
- closed on:  13 Aug 2024, 20:09:57
+ closed on:  14 Aug 2024, 00:57:41
 ------------------------------------------------------------------------------------------------------------------------------------------------------------

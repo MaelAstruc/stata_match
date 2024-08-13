@@ -44,10 +44,10 @@ class PConstant extends Pattern {
     void new()
     virtual void define(), print()
     virtual string scalar to_string(), to_expr()
-    virtual transmorphic overlap()
+    virtual transmorphic overlap(), overlap_pconstant(), overlap_prange(), overlap_por()
     virtual transmorphic scalar compress()
     virtual pointer scalar difference()
-    virtual real scalar includes()
+    virtual real scalar includes(), includes_pwild(), includes_pconstant(), includes_prange(), includes_por()
 }
 
 // Real or Float Range
@@ -57,10 +57,10 @@ class PRange extends Pattern {
     void new()
     virtual void define(), print()
     virtual string scalar to_string(), to_expr()
-    virtual transmorphic overlap()
+    virtual transmorphic overlap(), overlap_pconstant(), overlap_prange(), overlap_por()
     virtual transmorphic scalar compress()
-    virtual pointer scalar difference()
-    virtual real scalar includes()
+    virtual pointer scalar difference(), difference_pconstant(), difference_prange(), difference_por()
+    virtual real scalar includes(), includes_pwild(), includes_pconstant(), includes_prange(), includes_por()
 }
 
 class PatternList extends Pattern {
@@ -94,7 +94,7 @@ class POr extends Pattern {
     class PatternList scalar patterns
 
     void new()
-    virtual void define(), insert(), print()
+    virtual void define(), insert(), insert_por(), print()
     virtual string scalar to_string(), to_expr()
     virtual transmorphic overlap()
     virtual transmorphic scalar compress()

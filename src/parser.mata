@@ -41,7 +41,7 @@ class Arm scalar function parse_arm ( ///
     arm.lhs.arm_id = arm_id
 
     if (length(variables) == 1) {
-        arm.lhs.pattern = &parse_or(t, variables, arm_id)
+        arm.lhs.pattern = &parse_or(t, variables[1], arm_id)
     }
     else {
         arm.lhs.pattern = &parse_tuples(t, variables, arm_id)
@@ -58,19 +58,11 @@ class Arm scalar function parse_arm ( ///
 
 class Pattern scalar function parse_pattern( ///
     pointer t, ///
-    class Variable vector variables, ///
+    class Variable scalar variable, ///
     real scalar arm_id ///
 ) {
-    class Variable scalar variable
     string scalar tok, next, _
     real scalar number
-
-    if (tokenpeek(*t) == "(") {
-        return(parse_tuple(t, variables, arm_id))
-    }
-    else {
-        variable = variables[1]
-    }
 
     tok = tokenget(*t)
 
@@ -215,21 +207,16 @@ class PRange scalar function parse_range( ///
 
 class POr scalar function parse_or( ///
     pointer t, ///
-    class Variable vector variables, ///
+    class Variable scalar variable, ///
     real scalar arm_id ///
 ) {
     class POr scalar por
-    real scalar check_includes
 
-    check_includes = 1
+    do {
+        por.insert(&parse_pattern(t, variable, arm_id))
+    } while (match_next(t, "|"))
 
-    por.insert(&parse_pattern(t, variables, arm_id), check_includes)
-
-    while (match_next(t, "|")) {
-        por.insert(&parse_pattern(t, variables, arm_id), check_includes)
-    }
-
-    return(por)
+    return(por.compress())
 }
 
 class Tuple scalar function parse_tuple( ///
@@ -278,17 +265,12 @@ class POr scalar function parse_tuples( ///
     real scalar arm_id ///
 ) {
     class POr scalar por
-    real scalar check_includes
 
-    check_includes = 1
-
-    por.insert(&parse_tuple(t, variables, arm_id), check_includes)
-
-    while (match_next(t, "|")) {
-        por.insert(&parse_tuple(t, variables, arm_id), check_includes)
-    }
-
-    return(por)
+    do {
+        por.insert(&parse_tuple(t, variables, arm_id))
+    } while (match_next(t, "|"))
+    
+    return(por.compress())
 }
 
 //////////////////////////////////////////////////////////////////// Parse Value

@@ -26,7 +26,7 @@ end
 
 * Charge the package
 
-run "main.do"
+do "main.do"
 
 * Global variables to keep track of the results
 
@@ -43,6 +43,7 @@ run "./test/test_utils.do"
 
 //////////////////////////////////////////////////////////////////////////// LOG
 
+capture log close
 log using "test/test.log", replace
 
 ////////////////////////////////////////////////////////////////////// RUN TESTS

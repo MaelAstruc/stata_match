@@ -305,14 +305,9 @@ function test_por_define() {
     pconstant_3.define(2)
     
     por = POr()
-    por.define((&pconstant_1, &pconstant_2, &pconstant_3), 0)
+    por.define((&pconstant_1, &pconstant_2, &pconstant_3))
     
     test_result("Test POr::define(): base", por.to_string(), "1 | 2 | 2")
-    
-    por = POr()
-    por.define((&pconstant_1, &pconstant_2, &pconstant_3), 1)
-    
-    test_result("Test POr::define(): check includes", por.to_string(), "1 | 2")
 }
 
 // Tuple
@@ -433,27 +428,27 @@ function test_por_compress() {
     prange_2.define(1, 2, 0, 0, 1)
     
     por = POr()
-    por.define((&pconstant_1, &pconstant_2), 0)
+    por.define((&pconstant_1, &pconstant_2))
     compressed = por.compress()
     test_result("Test POr::compress(): base", compressed.to_string(), "1 | 2")
     
     por = POr()
-    por.define((&pconstant_1, &pconstant_2, &pconstant_3), 0)
+    por.define((&pconstant_1, &pconstant_2, &pconstant_3))
     compressed = por.compress()
     test_result("Test POr::compress(): shrink", compressed.to_string(), "1 | 2")
     
     por = POr()
-    por.define((&pconstant_2, &pconstant_3), 1)
+    por.define((&pconstant_2, &pconstant_3))
     compressed = por.compress()
     test_result("Test POr::compress(): to constant", compressed.to_string(), "2")
     
     por = POr()
-    por.define((&pconstant_1, &prange_1), 1)
+    por.define((&pconstant_1, &prange_1))
     compressed = por.compress()
     test_result("Test POr::compress(): compress each", compressed.to_string(), "1 | 2~3")
     
     por = POr()
-    por.define((&prange_2, &prange_2), 1)
+    por.define((&prange_2, &prange_2))
     compressed = por.compress()
     test_result("Test POr::compress(): empty", compressed.to_string(), "Empty")
 }

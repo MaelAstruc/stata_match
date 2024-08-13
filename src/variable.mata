@@ -62,17 +62,9 @@ void Variable::init_type() {
 }
 
 void Variable::init_levels() {
-    real scalar check_includes
-    string vector x_str, levels_str
-    real vector x_num, levels_int
-    class PRange scalar prange
-    class PConstant scalar pconstant
-    real scalar i, min, max, n_miss, precision
-
-    // All the levels are unique by definition
-    check_includes = 0
-
-    // TODO: improve depending on syntax and adapt to other types
+    string vector x_str
+    real vector x_num
+    real scalar i
 
     if (this.type == "string") {
         st_sview(x_str = "", ., this.name)
