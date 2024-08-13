@@ -2,14 +2,14 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\benchmark/logs/class_count.log
   log type:  text
- opened on:  13 Aug 2024, 19:18:30
+ opened on:  13 Aug 2024, 19:33:03
 
 . 
 . dis "`c(current_date)'"
 13 Aug 2024
 
 . dis "`c(current_time)'"
-19:18:30
+19:33:03
 
 . 
 . mata
@@ -30,7 +30,7 @@
   1602
 
 : N_PatternList
-  2458
+  2177
 
 : N_Tuple
   16
@@ -55,5 +55,5 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\benchmark/logs/class_count.log
   log type:  text
- closed on:  13 Aug 2024, 19:18:30
+ closed on:  13 Aug 2024, 19:33:03
 ------------------------------------------------------------------------------------------------------------------------------------------------------------

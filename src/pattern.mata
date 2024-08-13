@@ -916,7 +916,7 @@ pointer vector difference_list(class Pattern scalar pattern, class PatternList s
 
     // Loop over all pattern in Or
     for (i = 1; i <= pat_list.length; i++) {
-        new_differences = PatternList()
+        new_differences.clear()
         pattern_i = pat_list.get_pat(i)
 
         // Compute the difference
