@@ -39,7 +39,7 @@ mata: ERRORS = J(1, 0, "")
 
 * Small functions to run the tests and keep track of the results
 
-run "./test/utils.do"
+run "./test/test_utils.do"
 
 //////////////////////////////////////////////////////////////////////////// LOG
 
