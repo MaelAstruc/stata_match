@@ -30,6 +30,7 @@ run "main.do"
 
 * Global variables to keep track of the results
 
+mata: TOTAL  = 0
 mata: PASSED = 0
 mata: FAILED = 0
 mata: ERRORS = J(1, 0, "")
@@ -39,6 +40,10 @@ mata: ERRORS = J(1, 0, "")
 * Small functions to run the tests and keep track of the results
 
 run "./test/utils.do"
+
+//////////////////////////////////////////////////////////////////////////// LOG
+
+log using "test/test.log", replace
 
 ////////////////////////////////////////////////////////////////////// RUN TESTS
 
@@ -54,5 +59,8 @@ mata: mata drop test_*()
 ////////////////////////////////////////////////////////////////// PRINT RESULTS
 
 mata: display_errors(ERRORS)
-mata: printf("TEST PASSED: %f", PASSED)
-mata: printf("TEST FAILED: %f", FAILED)
+mata: printf("TEST TOTAL : %4.0f", TOTAL)
+mata: printf("TEST PASSED: %4.0f", PASSED)
+mata: printf("TEST FAILED: %4.0f", FAILED)
+
+log close

@@ -35,9 +35,12 @@ Wrapper function to compare two results in string format and keep track of the
 number of tests that passed or failed and the corresponding errors.
 */
 function test_result(string scalar test_name, string scalar result, string scalar expected) {
-    pointer(real scalar) PASSED, FAILED
+    pointer(real scalar) TOTAL, PASSED, FAILED
     pointer(string scalar) ERRORS
     string scalar new_error
+    
+    TOTAL = findexternal("TOTAL")
+    *TOTAL = *TOTAL + 1
     
     if (result == expected) {
         "TESTING PASSED"
@@ -72,6 +75,8 @@ program test_variables
     quietly: count if `expected' != `result'
     
     mata {
+        TOTAL = TOTAL + 1
+        
         if (`r(N)' == 0) {
             PASSED = PASSED + 1
         }

@@ -1,0 +1,38 @@
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\malsouder\Documents\Projets\stata_match\test/test.log
+  log type:  text
+ opened on:  13 Aug 2024, 18:59:44
+
+. 
+. ////////////////////////////////////////////////////////////////////// RUN TESTS
+> 
+. // TODO: run "./test/test_variables.do"
+. run "./test/test_patterns.do"
+
+. // TODO: run "./test/test_arm.do"
+. // TODO: run "./test/test_parser.do"
+. // TODO: run "./test/test_algorithm.do"
+. run "./test/test_end_to_end.do"
+
+. 
+. mata: mata drop test_*()
+
+. 
+. ////////////////////////////////////////////////////////////////// PRINT RESULTS
+> 
+. mata: display_errors(ERRORS)
+
+. mata: printf("TEST TOTAL : %4.0f", TOTAL)
+TEST TOTAL :  175
+. mata: printf("TEST PASSED: %4.0f", PASSED)
+TEST PASSED:  175
+. mata: printf("TEST FAILED: %4.0f", FAILED)
+TEST FAILED:    0
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\malsouder\Documents\Projets\stata_match\test/test.log
+  log type:  text
+ closed on:  13 Aug 2024, 18:59:45
+------------------------------------------------------------------------------------------------------------------------------------------------------------
