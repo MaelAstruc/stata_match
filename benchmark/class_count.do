@@ -17,6 +17,7 @@ N_PatternList = 0
 N_Tuple = 0
 N_Variable = 0
 N_Arm = 0
+N_Match_report = 0
 N_Usefulness = 0
 
 mata drop PEmpty::new()
@@ -88,6 +89,13 @@ void Arm::new() {
 	*N_Arm = *N_Arm + 1
 }
 
+void Match_report::new() {
+    pointer(real scalar) N_Match_report
+	
+    N_Match_report = findexternal("N_Match_report")
+	*N_Match_report = *N_Match_report + 1
+}
+
 void Usefulness::new() {
     pointer(real scalar) N_Usefulness
 	
@@ -134,6 +142,7 @@ N_PatternList
 N_Tuple
 N_Variable
 N_Arm
+N_Match_report
 N_Usefulness
 end
 
