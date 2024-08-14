@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\test/test.log
   log type:  text
- opened on:  14 Aug 2024, 00:57:35
+ opened on:  14 Aug 2024, 23:47:29
 
 . 
 . ////////////////////////////////////////////////////////////////////// RUN TESTS
@@ -34,5 +34,5 @@ TEST FAILED:    0
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\test/test.log
   log type:  text
- closed on:  14 Aug 2024, 00:57:36
+ closed on:  14 Aug 2024, 23:47:29
 ------------------------------------------------------------------------------------------------------------------------------------------------------------

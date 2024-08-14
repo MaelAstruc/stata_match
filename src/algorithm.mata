@@ -11,7 +11,6 @@ class Arm vector function check_match( ///
     class Pattern scalar missings
     class Arm scalar arm
     class Arm vector useful_arms
-    class POr scalar por
     real scalar i
 
     report.usefulness = check_useful(arms)
@@ -70,16 +69,15 @@ function check_useful(class Arm vector arms) {
 
 function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
     transmorphic scalar tuple
-    class Pattern scalar tuple_overlap, tuple_pattern, differences_pattern
+    class Pattern scalar tuple_pattern, differences_pattern
     struct LHS vector overlaps
     struct LHS scalar lhs_empty
     transmorphic scalar differences
     class Usefulness scalar result
     class Arm scalar ref_arm
-    class PEmpty scalar pempty
-    real scalar i, j, k, no_empty
+    real scalar i, k
 
-    lhs_empty.pattern = &pempty
+    lhs_empty.pattern = &(PEmpty())
 
     overlaps = LHS(length(useful_arms))
 
@@ -92,7 +90,6 @@ function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
     if (length(useful_arms) == 0) {
         result.useful = 1
         result.any_overlap = 0
-        result.tuple = &tuple
         result.overlaps = &lhs_empty
         result.differences = &differences
 
@@ -126,7 +123,6 @@ function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
         // No overlap, return tuple
         result.useful = 1
         result.any_overlap = 0
-        result.tuple = &tuple
         result.overlaps = &lhs_empty
         result.differences = &tuple
     }
@@ -138,7 +134,6 @@ function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
             // If no pattern remains, the pattern is not useful
             result.useful = 0
             result.any_overlap = 1
-            result.tuple = &tuple
             result.overlaps = &overlaps[1..k]
             result.differences = &differences
         }
@@ -146,7 +141,6 @@ function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
             // Else return the tuple, the overlaps and the differences
             result.useful = 1
             result.any_overlap = 1
-            result.tuple = &tuple
             result.overlaps = &overlaps[1..k]
             result.differences = &differences
         }

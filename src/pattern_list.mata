@@ -75,7 +75,7 @@ transmorphic scalar PatternList::compress() {
     }
 }
 
-transmorphic PatternList::overlap(class Pattern scalar pattern) {
+transmorphic scalar PatternList::overlap(class Pattern scalar pattern) {
     class Pattern scalar pattern_i
     class PatternList scalar overlap
     real scalar i
@@ -89,7 +89,7 @@ transmorphic PatternList::overlap(class Pattern scalar pattern) {
 }
 
 pointer scalar PatternList::difference(class Pattern scalar pattern) {
-    class Pattern scalar pattern_i, compressed
+    class Pattern scalar pattern_i
     class PatternList scalar differences
     real scalar i
 
@@ -133,27 +133,6 @@ void PatternList::push(pointer scalar value) {
     this.patterns[this.length] = value
 }
 
-// Add a new element at the end of the values and resize if required
-void PatternList::push_value(transmorphic scalar value) {
-    this.push(&value)
-}
-
-// Get the last value
-pointer scalar PatternList::last() {
-    check_empty("get the last value")
-
-    return(this.patterns[this.length])
-}
-
-// Remove the last element and resize if two thirds are empty
-pointer scalar PatternList::pop() {
-    check_empty("pop the last value")
-
-    // We just ignore the last value
-    this.length = this.length - 1
-    return(this.patterns[this.length+1])
-}
-
 // Add an array of new elements at the end and resize if required
 void PatternList::append(pointer rowvector new_values) {
     real scalar new_capacity, new_length
@@ -168,16 +147,6 @@ void PatternList::append(pointer rowvector new_values) {
 
     this.patterns[this.length+1..new_length] = new_values
     this.length = new_length
-}
-
-// Remove the empty values by resizing to the length
-void PatternList::trim() {
-    // Don't need if there are not empty values
-    check_empty("trim")
-
-    if (this.length != this.capacity) {
-        this.resize(this.length)
-    }
 }
 
 // Replace a value at a given index
@@ -266,14 +235,6 @@ void PatternList::check_range(real scalar index, string scalar verb) {
             "Cannot %s a value at index %f in an array of length %f\n",
             verb, index, this.length
         )
-        exit(_error(3300))
-    }
-}
-
-// Util check if the array is empty
-void PatternList::check_empty(string scalar message) {
-    if (this.length == 0) {
-        errprintf("Cannot %s an empty array\n", message)
         exit(_error(3300))
     }
 }

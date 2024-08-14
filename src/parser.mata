@@ -61,7 +61,7 @@ class Pattern scalar function parse_pattern( ///
     class Variable scalar variable, ///
     real scalar arm_id ///
 ) {
-    string scalar tok, next, _
+    string scalar tok
     real scalar number
 
     tok = tokenget(*t)
@@ -120,11 +120,11 @@ class Pattern scalar function parse_number( ///
     real scalar arm_id,
     class Variable scalar variable ///
 ) {
-    string scalar _, next
+    string scalar next
 
     next = tokenpeek(*t)
     if (israngesym(next)) {
-        _ = tokenget(*t)
+        (void) tokenget(*t)
         return(parse_range(t, next, number, arm_id, variable))
     }
     else {
@@ -161,8 +161,8 @@ class PRange scalar function parse_range( ///
     class Variable scalar variable ///
 ) {
     class PRange scalar prange
-    string scalar next, _
-    real scalar number, max, in_min, in_max, precision
+    string scalar next
+    real scalar max, in_min, in_max
     
     next = tokenget(*t)
     
@@ -213,7 +213,7 @@ class POr scalar function parse_or( ///
     class POr scalar por
 
     do {
-        por.insert(&parse_pattern(t, variable, arm_id))
+        por.push(&parse_pattern(t, variable, arm_id))
     } while (match_next(t, "|"))
 
     return(por.compress())
@@ -267,7 +267,7 @@ class POr scalar function parse_tuples( ///
     class POr scalar por
 
     do {
-        por.insert(&parse_tuple(t, variables, arm_id))
+        por.push(&parse_tuple(t, variables, arm_id))
     } while (match_next(t, "|"))
     
     return(por.compress())
@@ -295,7 +295,6 @@ pointer scalar function tokenize(string scalar str) {
 }
 
 string scalar function consume(pointer t, string scalar str) {
-    pointer scalar _
     string scalar tok, inside, value
 
     value = ""
@@ -306,17 +305,17 @@ string scalar function consume(pointer t, string scalar str) {
         }
         value = value + tok + inside
     }
-    _ = tokenget(*t)
+    (void) tokenget(*t)
     return(value)
 }
 
 real scalar function match_next(pointer t, string scalar str) {
-    string scalar next, _
-
+    string scalar next
+    
     next = tokenpeek(*t)
     
     if (next == str) {
-        _ = tokenget(*t)
+        (void) tokenget(*t)
         return(1)
     }
     else {

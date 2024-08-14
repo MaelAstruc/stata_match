@@ -6,7 +6,6 @@ void Usefulness::define(class Usefulness usefulness) {
     this.useful = usefulness.useful
     this.has_wildcard = usefulness.has_wildcard
     this.any_overlap = usefulness.any_overlap
-    this.tuple = usefulness.tuple
     this.arm_id = usefulness.arm_id
     this.overlaps = usefulness.overlaps
     this.differences = usefulness.differences

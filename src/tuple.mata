@@ -58,15 +58,15 @@ string scalar Tuple::to_expr(class Variable vector variables) {
         pattern = pattern.compress()
         if (classname(pattern) != "PWild" & classname(pattern) != "PEmpty") {
             k++
-			exprs[k] = pattern.to_expr(variables[i].name)
+            exprs[k] = pattern.to_expr(variables[i].name)
         }
     }
-	
-	if (k > 1) {
-		for (i = 1; i <= k; i++) {
-			exprs[i] = "(" + exprs[i] + ")"
-		}
-	}
+    
+    if (k > 1) {
+        for (i = 1; i <= k; i++) {
+            exprs[i] = "(" + exprs[i] + ")"
+        }
+    }
     
     return(invtokens(exprs[1..k], " & "))
 }
@@ -94,33 +94,12 @@ pointer scalar function tuple_compress_i(pointer vector patterns, real scalar i)
     return(&pattern.compress())
 }
 
-transmorphic Tuple::overlap(transmorphic scalar pattern) {
-    class Pattern scalar pattern_i
-    class Tuple scalar tuple, tuple_overlap
-    class POr scalar por, por_overlap
-    real scalar i
-
+transmorphic scalar Tuple::overlap(transmorphic scalar pattern) {
     if (classname(pattern) == "Tuple") {
-        tuple = pattern
-        tuple_overlap.patterns = J(1, length(this.patterns), NULL)
-
-        // We compute the overlap of each pattern in the tuple
-        for (i = 1; i <= length(this.patterns); i++) {
-            pattern_i = *this.patterns[i]
-            tuple_overlap.patterns[i] = &pattern_i.overlap(*tuple.patterns[i])
-        }
-
-        return(tuple_overlap.compress())
+        return(this.overlap_tuple(pattern))
     }
     else if (classname(pattern) == "POr") {
-        por = pattern
-
-        // We compute the overlap for each tuple in the Or pattern
-        for (i = 1; i <= por.len(); i++) {
-            por_overlap.insert(&this.overlap(por.patterns.get_pat(i)))
-        }
-
-        return(por_overlap.compress())
+        return(this.overlap_por(pattern))
     }
     else {
         errprintf("Unexpected pattern class: %s", classname(pattern))
@@ -148,7 +127,6 @@ real scalar Tuple::includes(class Tuple scalar tuple) {
     return(included)
 }
 
-
 void function check_tuples_length( ///
     class Tuple scalar tuple_1, ///
     class Tuple scalar tuple_2    ///
@@ -160,6 +138,34 @@ void function check_tuples_length( ///
         )
         exit(_error(3300))
     }
+}
+
+transmorphic scalar Tuple::overlap_tuple(class Tuple scalar tuple) {
+    class Pattern scalar pattern_i
+    class Tuple scalar tuple_overlap
+    real scalar i
+
+    tuple_overlap.patterns = J(1, length(this.patterns), NULL)
+
+    // We compute the overlap of each pattern in the tuple
+    for (i = 1; i <= length(this.patterns); i++) {
+        pattern_i = *this.patterns[i]
+        tuple_overlap.patterns[i] = &pattern_i.overlap(*tuple.patterns[i])
+    }
+
+    return(tuple_overlap.compress())
+}
+
+transmorphic scalar Tuple::overlap_por(class POr scalar por) {
+    class POr scalar por_overlap
+    real scalar i
+    
+    // We compute the overlap for each tuple in the Or pattern
+    for (i = 1; i <= por.len(); i++) {
+        por_overlap.push(&this.overlap(por.get_pat(i)))
+    }
+
+    return(por_overlap.compress())
 }
 
 /*
@@ -187,34 +193,38 @@ For the a field n, the difference is equal to diff_n. For a field (n-1),
 
 We recursively build the difference of all the fields up to the first one.
 */
-pointer scalar Tuple::difference( ///
-    transmorphic scalar pattern ///
-) {
-    class POr scalar por, por_result, res_inter, res_diff, result
-    transmorphic scalar new_diff
-    class Pattern scalar main_pattern, other_pattern, field_inter
-    pointer vector field_diff
-    class Tuple scalar tuple, new_main, new_other, new_diff_i
-    class PatternList scalar pat_list
-    real scalar i
-
+pointer scalar Tuple::difference(transmorphic scalar pattern) {
     if (classname(pattern) == "PEmpty") {
         return(&this)
     }
     else if (classname(pattern) == "POr") {
-        por = pattern
-
-        por_result.define(difference_list(this, por.patterns))
-
-        return(&por_result.compress())
+        return(this.difference_por(pattern))
     }
     else if (classname(pattern) != "Tuple") {
         errprintf("Unexpected pattern class %s", classname(pattern))
         exit(_error(101))
     }
 
-    tuple = pattern
+    return(this.difference_tuple(pattern))
+}
 
+pointer scalar Tuple::difference_por(class POr scalar por) {
+    class POr scalar por_result
+    
+    por_result.define(difference_list(this, por.patterns))
+
+    return(&por_result.compress())
+}
+
+pointer scalar Tuple::difference_tuple(class Tuple scalar tuple) {
+    class POr scalar res_inter, res_diff, result
+    transmorphic scalar new_diff
+    class Pattern scalar main_pattern, other_pattern, field_inter
+    pointer vector field_diff
+    class Tuple scalar new_main, new_other, new_diff_i
+    class PatternList scalar pat_list
+    real scalar i
+    
     // Compute the field difference
     main_pattern = *this.patterns[1]
     other_pattern = *tuple.patterns[1]
@@ -225,13 +235,13 @@ pointer scalar Tuple::difference( ///
     // If there are no other fields
     if (length(this.patterns) == 1) {
         if (classname(*field_diff) != "PEmpty") {
-            res_diff.insert(tuple_from_patterns(field_diff))
+            res_diff.push(tuple_from_patterns(field_diff))
         }
     }
     else {
         // If the fields difference is empty there is no difference part
         if (classname(*field_diff) != "PEmpty") {
-            res_diff.insert(tuple_from_patterns((field_diff, this.patterns[2..length(this.patterns)])))
+            res_diff.push(tuple_from_patterns((field_diff, this.patterns[2..length(this.patterns)])))
         }
 
         // If the fields intersection is empty there is intersection part
@@ -247,24 +257,24 @@ pointer scalar Tuple::difference( ///
             // If non empty, we fill the tuples
             if (classname(*new_diff) == "Tuple") {
                 new_diff_i = *new_diff
-                res_inter.insert(tuple_from_patterns((&field_inter, new_diff_i.patterns)))
+                res_inter.push(tuple_from_patterns((&field_inter, new_diff_i.patterns)))
             }
             else if (classname(*new_diff) == "PatternList") {
                 pat_list = *new_diff
                 for (i = 1; i <= pat_list.length; i++) {
                     new_diff_i = pat_list.get_pat(i)
-                    res_inter.insert(tuple_from_patterns((&field_inter, new_diff_i.patterns)))
+                    res_inter.push(tuple_from_patterns((&field_inter, new_diff_i.patterns)))
                 }
             }
             else if (classname(*new_diff) != "PEmpty") {
-                errprintf("Unexpected pattern of class '%s'", classname(pattern))
+                errprintf("Unexpected pattern of class '%s'", classname(*new_diff))
                 exit(_error(3260))
             }
         }
     }
 
-    result.insert(&res_diff)
-    result.insert(&res_inter)
+    result.push(&res_diff)
+    result.push(&res_inter)
 
     return(&result.compress())
 }
@@ -288,13 +298,11 @@ transmorphic scalar function difference_vec( ///
     class Pattern scalar pattern,
     class Tuple vector tuples ///
 ) {
-    class PatternList scalar differences, pat_list
+    class PatternList scalar differences
     transmorphic scalar new_differences
-    pointer scalar difference_p
-    real scalar i, j, index
+    real scalar i
 
     differences.push(&pattern)
-
 
     for (i = 1; i <= length(tuples); i++) {
 

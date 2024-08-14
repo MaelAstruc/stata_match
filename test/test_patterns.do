@@ -533,8 +533,8 @@ function test_pwild_overlap() {
     test_result("Test PWild::overlap() range", overlap.to_string(), prange.to_string())
     
     por = POr()
-    por.insert(pconstant)
-    por.insert(prange)
+    por.push(pconstant)
+    por.push(prange)
     overlap = pwild.overlap(por)
     test_result("Test PWild::overlap() or", overlap.to_string(), por.to_string())
 }
@@ -585,12 +585,12 @@ function test_pconstant_overlap() {
     test_result("Test PConstant::overlap() max out", overlap.to_string(), "Empty")
     
     por = POr()
-    por.insert(pconstant_2)
-    por.insert(prange_2)
+    por.push(pconstant_2)
+    por.push(prange_2)
     overlap = pconstant.overlap(por)
     test_result("Test PConstant::overlap() or out", overlap.to_string(), "Empty")
     
-    por.insert(pconstant_1)
+    por.push(pconstant_1)
     overlap = pconstant.overlap(por)
     test_result("Test PConstant::overlap() or in", overlap.to_string(), "1")
 }
@@ -660,9 +660,9 @@ function test_prange_overlap() {
     prange_8.define(2, 3, 1, 1, 1)
     
     por = POr()
-    por.insert(pconstant_1)
-    por.insert(pconstant_2)
-    por.insert(prange_8)
+    por.push(pconstant_1)
+    por.push(pconstant_2)
+    por.push(prange_8)
     overlap = prange.overlap(por)
     test_result("Test PRange::overlap() or", overlap.to_string(), "1 | 2~3")
 }
@@ -688,9 +688,9 @@ function test_por_overlap() {
     prange_1 = PRange()
     prange_1.define(2, 4, 1, 1, 1)
     
-    por_1.insert(pconstant_1)
-    por_1.insert(pconstant_2)
-    por_1.insert(prange_1)
+    por_1.push(pconstant_1)
+    por_1.push(pconstant_2)
+    por_1.push(prange_1)
     
     // POr 2 : (10~20 | 3 | 1)
     
@@ -702,9 +702,9 @@ function test_por_overlap() {
     pconstant_3 = PConstant()
     pconstant_3.define(3)
     
-    por_2.insert(prange_2)
-    por_2.insert(pconstant_3)
-    por_2.insert(pconstant_2)
+    por_2.push(prange_2)
+    por_2.push(pconstant_3)
+    por_2.push(pconstant_2)
     
     // Check
     // - pconstant out
@@ -768,8 +768,8 @@ function test_pwild_includes() {
     test_result("Test PWild::includes() range", strofreal(included), "1")
     
     por = POr()
-    por.insert(pconstant)
-    por.insert(prange)
+    por.push(pconstant)
+    por.push(prange)
     included = pwild.includes(por)
     test_result("Test PWild::includes() or", strofreal(included), "1")
 }
@@ -820,11 +820,11 @@ function test_pconstant_includes() {
     
     por = POr()
     
-    por.insert(pconstant_1)
+    por.push(pconstant_1)
     included = pconstant.includes(por)
     test_result("Test PConstant::includes() or in", strofreal(included), "1")
     
-    por.insert(pconstant_2)
+    por.push(pconstant_2)
     included = pconstant.includes(por)
     test_result("Test PConstant::includes() or out", strofreal(included), "0")
 }
@@ -894,11 +894,11 @@ function test_prange_includes() {
     test_result("Test PRange::includes() high", strofreal(included), "0")
     
     por = POr()
-    por.insert(pconstant_1)
+    por.push(pconstant_1)
     included = prange.includes(por)
     test_result("Test PRange::includes() or in", strofreal(included), "1")
     
-    por.insert(pconstant_2)
+    por.push(pconstant_2)
     included = prange.includes(por)
     test_result("Test PRange::includes() or out", strofreal(included), "0")
 }
@@ -921,8 +921,8 @@ function test_por_includes() {
     prange_1 = PRange()
     prange_1.define(1, 4, 1, 1, 1)
     
-    por.insert(pconstant_1)
-    por.insert(prange_1)
+    por.push(pconstant_1)
+    por.push(prange_1)
     
     included = por.includes(pconstant_1)
     test_result("Test POr::includes() constant in", strofreal(included), "1")
@@ -959,15 +959,15 @@ function test_por_includes() {
     
     por_1 = POr()
     
-    por_1.insert(pconstant_1)
+    por_1.push(pconstant_1)
     included = por.includes(por_1)
     test_result("Test POr::includes() or in 1 element", strofreal(included), "1")
     
-    por_1.insert(prange_2)
+    por_1.push(prange_2)
     included = por.includes(por_1)
     test_result("Test POr::includes() or in 2 elements", strofreal(included), "1")
     
-    por_1.insert(pconstant_3)
+    por_1.push(pconstant_3)
     included = por.includes(por_1)
     test_result("Test POr::includes() or out", strofreal(included), "0")    
 }
@@ -1024,8 +1024,8 @@ function test_pempty_difference() {
     // POr
 
     por = POr()
-    por.insert(pconstant_1)
-    por.insert(prange_1)
+    por.push(pconstant_1)
+    por.push(prange_1)
     
     difference = *pempty.difference(por)
 
@@ -1103,14 +1103,14 @@ function test_pconstant_difference() {
     // POr
 
     por = POr()
-    por.insert(pconstant_2)
-    por.insert(prange_2)
+    por.push(pconstant_2)
+    por.push(prange_2)
     
     difference = *pconstant.difference(por)
 
     test_result("Test PConstant::difference() range in", difference.to_string(), "1")
 
-    por.insert(pconstant_1)
+    por.push(pconstant_1)
     
     difference = *pconstant.difference(por)
 
@@ -1196,20 +1196,20 @@ function test_prange_difference() {
     // POr
     
     por = POr()
-    por.insert(pconstant_1)
-    por.insert(prange_1)
+    por.push(pconstant_1)
+    por.push(prange_1)
     
     difference = *prange.difference(por)
 
     test_result("Test PRange::difference() or out", difference.to_string(), "0~3")
     
-    por.insert(pconstant_3)
+    por.push(pconstant_3)
     
     difference = *prange.difference(por)
 
     test_result("Test PRange::difference() or in 1", difference.to_string(), "0~2")
     
-    por.insert(prange_2)
+    por.push(prange_2)
     
     difference = *prange.difference(por)
 
@@ -1235,8 +1235,8 @@ function test_por_difference() {
     prange_1 = PRange()
     prange_1.define(3, 7, 1, 1, 1)
     
-    por.insert(&pconstant_1)
-    por.insert(&prange_1)
+    por.push(&pconstant_1)
+    por.push(&prange_1)
     
     // PEmpty
     
@@ -1304,8 +1304,8 @@ function test_por_difference() {
     // POr
     
     por_1 = POr()
-    por_1.insert(pconstant_3)
-    por_1.insert(prange_3)
+    por_1.push(pconstant_3)
+    por_1.push(prange_3)
     
     difference = *por.difference(por_1)
     
@@ -1314,19 +1314,19 @@ function test_por_difference() {
 
     test_result("Test POr::difference() or out", difference.to_string(), "1 | 3~7")
     
-    por_1.insert(pconstant_2)
+    por_1.push(pconstant_2)
     
     difference = *por.difference(por_1)
 
     test_result("Test POr::difference() or in 1", difference.to_string(), "1 | 3~4 | 6~7")
     
-    por_1.insert(prange_2)
+    por_1.push(prange_2)
     
     difference = *por.difference(por_1)
 
     test_result("Test POr::difference() or in 2", difference.to_string(), "6~7")
     
-    por_1.insert(prange_4)
+    por_1.push(prange_4)
     
     difference = *por.difference(por_1)
 
@@ -1420,14 +1420,14 @@ function test_por_to_expr() {
     pconstant = PConstant()
     pconstant.value = 1
 
-    por.insert(pconstant)
+    por.push(pconstant)
 
     test_result("Test POr::to_expr()", por.to_expr(var_name), "test_var == `one_21x'")
 
     prange = PRange()
     prange.define(2, 3, 1, 1, 1)
 
-    por.insert(prange)
+    por.push(prange)
 
     test_result("Test POr::to_expr()", por.to_expr(var_name), "(test_var == `one_21x') | (test_var >= `two_21x' & test_var <= `three_21x')")
 }
@@ -1479,8 +1479,8 @@ function test_ptuple_to_expr() {
     // (1 | 1~3, _)
 
     por_1 = POr()
-    por_1.insert(pconstant)
-    por_1.insert(prange)
+    por_1.push(pconstant)
+    por_1.push(prange)
 
     pwild = PWild()
 
@@ -1501,8 +1501,8 @@ function test_ptuple_to_expr() {
     tuple_2.patterns[2] = &prange
     
     por_2 = POr()
-    por_2.insert(tuple_1)
-    por_2.insert(tuple_2)
+    por_2.push(tuple_1)
+    por_2.push(tuple_2)
     
     variables = Variable(2)
     variables[1].name = "test_var_1"
