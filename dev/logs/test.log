@@ -1,19 +1,19 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\malsouder\Documents\Projets\stata_match\test/test.log
+       log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/test/test.log
   log type:  text
- opened on:  14 Aug 2024, 23:47:29
+ opened on:  15 Aug 2024, 02:08:34
 
 . 
 . ////////////////////////////////////////////////////////////////////// RUN TESTS
 > 
-. // TODO: run "./test/test_variables.do"
-. run "./test/test_patterns.do"
+. // TODO: run "dev/test/test_variables.do"
+. run "dev/test/test_patterns.do"
 
-. // TODO: run "./test/test_arm.do"
-. // TODO: run "./test/test_parser.do"
-. // TODO: run "./test/test_algorithm.do"
-. run "./test/test_end_to_end.do"
+. // TODO: run "dev/test/test_arm.do"
+. // TODO: run "dev/test/test_parser.do"
+. // TODO: run "dev/test/test_algorithm.do"
+. run "dev/test/test_end_to_end.do"
 
 . 
 . mata: mata drop test_*()
@@ -32,7 +32,7 @@ TEST FAILED:    0
 . 
 . log close
       name:  <unnamed>
-       log:  C:\Users\malsouder\Documents\Projets\stata_match\test/test.log
+       log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/test/test.log
   log type:  text
- closed on:  14 Aug 2024, 23:47:29
+ closed on:  15 Aug 2024, 02:08:34
 ------------------------------------------------------------------------------------------------------------------------------------------------------------

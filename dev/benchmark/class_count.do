@@ -4,7 +4,7 @@ clear all
 
 local obs = 100
 
-do "main.do"
+do "match.ado"
 
 mata
 
@@ -106,7 +106,7 @@ assert y_base == y
 
 
 capture log close
-log using "benchmark/logs/class_count.log", replace
+log using "dev/logs/class_count.log", replace
 
 dis "`c(current_date)'"
 dis "`c(current_time)'"

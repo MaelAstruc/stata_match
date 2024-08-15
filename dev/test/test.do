@@ -26,7 +26,7 @@ end
 
 * Charge the package
 
-do "main.do"
+do "match.ado"
 
 * Global variables to keep track of the results
 
@@ -39,21 +39,21 @@ mata: ERRORS = J(1, 0, "")
 
 * Small functions to run the tests and keep track of the results
 
-run "./test/test_utils.do"
+run "dev/test/test_utils.do"
 
 //////////////////////////////////////////////////////////////////////////// LOG
 
 capture log close
-log using "test/test.log", replace
+log using "dev/logs/test.log", replace
 
 ////////////////////////////////////////////////////////////////////// RUN TESTS
 
-// TODO: run "./test/test_variables.do"
-run "./test/test_patterns.do"
-// TODO: run "./test/test_arm.do"
-// TODO: run "./test/test_parser.do"
-// TODO: run "./test/test_algorithm.do"
-run "./test/test_end_to_end.do"
+// TODO: run "dev/test/test_variables.do"
+run "dev/test/test_patterns.do"
+// TODO: run "dev/test/test_arm.do"
+// TODO: run "dev/test/test_parser.do"
+// TODO: run "dev/test/test_algorithm.do"
+run "dev/test/test_end_to_end.do"
 
 mata: mata drop test_*()
 

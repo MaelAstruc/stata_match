@@ -4,8 +4,8 @@ Benchmark the match function and compare to performance of base commands
 
 clear all
 
-run "benchmark/bench_utils.mata"
-run "main.do"
+run "match.ado"
+run "dev/benchmark/bench_utils.mata"
 
 // Check the time needed  with different number of observations
 
@@ -105,7 +105,7 @@ program profile_obs_string
 end
 
 capture log close
-log using "benchmark/logs/bench_e2e.log", replace
+log using "dev/logs/bench_e2e.log", replace
 
 dis "`c(current_date)'"
 dis "`c(current_time)'"

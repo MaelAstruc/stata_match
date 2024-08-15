@@ -1,15 +1,15 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\malsouder\Documents\Projets\stata_match\benchmark/logs/class_count.log
+       log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/benchmark/logs/class_count.log
   log type:  text
- opened on:  14 Aug 2024, 23:47:37
+ opened on:  15 Aug 2024, 02:08:34
 
 . 
 . dis "`c(current_date)'"
-14 Aug 2024
+15 Aug 2024
 
 . dis "`c(current_time)'"
-23:47:37
+02:08:34
 
 . 
 . mata
@@ -53,7 +53,7 @@
 . 
 . log close
       name:  <unnamed>
-       log:  C:\Users\malsouder\Documents\Projets\stata_match\benchmark/logs/class_count.log
+       log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/benchmark/logs/class_count.log
   log type:  text
- closed on:  14 Aug 2024, 23:47:37
+ closed on:  15 Aug 2024, 02:08:34
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
