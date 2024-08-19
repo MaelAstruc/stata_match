@@ -15,7 +15,7 @@ mata
         
         fh = fopen(file, "r")
         while ((line = fget(fh)) != J(0, 0, "")) {
-            lines = lines, regexr(line, char(9), " " * 4)
+            lines = lines, ustrregexra(line, char(9), " " * 4)
         }
         fclose(fh)
         

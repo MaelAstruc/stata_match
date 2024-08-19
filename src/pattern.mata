@@ -1073,25 +1073,46 @@ transmorphic function por_overlap( ///
 }
 
 real scalar POr::includes(transmorphic scalar pattern) {
-    pointer vector difference
-
     check_pattern(pattern)
 
     if (classname(pattern) == "PEmpty") {
         return(1)
     }
+    if (classname(pattern) == "PConstant") {
+        return(this.includes_pconstant(pattern))
+    }
     else {
-        difference = difference_list(pattern, this.patterns)
+        return(this.includes_default(pattern))
+    }
+}
+
+real scalar POr::includes_pconstant(class PConstant scalar pconstant) {
+    class Pattern scalar pattern_i
+    real scalar i
     
-        if (length(difference) > 1) {
-            return(0)
-        }
-        else if (classname(*difference[1]) == "PEmpty") {
+    for (i = 1; i <= this.len(); i++) {
+        pattern_i = this.get_pat(i)
+        if (pattern_i.includes(pconstant)) {
             return(1)
         }
-        else {
-            return(0)
-        }
+    }
+    
+    return(0)
+}
+
+real scalar POr::includes_default(transmorphic scalar pattern) {
+    pointer vector difference
+    
+    difference = difference_list(pattern, this.patterns)
+
+    if (length(difference) > 1) {
+        return(0)
+    }
+    else if (classname(*difference[1]) == "PEmpty") {
+        return(1)
+    }
+    else {
+        return(0)
     }
 }
 

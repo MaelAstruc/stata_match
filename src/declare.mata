@@ -156,6 +156,8 @@ class POr extends Pattern {
     
     // Other methods
     void new()
+    real scalar includes_pconstant()                                            // Includes PConstant()
+    real scalar includes_default()                                              // Includes PWild(), PRange() or POr()
     real scalar len()                                                           // Get the # of patterns
     void push()                                                                 // Push a new pattern
     void append_por()                                                           // Append a new por
