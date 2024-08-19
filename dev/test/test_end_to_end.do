@@ -327,3 +327,66 @@ pmatch y2, v(x1) b( ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: 'max' in range")
+
+///////////////////////////////////////////////////////////////// Exhaustiveness
+
+clear
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 5))
+
+gen y1 = ""
+replace y1 = "a" if x1 == 1 | x1 == 2
+replace y1 = "b" if x1 == 3
+
+gen y2 = ""
+
+pmatch y2, v(x1) b( ///
+    1 | 2   => "a",  ///
+    3   => "b"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: non-exhaustive")
+
+/////////////////////////////////////////////////////////////////////// Overlaps
+
+clear
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 5))
+
+gen y1 = ""
+replace y1 = "a" if x1 == 1 | x1 == 2
+replace y1 = "b" if x1 > 2
+
+gen y2 = ""
+
+// pmatch y2, v(x1) b( 1 | 2 => "a", 2~max => "b")
+pmatch y2, v(x1) b( ///
+    1 | 2   => "a",  ///
+    2~max   => "b"   ///
+)
+
+// We expect 2 to be "a", not "b" due to the overlap
+test_variables, expected(y1) result(y2) test("End to end: overlaps")
+
+///////////////////////////////////////////////////////////////////// Non-useful
+
+clear
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 5))
+
+gen y1 = "a"
+
+gen y2 = ""
+
+pmatch y2, v(x1) b( ///
+    _   => "a",  ///
+    1   => "b"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: non-useful")

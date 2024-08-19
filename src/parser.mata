@@ -1,19 +1,19 @@
 mata
 
-class Arm vector function parse_string( ///
-        string scalar str, ///
-        class Variable vector variables ///
+class Arm vector function parse_string(
+        string scalar str,
+        class Variable vector variables
     ) {
     pointer scalar t
 
     t = tokenize(str)
 
-    return(parse_arms(&t, variables))
+    return(parse_arms(t, variables))
 }
 
-class Arm vector function parse_arms ( ///
-        pointer t, ///
-        class Variable vector variables ///
+class Arm vector function parse_arms (
+        pointer t,
+        class Variable vector variables
 ) {
     class Arm scalar arm
     class Arm vector arms
@@ -22,7 +22,7 @@ class Arm vector function parse_arms ( ///
     arms = Arm(0)
     i = 0
 
-    while (tokenpeek(*t) != "") {
+    while (tokenpeek(t) != "") {
         arm = parse_arm(t, ++i, variables)
         arms = arms, arm
     }
@@ -30,10 +30,10 @@ class Arm vector function parse_arms ( ///
     return(arms)
 }
 
-class Arm scalar function parse_arm ( ///
-        pointer t, ///
+class Arm scalar function parse_arm (
+        pointer t,
         real scalar arm_id,
-        class Variable vector variables ///
+        class Variable vector variables
     ) {
     class Arm scalar arm
 
@@ -56,15 +56,15 @@ class Arm scalar function parse_arm ( ///
     return(arm)
 }
 
-class Pattern scalar function parse_pattern( ///
-    pointer t, ///
-    class Variable scalar variable, ///
-    real scalar arm_id ///
+class Pattern scalar function parse_pattern(
+    pointer t,
+    class Variable scalar variable,
+    real scalar arm_id
 ) {
     string scalar tok
     real scalar number
 
-    tok = tokenget(*t)
+    tok = tokenget(t)
 
     if (variable.type == "string") {
         if (tok == "_") {
@@ -114,17 +114,17 @@ class Pattern scalar function parse_pattern( ///
     }
 }
 
-class Pattern scalar function parse_number( ///
-    pointer t, ///
-    real scalar number, ///
+class Pattern scalar function parse_number(
+    pointer t,
+    real scalar number,
     real scalar arm_id,
-    class Variable scalar variable ///
+    class Variable scalar variable
 ) {
     string scalar next
 
-    next = tokenpeek(*t)
+    next = tokenpeek(t)
     if (israngesym(next)) {
-        (void) tokenget(*t)
+        (void) tokenget(t)
         return(parse_range(t, next, number, arm_id, variable))
     }
     else {
@@ -153,18 +153,18 @@ class PConstant scalar function parse_constant(transmorphic scalar value) {
     return(pconstant)
 }
 
-class PRange scalar function parse_range( ///
-    pointer scalar t, ///
-    string scalar symbole, ///
-    real scalar min, ///
-    real scalar arm_id, ///
-    class Variable scalar variable ///
+class PRange scalar function parse_range(
+    pointer scalar t,
+    string scalar symbole,
+    real scalar min,
+    real scalar arm_id,
+    class Variable scalar variable
 ) {
     class PRange scalar prange
     string scalar next
     real scalar max, in_min, in_max
     
-    next = tokenget(*t)
+    next = tokenget(t)
     
     if (next == "max") {
         max = max(variable.levels)
@@ -205,24 +205,24 @@ class PRange scalar function parse_range( ///
     return(prange)
 }
 
-class POr scalar function parse_or( ///
-    pointer t, ///
-    class Variable scalar variable, ///
-    real scalar arm_id ///
+class POr scalar function parse_or(
+    pointer t,
+    class Variable scalar variable,
+    real scalar arm_id
 ) {
     class POr scalar por
 
     do {
-        por.push(&parse_pattern(t, variable, arm_id))
+        por.push(parse_pattern(t, variable, arm_id))
     } while (match_next(t, "|"))
 
     return(por.compress())
 }
 
-class Tuple scalar function parse_tuple( ///
-    pointer t, ///
-    class Variable vector variables, ///
-    real scalar arm_id ///
+class Tuple scalar function parse_tuple(
+    pointer t,
+    class Variable vector variables,
+    real scalar arm_id
 ) {
     class Tuple scalar tuple
     real scalar i
@@ -259,15 +259,15 @@ class Tuple scalar function parse_tuple( ///
     return(tuple)
 }
 
-class POr scalar function parse_tuples( ///
-    pointer t, ///
-    class Variable vector variables, ///
-    real scalar arm_id ///
+class POr scalar function parse_tuples(
+    pointer t,
+    class Variable vector variables,
+    real scalar arm_id
 ) {
     class POr scalar por
 
     do {
-        por.push(&parse_tuple(t, variables, arm_id))
+        por.push(parse_tuple(t, variables, arm_id))
     } while (match_next(t, "|"))
     
     return(por.compress())
@@ -298,24 +298,24 @@ string scalar function consume(pointer t, string scalar str) {
     string scalar tok, inside, value
 
     value = ""
-    while (tokenpeek(*t) != str & tokenpeek(*t) != "") {
-        tok = tokenget(*t)
+    while (tokenpeek(t) != str & tokenpeek(t) != "") {
+        tok = tokenget(t)
         if (tok == "(") {
             inside = consume(t, ")") + ")"
         }
         value = value + tok + inside
     }
-    (void) tokenget(*t)
+    (void) tokenget(t)
     return(value)
 }
 
 real scalar function match_next(pointer t, string scalar str) {
     string scalar next
     
-    next = tokenpeek(*t)
+    next = tokenpeek(t)
     
     if (next == str) {
-        (void) tokenget(*t)
+        (void) tokenget(t)
         return(1)
     }
     else {
@@ -326,7 +326,7 @@ real scalar function match_next(pointer t, string scalar str) {
 void function check_next(pointer t, string scalar str, real scalar arm_id) {
     string scalar next
 
-    next = tokenget(*t)
+    next = tokenget(t)
     
     if (next != str) {
         errprintf("Expect '%s' in arm %f, found: '%s'\n", str, arm_id, next)
@@ -347,14 +347,8 @@ real scalar function israngesym(str) {
 }
 
 real scalar function check_wildcard(transmorphic scalar pattern) {
-    transmorphic scalar pattern_copy
-    class POr scalar por
-    class Tuple scalar tuple
-    real scalar i
-    
     if (eltype(pattern) == "pointer") {
-        pattern_copy = *pattern
-        return(check_wildcard(pattern_copy))
+        return(check_wildcard(*pattern))
     }
     else if (classname(pattern) == "PEmpty") {
         return(0)
@@ -369,24 +363,35 @@ real scalar function check_wildcard(transmorphic scalar pattern) {
         return(0)
     }
     else if (classname(pattern) == "POr") {
-        por = pattern
-        
-        for (i = 1; i <= por.len(); i++) {
-            if (check_wildcard(por.patterns.get_pat(i)) == 1) {
-                return(1)
-            }
-        }
-        return(0)
+        return(check_wildcard_por(pattern))
     }
     else if (classname(pattern) == "Tuple") {
-        tuple = pattern
-        for (i = 1; i <= length(tuple.patterns); i++) {
-            if (check_wildcard(tuple.patterns[i]) == 1) {
-                return(1)
-            }
-        }
-        return(0)
+        return(check_wildcard_tuple(pattern))
     }
+}
+
+real scalar function check_wildcard_por(class POr scalar por) {
+    real scalar i
+    
+    for (i = 1; i <= por.len(); i++) {
+        if (check_wildcard(por.get_pat(i)) == 1) {
+            return(1)
+        }
+    }
+    
+    return(0)
+}
+
+real scalar function check_wildcard_tuple(class Tuple scalar tuple) {
+    real scalar i
+    
+    for (i = 1; i <= length(tuple.patterns); i++) {
+        if (check_wildcard(tuple.patterns[i]) == 1) {
+            return(1)
+        }
+    }
+    
+    return(0)
 }
 
 end

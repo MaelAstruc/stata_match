@@ -13,43 +13,42 @@ void PatternList::print() {
 }
 
 string scalar PatternList::to_string(string scalar sep) {
-    string scalar str
+    string vector strings
     class Pattern scalar pattern
     real scalar i
 
-    str = ""
+    strings = J(1, this.length, "")
 
     for (i = 1; i <= this.length; i++) {
         pattern = *this.patterns[i]
-        if (i == 1) {
-            str = pattern.to_string()
-        }
-        else {
-            str = str + sep + pattern.to_string()
-        }
+        strings[i] = pattern.to_string()
     }
 
-    return(str)
+    return(invtokens(strings, sep))
 }
 
-string scalar PatternList::to_expr(string scalar sep) {
-    string scalar str
+string scalar PatternList::to_expr(string scalar sep, string vector variable) {
+    string vector exprs
     class Pattern scalar pattern
     real scalar i
-
-    str = ""
-
-    for (i = 1; i <= this.length; i++) {
-        pattern = *this.patterns[i]
-        if (i == 1) {
-            str = pattern.to_expr()
-        }
-        else {
-            str = str + sep + pattern.to_expr()
-        }
+    
+    if (this.length == 0) {
+        return("")
     }
 
-    return(str)
+    if (this.length == 1) {
+        pattern = *this.patterns[1]
+        return(pattern.to_expr(variable))
+    }
+
+    exprs = J(1, this.length, "")
+    
+    for (i = 1; i <= this.length; i++) {
+        pattern = *this.patterns[i]
+        exprs[i] = "(" + pattern.to_expr(variable) + ")"
+    }
+
+    return(invtokens(exprs, sep))
 }
 
 transmorphic scalar PatternList::compress() {
@@ -82,7 +81,7 @@ transmorphic scalar PatternList::overlap(class Pattern scalar pattern) {
 
     for (i = 1; i <= this.length; i ++) {
         pattern_i = this.get_pat(i)
-        overlap.push(&pattern_i.overlap(pattern))
+        overlap.push(pattern_i.overlap(pattern))
     }
 
     return(overlap.compress())

@@ -63,11 +63,11 @@ function check_useful(class Arm vector arms) {
 
         usefulness_vec[i].define(usefulness)
     }
-
+    
     return(usefulness_vec)
 }
 
-function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
+class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
     transmorphic scalar tuple
     class Pattern scalar tuple_pattern, differences_pattern
     struct LHS vector overlaps
@@ -115,7 +115,11 @@ function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
         overlaps[i].pattern = get_and_compress(overlaps, i)
         if (classname(*overlaps[i].pattern) != "PEmpty") {
             k++
-            overlaps[k] = overlaps[i]
+            // Copy member by member
+            // Otherwise it's empty at the end of the loop
+            // And it crashes when trying to access it
+            overlaps[k].arm_id = overlaps[i].arm_id
+            overlaps[k].pattern = overlaps[i].pattern
         }
     }
 

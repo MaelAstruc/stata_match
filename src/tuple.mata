@@ -252,21 +252,21 @@ pointer scalar Tuple::difference_tuple(class Tuple scalar tuple) {
             new_other.patterns = tuple.patterns[2..length(this.patterns)]
 
             // Compute the difference
-            new_diff = new_main.difference(new_other)
+            new_diff = *new_main.difference(new_other)
 
             // If non empty, we fill the tuples
-            if (classname(*new_diff) == "Tuple") {
-                new_diff_i = *new_diff
+            if (classname(new_diff) == "Tuple") {
+                new_diff_i = new_diff
                 res_inter.push(tuple_from_patterns((&field_inter, new_diff_i.patterns)))
             }
-            else if (classname(*new_diff) == "PatternList") {
-                pat_list = *new_diff
+            else if (classname(new_diff) == "PatternList") {
+                pat_list = new_diff
                 for (i = 1; i <= pat_list.length; i++) {
                     new_diff_i = pat_list.get_pat(i)
                     res_inter.push(tuple_from_patterns((&field_inter, new_diff_i.patterns)))
                 }
             }
-            else if (classname(*new_diff) != "PEmpty") {
+            else if (classname(new_diff) != "PEmpty") {
                 errprintf("Unexpected pattern of class '%s'", classname(*new_diff))
                 exit(_error(3260))
             }

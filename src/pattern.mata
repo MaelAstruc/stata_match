@@ -975,23 +975,23 @@ void POr::define(pointer vector patterns) {
 
 transmorphic scalar POr::compress() {
     class POr scalar por
-    class Pattern scalar pattern, new_pattern
+    class Pattern scalar pattern
     real scalar i
 
     // TODO: Replace in place
     
     for (i = 1; i <= this.len(); i++) {
         pattern = this.get_pat(i)
-        new_pattern = pattern.compress()
-        if (classname(new_pattern) == "PEmpty") {
+        pattern = pattern.compress()
+        if (classname(pattern) == "PEmpty") {
             continue
         }
-        else if (classname(new_pattern) == "PWild") {
-            return(new_pattern)
+        else if (classname(pattern) == "PWild") {
+            return(pattern)
         }
         else {
-            if (!por.includes(new_pattern)) {
-                por.push(new_pattern) 
+            if (!por.includes(pattern)) {
+                por.push(pattern) 
             }
         }
     }
@@ -1008,38 +1008,15 @@ transmorphic scalar POr::compress() {
 }
 
 string scalar POr::to_string() {
-    class Pattern scalar pattern
-    string vector str
-    real scalar i
-
-    str = J(1, this.len(), "")
-    
-    for (i = 1; i <= this.len(); i++) {
-        pattern = this.get_pat(i)
-        str[i] = pattern.to_string()
-    }
-
-    return(invtokens(str, " | "))
+    return(this.patterns.to_string(" | "))
 }
 
 string scalar POr::to_expr(string vector variable) {
     class Pattern scalar pattern
     string vector exprs
     real scalar i
-
-    exprs = J(1, this.len(), "")
     
-    for (i = 1; i <= this.len(); i++) {
-        pattern = this.get_pat(i)
-        if (this.len() > 1) {
-            exprs[i] = "(" + pattern.to_expr(variable) + ")"
-        }
-        else {
-            exprs[i] = pattern.to_expr(variable)
-        }
-    }
-    
-    return(invtokens(exprs, " | "))
+    return(this.patterns.to_expr(" | ", variable))
 }
 
 void POr::print() {
@@ -1049,27 +1026,15 @@ void POr::print() {
 
 transmorphic scalar POr::overlap(class Pattern scalar pattern) {
     class POr scalar por
+    class Pattern scalar pattern_i
     real scalar i
 
     for (i = 1; i <= this.len(); i++) {
-        por.push(&por_overlap(this, i, pattern))
+        pattern_i = this.get_pat(i)
+        por.push(pattern_i.overlap(pattern))
     }
     
     return(por.compress())
-}
-
-transmorphic function por_overlap( ///
-    class POr scalar por, ///
-    real scalar i, ///
-    class Pattern scalar pattern ///
-) {
-    class Pattern scalar pattern_i
-    // We need to declare a new variable to call overlap on the ith pattern
-    // Because patterns[i] is transmorphic and does not have the method
-    // In a loop, a pointer to this variable always return the last value
-    // We need to create this variable in a new scope
-    pattern_i = por.get_pat(i)
-    return(pattern_i.overlap(pattern))
 }
 
 real scalar POr::includes(transmorphic scalar pattern) {
@@ -1083,6 +1048,25 @@ real scalar POr::includes(transmorphic scalar pattern) {
     }
     else {
         return(this.includes_default(pattern))
+    }
+}
+
+pointer scalar POr::difference(transmorphic scalar pattern) {
+    class POr scalar differences
+    class Pattern scalar pattern_i
+    real scalar i
+
+    // Loop over all patterns in Or and compute the difference
+    for (i = 1; i <= this.len(); i++) {
+        pattern_i = this.get_pat(i)
+        differences.push(*pattern_i.difference(pattern))
+    }
+    
+    if (differences.len() == 0) {
+        return(&(PEmpty()))
+    }
+    else {
+        return(&differences)
     }
 }
 
@@ -1114,34 +1098,6 @@ real scalar POr::includes_default(transmorphic scalar pattern) {
     else {
         return(0)
     }
-}
-
-pointer scalar POr::difference(transmorphic scalar pattern) {
-    class POr scalar differences
-    real scalar i
-
-    // Loop over all patterns in Or and compute the difference
-    for (i = 1; i <= this.len(); i++) {
-        differences.push(por_difference(this, i, pattern))
-    }
-    
-    if (differences.len() == 0) {
-        return(&(PEmpty()))
-    }
-    else {
-        return(&differences)
-    }
-}
-
-transmorphic function por_difference( ///
-    class POr scalar por, ///
-    real scalar i, ///
-    class Pattern scalar pattern ///
-) {
-    class Pattern scalar pattern_i
-
-    pattern_i = por.get_pat(i)
-    return(pattern_i.difference(pattern))
 }
 
 real scalar POr::len() {
