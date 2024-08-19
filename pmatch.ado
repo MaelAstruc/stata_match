@@ -42,7 +42,7 @@ function pmatch(string scalar newvar, string scalar vars_exp, string scalar body
     
     useful_arms = check_match(arms, variables)
     
-    eval_arms(newvar, useful_arms, variables)
+    eval_arms(newvar, arms, variables)
 }
 end
 

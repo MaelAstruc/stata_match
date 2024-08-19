@@ -1358,7 +1358,7 @@ function test_pwild_to_expr() {
 
     pwild = PWild()
 
-    test_result("Test PWild::to_expr()", pwild.to_expr(var_name), "1==1")
+    test_result("Test PWild::to_expr()", pwild.to_expr(var_name), "1")
 }
 
 // PConstant

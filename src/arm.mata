@@ -21,31 +21,31 @@ void Arm::print() {
 
 void function eval_arms(
     string scalar newvar,
-    class Arm vector useful_arms,
+    class Arm vector arms,
     class Variable vector variables
 ) {
     class Arm scalar arm
     class Pattern scalar pattern
-    string scalar command
+    string scalar condition, command
     real scalar i
     
-    
     displayas("text")
-    for (i = 1; i <= length(useful_arms); i++) {
-        arm = useful_arms[i]
+    for (i = length(arms); i >= 1; i--) {
+        arm = arms[i]
         pattern = *arm.lhs.pattern
-
+        
         if (length(variables) == 1) {
-            command = sprintf(
-                `"replace %s = %s if %s"',
-                newvar, arm.value, pattern.to_expr(variables[1].name)
-            )
+            condition = pattern.to_expr(variables[1].name)
         }
         else {
-            command = sprintf(
-                `"replace %s = %s if %s"',
-                newvar, arm.value, pattern.to_expr(variables)
-            )
+            condition = pattern.to_expr(variables)
+        }
+        
+        if (condition == "1") {
+            command = sprintf(`"replace %s = %s"', newvar, arm.value)
+        }
+        else {
+            command = sprintf(`"replace %s = %s if %s"', newvar, arm.value, condition)
         }
 
         printf("%s\n", command)

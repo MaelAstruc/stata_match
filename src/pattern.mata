@@ -265,7 +265,7 @@ void PWild::print(| real scalar all) {
 }
 
 string scalar PWild::to_expr(string scalar variable) {
-    return("1==1")
+    return("1")
 }
 
 transmorphic scalar PWild::compress() {

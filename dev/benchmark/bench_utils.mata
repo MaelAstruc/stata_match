@@ -38,7 +38,7 @@ function pmatch(string scalar newvar, string scalar vars_exp, string scalar body
     bench_off("check")
     
     bench_on("eval")
-    eval_arms(newvar, useful_arms, variables)
+    eval_arms(newvar, arms, variables)
     bench_off("eval")
 
     bench_off("total")

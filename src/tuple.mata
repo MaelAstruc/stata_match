@@ -62,6 +62,10 @@ string scalar Tuple::to_expr(class Variable vector variables) {
         }
     }
     
+    if (k == 0) {
+        return("1")
+    }
+    
     if (k > 1) {
         for (i = 1; i <= k; i++) {
             exprs[i] = "(" + exprs[i] + ")"
