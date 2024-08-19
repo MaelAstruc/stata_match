@@ -4,7 +4,7 @@ Benchmark the match function and compare to performance of base commands
 
 clear all
 
-run "match.ado"
+run "pmatch.ado"
 run "dev/benchmark/bench_utils.mata"
 
 // Check the time needed  with different number of observations
@@ -28,7 +28,7 @@ program profile_obs_integer
         mata: bench_off("base")
 
         gen y = ""
-        match y, v(x) b(    ///
+        pmatch y, v(x) b(    ///
             1         => "a",  ///
             2 | 3 | 4 => "b",  ///
             5~9       => "c",  ///
@@ -60,7 +60,7 @@ program profile_obs_float
         mata: bench_off("base")
 
         gen y = ""
-        match y, v(x) b(    ///
+        pmatch y, v(x) b(    ///
             1         => "a",  ///
             2 | 3 | 4 => "b",  ///
             5~9       => "c",  ///
@@ -92,7 +92,7 @@ program profile_obs_string
         mata: bench_off("base")
 
         gen y = ""
-        match y, v(x) b(    ///
+        pmatch y, v(x) b(    ///
             "1"             => "a",  ///
             "2" | "3" | "4" => "b",  ///
             _               => "c"   ///

@@ -26,7 +26,7 @@ end
 
 * Charge the package
 
-do "match.ado"
+do "pmatch.ado"
 
 * Global variables to keep track of the results
 

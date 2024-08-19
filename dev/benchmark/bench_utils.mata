@@ -3,16 +3,13 @@
 mata
 BENCH_NAMES = ("base", "init", "parse", "check", "eval", "total")
 
-// A copy of the match function with bench functions
-mata drop match()
-function match(string scalar str, string scalar newvar, string scalar vars_exp) {
-    class Arm scalar arm
+// A copy of the pmatch function with bench functions
+mata drop pmatch()
+function pmatch(string scalar newvar, string scalar vars_exp, string scalar body) {
     class Arm vector arms, useful_arms
     class Variable vector variables
-    class Pattern scalar pattern
     pointer scalar t
     real scalar i, n_vars
-    string scalar command
     string vector vars_str
 
     bench_on("total")
@@ -33,7 +30,7 @@ function match(string scalar str, string scalar newvar, string scalar vars_exp) 
     bench_off("init")
     
     bench_on("parse")
-    arms = parse_string(str, variables)
+    arms = parse_string(body, variables)
     bench_off("parse")
     
     bench_on("check")

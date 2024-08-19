@@ -20,16 +20,16 @@ void Arm::print() {
 }
 
 void function eval_arms(
-	string scalar newvar,
-	class Arm vector useful_arms,
-	class Variable vector variables
+    string scalar newvar,
+    class Arm vector useful_arms,
+    class Variable vector variables
 ) {
     class Arm scalar arm
     class Pattern scalar pattern
-	string scalar command
-	real scalar i
-	
-	
+    string scalar command
+    real scalar i
+    
+    
     displayas("text")
     for (i = 1; i <= length(useful_arms); i++) {
         arm = useful_arms[i]

@@ -12,22 +12,14 @@ run "src/match_report.mata"
 run "src/algorithm.mata"
 
 capture program drop match
-program match
-    syntax varlist, Variables(str) Body(str asis)
+program pmatch
+    syntax varlist(min=1 max=1), Variables(varlist min=1) Body(str asis)
 
-    tokenize `varlist'
-
-    if ("`2'" != "") {
-        exit(error(103))
-    }
-
-    local newvar "`1'"
-
-    mata: match(`"`body'"', "`newvar'", "`variables'")
+    mata: pmatch("`varlist'", "`variables'", `"`body'"')
 end
 
 mata
-function match(string scalar str, string scalar newvar, string scalar vars_exp) {
+function pmatch(string scalar newvar, string scalar vars_exp, string scalar body) {
     class Arm vector arms, useful_arms
     class Variable vector variables
     pointer scalar t
@@ -35,10 +27,9 @@ function match(string scalar str, string scalar newvar, string scalar vars_exp) 
     string vector vars_str
 
     t = tokeninit()
-    tokenwchars(t, ",")
     tokenset(t, vars_exp)
-    vars_str = strtrim(tokengetall(t))
-	
+    vars_str = tokengetall(t)
+    
     n_vars = length(vars_str)
 
     variables = Variable(n_vars)
@@ -46,11 +37,12 @@ function match(string scalar str, string scalar newvar, string scalar vars_exp) 
     for (i = 1; i <= n_vars; i++) {
         variables[i].init(vars_str[i])
     }
-	
-    arms = parse_string(str, variables)
-	
+    
+    arms = parse_string(body, variables)
+    
     useful_arms = check_match(arms, variables)
-	
+    
     eval_arms(newvar, useful_arms, variables)
 }
 end
+

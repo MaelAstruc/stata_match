@@ -1,0 +1,6 @@
+OFF
+v 3
+
+d 'PMATCH': Pattern matching in Stata
+
+l Github https://github.com/MaelAstruc/stata_match

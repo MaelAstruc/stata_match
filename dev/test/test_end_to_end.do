@@ -13,7 +13,7 @@ replace y1 = "c" if x1 >= 4 & x1 <= 5
 
 gen y2 = ""
 
-match y2, v(x1) b( ///
+pmatch y2, v(x1) b( ///
     1      => "a",  ///
     2 | 3  => "b",  ///
     4~5    => "c",  ///
@@ -38,7 +38,7 @@ replace y1 = "c" if x1 >= 8 & x1 <= 12
 
 gen y2 = ""
 
-match y2, v(x1) b( ///
+pmatch y2, v(x1) b( ///
     2      => "a",  ///
     4 | 6  => "b",  ///
     8~12   => "c",  ///
@@ -64,7 +64,7 @@ replace y1 = "c" if x1 >= 4 & x1 <= 5
 
 gen y2 = ""
 
-match y2, v(x1) b( ///
+pmatch y2, v(x1) b( ///
     1      => "a",  ///
     2 | 3  => "b",  ///
     4~5    => "c",  ///
@@ -149,7 +149,7 @@ replace y1 = "1f" if x1 == 1.0x-1f
 
 gen y2 = ""
 
-match y2, v(x1) b(   ///
+pmatch y2, v(x1) b(   ///
     1.0x-0  => "0" , ///
     1.0x-1  => "1" , ///
     1.0x-2  => "2" , ///
@@ -203,7 +203,7 @@ replace y1 = "b" if x1 == "2" | x1 == "3"
 
 gen y2 = ""
 
-match y2, v(x1) b( ///
+pmatch y2, v(x1) b( ///
     "1"        => "a",  ///
     "2" | "3"  => "b",  ///
     _          => "c"   ///
@@ -229,7 +229,7 @@ replace y1 = "e" if x1 >  2 & x1 <= 3 & x2 == "2"
 
 gen y2 = ""
 
-match y2, v(x1, x2) b( ///
+pmatch y2, v(x1 x2) b( ///
     (1,     "1")       => "a",  ///
     (1,     "2" | "3") => "b",  ///
     (2~3,   "1")       => "c",  ///
@@ -254,7 +254,7 @@ replace y1 = "b" if x1 == 2 | x1 == 3
 
 gen y2 = ""
 
-match y2, v(x1) b( ///
+pmatch y2, v(x1) b( ///
     min    => "a",  ///
     2 | 3  => "b",  ///
     _      => "c"   ///
@@ -277,7 +277,7 @@ replace y1 = "c" if x1 == 4
 
 gen y2 = ""
 
-match y2, v(x1) b( ///
+pmatch y2, v(x1) b( ///
     1      => "a",  ///
     2 | 3  => "b",  ///
     max    => "c"   ///
@@ -299,7 +299,7 @@ replace y1 = "b" if x1 == 3
 
 gen y2 = ""
 
-match y2, v(x1) b( ///
+pmatch y2, v(x1) b( ///
     min~2  => "a",  ///
     3      => "b",  ///
     _      => "c"   ///
@@ -321,7 +321,7 @@ replace y1 = "b" if x1 >= 3 & x1 <= 4
 
 gen y2 = ""
 
-match y2, v(x1) b( ///
+pmatch y2, v(x1) b( ///
     1 | 2   => "a",  ///
     3~max   => "b"   ///
 )

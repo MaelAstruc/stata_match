@@ -4,7 +4,7 @@ clear all
 
 local obs = 100
 
-do "match.ado"
+do "pmatch.ado"
 
 mata
 
@@ -95,7 +95,7 @@ replace y_base = "b" if x == 2 | x == 3 | x == 4
 replace y_base = "c" if x >= 5 & x <= 9
 
 gen y = ""
-match y, v(x) b(    ///
+pmatch y, v(x) b(    ///
     1         => "a",  ///
     2 | 3 | 4 => "b",  ///
     5~9       => "c",  ///
