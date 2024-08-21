@@ -20,6 +20,7 @@ sthlp2pdf_dir "docs"
 // Run tests
 
 do "dev/test/test.do"
+mata: exit_if_errors()
 
 // Run benchmarks
 

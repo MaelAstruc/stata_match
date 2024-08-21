@@ -10,7 +10,7 @@ run "dev/benchmark/bench_utils.mata"
 // Check the time needed  with different number of observations
 
 program profile_obs_integer
-    syntax, OBS(integer) REP(integer)
+    syntax, OBS(integer) REP(integer) [NOCHECK]
     
     mata: BENCH = bench_init(`rep')
     
@@ -32,7 +32,7 @@ program profile_obs_integer
             2 | 3 | 4 => "b",  ///
             5~9       => "c",  ///
             _         => "d"   ///
-        )
+        ) `nocheck'
         
         assert y_base == y
     }
@@ -41,7 +41,7 @@ program profile_obs_integer
 end
 
 program profile_obs_float
-    syntax, OBS(integer) REP(integer)
+    syntax, OBS(integer) REP(integer) [NOCHECK]
     
     mata: BENCH = bench_init(`rep')
     
@@ -63,7 +63,7 @@ program profile_obs_float
             2 | 3 | 4 => "b",  ///
             5~9       => "c",  ///
             _         => "d"   ///
-        )
+        ) `nocheck'
         
         assert y_base == y
     }
@@ -72,7 +72,7 @@ program profile_obs_float
 end
 
 program profile_obs_string
-    syntax, OBS(integer) REP(integer)
+    syntax, OBS(integer) REP(integer) [NOCHECK]
     
     mata: BENCH = bench_init(`rep')
     
@@ -93,7 +93,7 @@ program profile_obs_string
             "1"             => "a",  ///
             "2" | "3" | "4" => "b",  ///
             _               => "c"   ///
-        )
+        ) `nocheck'
         
         assert y_base == y
     }
@@ -107,22 +107,44 @@ log using "dev/logs/bench_e2e.log", replace
 dis "`c(current_date)'"
 dis "`c(current_time)'"
 
+///////////////////////////////////////////////////////// Benchmarks with checks
+
 profile_obs_integer, obs(1000)     rep(1000)
 profile_obs_integer, obs(10000)    rep(1000)
 profile_obs_integer, obs(100000)   rep(100)
 profile_obs_integer, obs(1000000)  rep(10)
 profile_obs_integer, obs(10000000) rep(10)
 
-profile_obs_float, obs(1000)     rep(1000)
-profile_obs_float, obs(10000)    rep(1000)
-profile_obs_float, obs(100000)   rep(100)
-profile_obs_float, obs(1000000)  rep(10)
-profile_obs_float, obs(10000000) rep(10)
+profile_obs_float,   obs(1000)     rep(1000)
+profile_obs_float,   obs(10000)    rep(1000)
+profile_obs_float,   obs(100000)   rep(100)
+profile_obs_float,   obs(1000000)  rep(10)
+profile_obs_float,   obs(10000000) rep(10)
 
-profile_obs_string, obs(1000)     rep(1000)
-profile_obs_string, obs(10000)    rep(1000)
-profile_obs_string, obs(100000)   rep(100)
-profile_obs_string, obs(1000000)  rep(10)
-profile_obs_string, obs(10000000) rep(10)
+profile_obs_string,  obs(1000)     rep(1000)
+profile_obs_string,  obs(10000)    rep(1000)
+profile_obs_string,  obs(100000)   rep(100)
+profile_obs_string,  obs(1000000)  rep(10)
+profile_obs_string,  obs(10000000) rep(10)
+
+////////////////////////////////////////////////////// Benchmarks without checks
+
+profile_obs_integer, obs(1000)     rep(1000) nocheck
+profile_obs_integer, obs(10000)    rep(1000) nocheck
+profile_obs_integer, obs(100000)   rep(100)  nocheck
+profile_obs_integer, obs(1000000)  rep(10)   nocheck
+profile_obs_integer, obs(10000000) rep(10)   nocheck
+
+profile_obs_float,   obs(1000)     rep(1000) nocheck
+profile_obs_float,   obs(10000)    rep(1000) nocheck
+profile_obs_float,   obs(100000)   rep(100)  nocheck
+profile_obs_float,   obs(1000000)  rep(10)   nocheck
+profile_obs_float,   obs(10000000) rep(10)   nocheck
+ 
+profile_obs_string,  obs(1000)     rep(1000) nocheck
+profile_obs_string,  obs(10000)    rep(1000) nocheck
+profile_obs_string,  obs(100000)   rep(100)  nocheck
+profile_obs_string,  obs(1000000)  rep(10)   nocheck
+profile_obs_string,  obs(10000000) rep(10)   nocheck
 
 log close

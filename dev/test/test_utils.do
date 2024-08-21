@@ -67,6 +67,15 @@ function test_result(string scalar test_name, string scalar result, string scala
     }
 }
 
+void function exit_if_errors() {
+    real scalar FAILED
+    
+    FAILED = *findexternal("FAILED")
+    
+    if (FAILED > 0) {
+        exit(1)
+    }
+}
 end
 
 program test_variables

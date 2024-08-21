@@ -5,7 +5,7 @@ BENCH_NAMES = ("base", "init", "parse", "check", "eval", "total")
 
 // A copy of the pmatch function with bench functions
 mata drop pmatch()
-function pmatch(string scalar newvar, string scalar vars_exp, string scalar body) {
+function pmatch(string scalar newvar, string scalar vars_exp, string scalar body, real scalar check) {
     class Arm vector arms, useful_arms
     class Variable vector variables
     pointer scalar t
@@ -25,7 +25,7 @@ function pmatch(string scalar newvar, string scalar vars_exp, string scalar body
     variables = Variable(n_vars)
 
     for (i = 1; i <= n_vars; i++) {
-        variables[i].init(vars_str[i])
+        variables[i].init(vars_str[i], check)
     }
     bench_off("init")
     
@@ -34,7 +34,9 @@ function pmatch(string scalar newvar, string scalar vars_exp, string scalar body
     bench_off("parse")
     
     bench_on("check")
-    useful_arms = check_match(arms, variables)
+    if (check) {
+        useful_arms = check_match(arms, variables)
+    }
     bench_off("check")
     
     bench_on("eval")

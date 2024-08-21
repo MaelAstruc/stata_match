@@ -209,6 +209,11 @@ void PWild::define(class Variable scalar variable) {
     class PConstant scalar pconstant
     real scalar i
 
+    if (length(variable.levels) == 0) {
+        this.push(PEmpty())
+        return
+    }
+
     if (variable.type == "string") {
         for (i = 1; i <= length(variable.levels); i++) {
             pconstant.define(variable.levels[i])

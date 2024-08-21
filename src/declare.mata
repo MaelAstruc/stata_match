@@ -197,6 +197,8 @@ class Variable {
     string scalar stata_type                                                    // Stata type of the variable
     string scalar type                                                          // Internal type of the variable
     transmorphic rowvector levels                                               // The corresponding sorted vector of levels
+    private real scalar min
+    private real scalar max
 
     void new()
     string scalar to_string()
@@ -204,6 +206,9 @@ class Variable {
     void init()                                                                 // Initialize the variable given its name
     void init_type()                                                            // Initialize the type
     void init_levels()                                                          // Initialize the levels
+    void set_minmax()                                                           // Set min and max levels
+    real scalar get_min()                                                       // Get minimum level
+    real scalar get_max()                                                       // Get maximum level
 }
 
 //////////////////////////////////////////////////////////////////////////// Arm

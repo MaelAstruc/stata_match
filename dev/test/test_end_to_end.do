@@ -412,3 +412,69 @@ pmatch y2, v(x1) b( ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: gen new var")
+
+///////////////////////////////////////////////////////////// Without checks int
+
+clear
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 7)) // [1, 6]
+
+gen y1 = "d"
+replace y1 = "a" if x1 == 1
+replace y1 = "b" if x1 == 2 | x1 == 3
+replace y1 = "c" if x1 >= 5 & x1 <= 6
+
+pmatch y2, nocheck v(x1) b( ///
+    min    => "a",  ///
+    2 | 3  => "b",  ///
+    5~max  => "c",  ///
+    _      => "d"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: without checks")
+
+/////////////////////////////////////////////////////////// Without checks float
+
+clear
+
+set obs 100
+
+gen float x1 = floor(runiform(1, 7)) // [1, 6]
+
+gen y1 = "d"
+replace y1 = "a" if x1 == 1
+replace y1 = "b" if x1 == 2 | x1 == 3
+replace y1 = "c" if x1 >= 5 & x1 <= 6
+
+pmatch y2, nocheck v(x1) b( ///
+    min    => "a",  ///
+    2 | 3  => "b",  ///
+    5~max  => "c",  ///
+    _      => "d"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: without checks")
+
+////////////////////////////////////////////////////////// Without checks string
+
+clear
+
+set obs 100
+
+gen str x1 = string(floor(runiform(1, 7))) // [1, 6]
+
+gen y1 = "d"
+replace y1 = "a" if x1 == "1"
+replace y1 = "b" if x1 == "2" | x1 == "3"
+replace y1 = "c" if x1 == "5" | x1 == "6"
+
+pmatch y2, nocheck v(x1) b( ///
+    "1"        => "a",  ///
+    "2" | "3"  => "b",  ///
+    "5" | "6"  => "c",  ///
+    _          => "d"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: without checks")

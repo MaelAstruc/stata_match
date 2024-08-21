@@ -13,13 +13,17 @@ run "src/algorithm.mata"
 
 capture program drop match
 program pmatch
-    syntax namelist(min=1 max=1), Variables(varlist min=1) Body(str asis)
+    syntax namelist(min=1 max=1), ///
+        Variables(varlist min=1) Body(str asis) ///
+        [NOCHECK]
+    
+    local check = ("`nocheck'" == "")
 
-    mata: pmatch("`namelist'", "`variables'", `"`body'"')
+    mata: pmatch("`namelist'", "`variables'", `"`body'"', `check')
 end
 
 mata
-function pmatch(string scalar newvar, string scalar vars_exp, string scalar body) {
+function pmatch(string scalar newvar, string scalar vars_exp, string scalar body, real scalar check) {
     class Arm vector arms, useful_arms
     class Variable vector variables
     pointer scalar t
@@ -35,12 +39,14 @@ function pmatch(string scalar newvar, string scalar vars_exp, string scalar body
     variables = Variable(n_vars)
 
     for (i = 1; i <= n_vars; i++) {
-        variables[i].init(vars_str[i])
+        variables[i].init(vars_str[i], check)
     }
     
     arms = parse_string(body, variables)
     
-    useful_arms = check_match(arms, variables)
+    if (check) {
+        useful_arms = check_match(arms, variables)
+    }
     
     eval_arms(newvar, arms, variables)
 }

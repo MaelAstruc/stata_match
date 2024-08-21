@@ -86,11 +86,11 @@ class Pattern scalar function parse_pattern(
             return(parse_wild(variable))
         }
         else if (tok == "min") {
-            number = min(variable.levels)
+            number =  variable.get_min()
             return(parse_number(t, number, arm_id, variable))
         }
         else if (tok == "max") {
-            number = max(variable.levels)
+            number = variable.get_max()
             return(parse_number(t, number, arm_id, variable))
         }
         else if (isnumber(tok)) {
@@ -167,7 +167,7 @@ class PRange scalar function parse_range(
     next = tokenget(t)
     
     if (next == "max") {
-        max = max(variable.levels)
+        max = variable.get_max()
     }
     else  {
         max = strtoreal(next)
