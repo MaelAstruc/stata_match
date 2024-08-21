@@ -478,3 +478,32 @@ pmatch y2, nocheck v(x1) b( ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: without checks")
+
+//////////////////////////////////////////////////////////// Match labeled value
+
+clear
+
+set obs 100
+
+gen int x1 = runiform(1, 6) // [1, 5]
+tostring x1, replace
+replace  x1 = "V" if x1 == "1"
+replace  x1 = "W" if x1 == "2"
+replace  x1 = "X" if x1 == "3"
+replace  x1 = "Y" if x1 == "4"
+replace  x1 = "Z" if x1 == "5"
+encode x1, gen(x2)
+
+gen y1 = "d"
+replace y1 = "a" if x2 == 1
+replace y1 = "b" if x2 == 2 | x2 == 3
+replace y1 = "c" if x2 == 4
+
+pmatch y2, v(x2) b( ///
+    1        => "a",  ///
+    "W" | 3  => "b",  ///
+    "Y"      => "c",  ///
+    _        => "d"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: one integer")

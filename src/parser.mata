@@ -97,9 +97,22 @@ class Pattern scalar function parse_pattern(
             number = strtoreal(tok)
             return(parse_number(t, number, arm_id, variable))
         }
+        else if (isquoted(tok)) {
+            number = st_vlsearch(variable.name, unquote(tok))
+            if (number != .) {
+                return(parse_number(t, number, arm_id, variable))
+            }
+            else {
+                errprintf(
+                    "Unknown label value for variable %s in arm %f: %s\n",
+                    variable.name, arm_id, tok
+                )
+                exit(_error(180))
+            }
+        }
         else {
             errprintf(
-                "Expected a number for variable %s in arm %f, found: %s\n",
+                "Expected a number or a quoted value label for variable %s in arm %f, found: %s\n",
                 variable.name, arm_id, tok
             )
             exit(_error(3253))
@@ -340,6 +353,10 @@ real scalar function isnumber(string scalar str) {
 
 real scalar function isquoted(string scalar str) {
     return(strmatch(str, `""*""'))
+}
+
+string scalar function unquote(string scalar str) {
+    return(ustrregexra(str, `"(^"|"$)"', ""))
 }
 
 real scalar function israngesym(str) {

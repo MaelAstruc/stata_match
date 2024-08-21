@@ -2,14 +2,14 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/class_count.log
   log type:  text
- opened on:  21 Aug 2024, 16:45:01
+ opened on:  21 Aug 2024, 18:33:16
 
 . 
 . dis "`c(current_date)'"
 21 Aug 2024
 
 . dis "`c(current_time)'"
-16:45:01
+18:33:16
 
 . 
 . mata
@@ -55,5 +55,5 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/class_count.log
   log type:  text
- closed on:  21 Aug 2024, 16:45:01
+ closed on:  21 Aug 2024, 18:33:16
 ---------------------------------------------------------------------------------------------------------------------------------------------------
