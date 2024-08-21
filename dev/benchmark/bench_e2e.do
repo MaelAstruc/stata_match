@@ -27,7 +27,6 @@ program profile_obs_integer
         replace y_base = "c" if x >= 5 & x <= 9
         mata: bench_off("base")
 
-        gen y = ""
         pmatch y, v(x) b(    ///
             1         => "a",  ///
             2 | 3 | 4 => "b",  ///
@@ -59,7 +58,6 @@ program profile_obs_float
         replace y_base = "c" if x >= 5 & x <= 9
         mata: bench_off("base")
 
-        gen y = ""
         pmatch y, v(x) b(    ///
             1         => "a",  ///
             2 | 3 | 4 => "b",  ///
@@ -91,7 +89,6 @@ program profile_obs_string
         replace y_base = "b" if x == "2" | x == "3" | x == "4"
         mata: bench_off("base")
 
-        gen y = ""
         pmatch y, v(x) b(    ///
             "1"             => "a",  ///
             "2" | "3" | "4" => "b",  ///

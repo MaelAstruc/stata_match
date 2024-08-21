@@ -13,9 +13,9 @@ run "src/algorithm.mata"
 
 capture program drop match
 program pmatch
-    syntax varlist(min=1 max=1), Variables(varlist min=1) Body(str asis)
+    syntax namelist(min=1 max=1), Variables(varlist min=1) Body(str asis)
 
-    mata: pmatch("`varlist'", "`variables'", `"`body'"')
+    mata: pmatch("`namelist'", "`variables'", `"`body'"')
 end
 
 mata

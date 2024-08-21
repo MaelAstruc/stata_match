@@ -20,19 +20,28 @@ void Arm::print() {
 }
 
 void function eval_arms(
-    string scalar newvar,
+    string scalar varname,
     class Arm vector arms,
     class Variable vector variables
 ) {
     class Arm scalar arm
     class Pattern scalar pattern
-    string scalar condition, command
-    real scalar i
+    string scalar command, condition, statement
+    real scalar i, n
+
+    n = length(arms)
     
     displayas("text")
-    for (i = length(arms); i >= 1; i--) {
+    for (i = n; i >= 1; i--) {
         arm = arms[i]
         pattern = *arm.lhs.pattern
+        
+        if (i == n & _st_varindex(varname) == .) {
+            command = "generate"
+        }
+        else {
+            command = "replace"
+        }
         
         if (length(variables) == 1) {
             condition = pattern.to_expr(variables[1].name)
@@ -42,14 +51,14 @@ void function eval_arms(
         }
         
         if (condition == "1") {
-            command = sprintf(`"replace %s = %s"', newvar, arm.value)
+            statement = sprintf(`"%s %s = %s"', command, varname, arm.value)
         }
         else {
-            command = sprintf(`"replace %s = %s if %s"', newvar, arm.value, condition)
+            statement = sprintf(`"%s %s = %s if %s"', command, varname, arm.value, condition)
         }
 
-        printf("%s\n", command)
-        stata(command, 1)
+        printf("%s\n", statement)
+        stata(statement, 1)
     }
 }
 
