@@ -5,5 +5,5 @@ d
 d Distribution-Date: 15/08/2024
 
 f pmatch.ado
-f focs/pmatch.sthlp
-
+f ../docs/pmatch.sthlp
+f ../docs/pmatch.pdf

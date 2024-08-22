@@ -14,19 +14,9 @@ as I add new features.
 
 ///////////////////////////////////////////////////////////////////////// SET-UP
 
-* Set up environment
+* Charge the package internals that are not installed
 
-clear all
-
-mata
-mata clear
-mata set matastrict on
-mata set matalnum off
-end
-
-* Charge the package
-
-do "pmatch.ado"
+run "pkg/pmatch.ado"
 
 * Global variables to keep track of the results
 

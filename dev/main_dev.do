@@ -5,6 +5,25 @@ Tests the code and runs benchmarks
 
 clear all
 
+local version = "0.0.1"
+
+mata
+	files = (
+		"src/declare.mata",
+		"src/pattern_list.mata",
+		"src/pattern.mata",
+		"src/variable.mata",
+		"src/tuple.mata",
+		"src/arm.mata",
+		"src/parser.mata",
+		"src/usefulness.mata",
+		"src/match_report.mata",
+		"src/algorithm.mata",
+		"src/pmatch.mata",
+		"src/pmatch.ado"
+	)
+end
+
 // Clean up space
 
 do "dev/dev_utils.do"
@@ -16,6 +35,15 @@ mata: rm_tabs_dir("dev/test")
 
 * Translate all .sthlp help files to pdf
 sthlp2pdf_dir "docs"
+
+// Build main file
+
+mata: combine_files(files, "pkg/pmatch.ado", "`version'", 0)
+
+// Reinstall command
+
+capture net uninstall pmatch
+net install pmatch, from("`c(pwd)'/pkg")
 
 // Run tests
 

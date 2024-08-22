@@ -4,7 +4,7 @@ clear all
 
 local obs = 100
 
-do "pmatch.ado"
+run "pkg/pmatch.ado"
 
 mata
 

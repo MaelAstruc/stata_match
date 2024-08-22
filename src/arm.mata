@@ -57,7 +57,6 @@ void function eval_arms(
             statement = sprintf(`"%s %s = %s if %s"', command, varname, arm.value, condition)
         }
 
-        printf("%s\n", statement)
         stata(statement, 1)
     }
 }

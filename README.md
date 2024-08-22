@@ -1,234 +1,21 @@
 # Pattern Matching for Stata
 
-This package introduces the `match` command which is similar to a switch statement in terms of syntax, but with further guaranties on patterns usefulness and exhaustiveness. It is inspired by the [Rust](https://www.rust-lang.org/) Programming Language [pattern syntax](https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html) and [algorithm](https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html).
+This package introduces the `pmatch` command, which provides an alternative syntax to series of 'replace ... if ...' statements. It limits repetitions and might feel familiar for users coming from other programming languages with pattern matching.
 
-The purposes of the `match` command are:
+Beyond the new syntax, the `pmatch` command provides run-time checks for the exhaustiveness and the usefulness of the conditions provided. The exhaustiveness check means that the command will tell you if some levels are not covered and which ones are missing. The usefulness check means that the command will tell you if the conditions you specified in each arm are useful, or if some of them overlap with previous ones.
 
-- To provide a familiar syntax for those coming from other programming languages
-- Check if all the possible cases are covered when creating a new variable $x$ based on another variable $y$
-- Check that all the cases are useful and not overlapping
+The command is inspired by the [Rust](https://www.rust-lang.org/) Programming Language [pattern syntax](https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html) and [algorithm](https://doi.org/10.1017/S0956796807006223).
+
+For more information on the syntax and for examples, check the documentation [pdf](https://github.com/MaelAstruc/stata_match/blob/master/docs/pmatch.pdf).
 
 *WARNING*: This project is still under development, the core of the algorithm is implemented but the syntax and features are still evolving.
 
 # How to install
 
-Copy and paste the code if you really want, but for now this project is absolutely not stable.
-
-# Pattern Syntax
-
-Before presenting the magic of usefulness and exhaustiveness, I need to introduce the pattern syntax.
-
-## Constant pattern
-
-A simple case where the `match` command could be used is when creating a variable from another one with the constant pattern (also called literal).
-
-```Stata
-    sysuse auto, clear
-
-* Usual way with 'replace newvar = value if condition'
-
-    gen var_1 = ""
-    replace var_1 = "very low"      if rep78 == 1
-    replace var_1 = "low"           if rep78 == 2
-    replace var_1 = "mid"           if rep78 == 3
-    replace var_1 = "high"          if rep78 == 4
-    replace var_1 = "very high"     if rep78 == 5
-    replace var_1 = "missing"       if rep78 == .
-
-* With the match command: match var, variables(newvar) body(condition => value)
-
-    gen var_2 = ""
-    match var_2, variables(rep78) body( ///
-        1 => "very low",                ///
-        2 => "low",                     ///
-        3 => "mid",                     ///
-        4 => "high",                    ///
-        5 => "very high",               ///
-        . => "missing",                 ///
-    )
-
-    assert var_1 == var_2
-
-    drop var_1 var_2
-```
-
-In this example we match the simplest pattern: the constant. It can be a number, a string or a missing value. No other types are supported for now. The values in the pattern constant must have the same type as the variable.
-
-## Wildcard pattern
-
-To define a default value, the wildcard pattern `_` can be used. It covers all the values not called in the previous arms. This means that any arm included after a wildcard are ignored.
-
-```Stata
-    sysuse auto, clear
-
-    gen var_1 = ""
-    replace var_1 = "very low"      if rep78 == 1
-    replace var_1 = "low"           if rep78 == 2
-    replace var_1 = "other"         if var_1 == ""
-
-    gen var_2 = ""
-    match var_2, variables(rep78) body( ///
-        1 => "very low",                ///
-        2 => "low",                     ///
-        _ => "other",                   ///
-    )
-
-    assert var_1 == var_2
-
-    drop var_1 var_2
-```
-
-## Range pattern
-
-The constant pattern is simple but not practical once we have many values or decimals. In such cases we can us the range pattern.
-
-```Stata
-    sysuse auto, clear
-
-    gen var_1 = ""
-    replace var_1 = "cheap"         if price >= 0    & price < 6000
-    replace var_1 = "normal"        if price >= 6000 & price < 9000
-    replace var_1 = "expensive"     if price >= 9000 & price <= 16000
-    replace var_1 = "missing"       if price == .
-
-    gen var_2 = ""
-    match var_2, variables(price) body( ///
-        0~!6000     => "cheap",         ///
-        6000~!9000  => "normal",        ///
-        9000~16000  => "expensive",     ///
-        .           => "missing",       ///
-    )
-
-    assert var_1 == var_2
-
-    drop var_1 var_2
-```
-
-A range pattern is composed of three parts. A minimum value on the left hand side, a symbol in the middle and a maximum value on the right hand side. The symbol can be:
-
-- `~`: corresponding to `>= & <=`
-- `~!`: corresponding to `>= & <`
-- `!~`: corresponding to `> & <=`
-- `!!`: corresponding to `> & <`
-
-*Note*: If the minimum (or the maximum) value is missing, it is replaced by the actual minimum (or maximum) value.
-
-*Bonus*: The previous note implies that an open range will not include the missing value, while `replace y = 1 if x > 10` means that `y == 1 if x == .`
-
-## Or pattern
-
-The or pattern is used to combine multiple patterns with the `|` syntax.
-
-```Stata
-    sysuse auto, clear
-
-    gen var_1 = ""
-    replace var_1 = "low"           if rep78 == 1 | rep78 == 2
-    replace var_1 = "mid"           if rep78 == 3
-    replace var_1 = "high"          if rep78 == 4 | rep78 == 5
-    replace var_1 = "missing"       if rep78 == .
-
-    gen var_2 = ""
-    match var_2, variables(rep78) body( ///
-        1 | 2   => "low",               ///
-        3       => "mid",               ///
-        4 | 5   => "high",              ///
-        .       => "missing",           ///
-    )
-
-    assert var_1 == var_2
-
-    drop var_1 var_2
-```
-
-## Tuple
-
-Replacing a variable depending on another is useful but sometimes a variable depends on two other variable. In this case you can use a tuple pattern with the syntax `(y1, y2, ...)` to match multiple variables.
-
-```Stata
-    sysuse auto, clear
-
-    gen var_1 = ""
-    replace var_1 = "case 1"        if rep78 < 3 & price < 10000
-    replace var_1 = "case 2"        if rep78 < 3 & price >= 10000
-    replace var_1 = "case 3"        if rep78 >= 3
-    replace var_1 = "missing"       if rep78 == . | price == .
-
-    gen var_2 = ""
-    match var_2, variables(rep78, price) body(  ///
-        (~!3, ~!10000)      => "case 1",        ///
-        (~!3, 10000~)       => "case 2",        ///
-        (3~, _)             => "case 3",        ///
-        (., _) | (_, .)     => "missing",       ///
-    )
-
-    assert var_1 == var_2
-
-    drop var_1 var_2
-```
-
-# Exhaustiveness and usefulness
-
-Even if the previous examples are simple, we can see that it's easy to mess up some cases, especially forgetting the missing value or overlapping ranges. The most important value added of the `match` command is it's capacity to check that none of the cases are overlapping and that all of them are covered.
-
-To come back to the first example, if we forget to cover the missing value:
-
-```Stata
-    sysuse auto, clear
-
-    gen var_1 = ""
-    replace var_1 = "very low"      if rep78 == 1
-    replace var_1 = "low"           if rep78 == 2
-    replace var_1 = "mid"           if rep78 == 3
-    replace var_1 = "high"          if rep78 == 4
-    replace var_1 = "very high"     if rep78 == 5
-
-    gen var_2 = ""
-    match var_2, variables(rep78) body( ///
-        1 => "very low",                ///
-        2 => "low",                     ///
-        3 => "mid",                     ///
-        4 => "high",                    ///
-        5 => "very high",               ///
-    )
-```
-
-Here, we will receive a warning:
+The code can be installed from this repository with:
 
 ```
-    Warning : Missing values
-        .
-```
-
-Including a wildcard pattern or a tuple of wildcard patterns covers all the cases by default.
-
-Looking at the range example, we can also mess up the ranges and cover some cases multiple times.
-
-```Stata
-    sysuse auto, clear
-
-    gen var_1 = ""
-    replace var_1 = "cheap"         if price >= 0    & price <= 6000
-    replace var_1 = "normal"        if price >= 6000 & price <= 9000
-    replace var_1 = "expensive"     if price >= 9000 & price <= 15000
-    replace var_1 = "missing"       if price == .
-
-    gen var_2 = ""
-    match var_2, variables(rep78) body( ///
-        0~6000      => "cheap",         ///
-        6000~9000   => "normal",        ///
-        9000~15000  => "expensive",     ///
-        .           => "missing",       ///
-    )
-```
-
-In this case we will receive another warning:
-
-```
-    Warning : Arm 2 has overlaps
-        Arm 1: 6000
-    Warning : Arm 3 has overlaps
-        Arm 2: 9000
+net install pmatch, from("https://github.com/MaelAstruc/stata_match/pkg")
 ```
 
 ## Limitations
@@ -236,15 +23,18 @@ In this case we will receive another warning:
 Missing types
 
 - I haven't checked any type apart from numerics and strings.
-- Dates would be interesting especially with the range, but for now they are not covered.
-- Encoded values will be added but it requires to define a proper syntax depending if we want to match on the values or the labels.
-- Comparing two variables would be useful but it would require to define new patterns and greatly modify the algorithm I think.
+- Dates would be interesting especially with the range, but they are not covered for now.
+- Comparing two variables would be useful, but it would require to define new patterns and greatly modify the algorithm I think.
 
-Performance
+## Performance
 
-- Because Stata is a dynamically typed language, the levels of the variables are checked at runtime
+- Because Stata is a dynamically typed language, the levels of the variables are checked in the database similarly to `levelsof`.
 - The exhaustiveness and usefulness are also checked at run time.
-- While it does not have a large impact on small databases, checking the levels is costly in large databases.
-- According to a quick profiling, the checks are less important compared to getting the levels.
-- Getting the levels from encoded values should decrease the performance cost.
-- I need to implement a proper profiling suite.
+- With small databases (less than 1M observations), the performance cost is lower than 0.1s.
+- With larger databases, getting the levels of the variables is costly, especially for string variables.
+- You can check the latest end-to-end performance tests logs in [dev/logs](https://github.com/MaelAstruc/stata_match/tree/master/dev/logs).
+    - The measures are in seconds.
+	- The first line measures the time needed to run the equivalent `replace ... if ...` statements.
+	- The last line measure the total time needed to run the `pmatch` command.
+	- The last column gives the average difference in seconds.
+	- The '%base' column compares the mean of each line to the average 'base' time.

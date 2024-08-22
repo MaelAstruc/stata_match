@@ -1,4 +1,25 @@
 mata
+class Variable vector function init_variables(string scalar vars_exp, real scalar check) {
+    class Variable vector variables
+    pointer scalar t
+    real scalar i, n_vars
+    string vector vars_str
+    
+    t = tokeninit()
+    tokenset(t, vars_exp)
+    
+    vars_str = tokengetall(t)
+    
+    n_vars = length(vars_str)
+    
+    variables = Variable(n_vars)
+    
+    for (i = 1; i <= n_vars; i++) {
+        variables[i].init(vars_str[i], check)
+    }
+    
+    return(variables)
+}
 
 void Variable::new() {}
 

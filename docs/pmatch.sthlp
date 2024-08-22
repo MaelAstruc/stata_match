@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.0.0  15Aug2024}{...}
+{* *! version 0.0.1 22Aug2024}{...}
 {marker syntax}{title:Title}
 
 {p2colset 5 16 18 2}{...}
@@ -30,10 +30,14 @@
 {marker description}{title:Description}
 
 {pstd}
-The {cmd:pmatch} command provides an alternative syntax to series of '{bind:{cmd:replace ... if ...}}' statements. It limits repetitions and might feel familiar for users coming from other programming languages with Pattern matching.
+The {cmd:pmatch} command provides an alternative syntax to series of '{bind:{cmd:replace ... if ...}}' statements. It limits repetitions and might feel familiar for users coming from other programming languages with pattern matching.
 
 {pstd}
-Beyond the new syntax, the {cmd:pmatch} command provides run-time checks for the exhaustiveness and the usefulness of the conditions provided. The exhaustiveness check means that the command will tell you if some levels are not covered and which one are missing. The usefulness check means that it will tell you if the conditions you specified in each arm are useful, or if one of them overlaps with a previous one.
+Beyond the new syntax, the {cmd:pmatch} command provides run-time checks for the exhaustiveness and the usefulness of the conditions provided. The exhaustiveness check means that the command will tell you if some levels are not covered and which ones are missing. The usefulness check means that the command will tell you if the conditions you specified in each arm are useful, or if some of them overlap with a previous ones.
+
+{pstd}
+The command is inspired by the {browse "https://www.rust-lang.org/":Rust} Programming Language {browse "https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html":pattern syntax} and {browse "https://doi.org/10.1017/S0956796807006223":algorithm}.
+
 
 {pstd}
 The different {help pmatch##examples:examples} illustrate how to use the different patterns detailed in the next section and what kind of information the checks provide.
@@ -207,11 +211,11 @@ To pmatch on multiple variables at the same time, we can use the Tuple pattern w
         * With the pmatch command
         
         {cmd:gen var_2 = ""}
-        {cmd:pmatch var_2, variables(rep78, price) body(  ///}
-        {cmd:    (~!3, ~!10000)      => "case 1",         ///}
-        {cmd:    (~!3, 10000~)       => "case 2",         ///}
-        {cmd:    (3~, _)             => "case 3",         ///}
-        {cmd:    (., _) | (_, .)     => "missing",        ///}
+        {cmd:pmatch var_2, variables(rep78 price) body(  ///}
+        {cmd:    (min~!3, min~!10000)   => "case 1",      ///}
+        {cmd:    (min~!3, 10000~max)    => "case 2",      ///}
+        {cmd:    (3~max, _)             => "case 3",      ///}
+        {cmd:    (., _) | (_, .)        => "missing",     ///}
         {cmd:)}
 
         {cmd:assert var_1 == var_2}
@@ -293,9 +297,11 @@ On the other hand, with {help pmatch##range_example:Example 2}, we can also do m
 
 {title:References}
 
+{p}MARANGET L. Warnings for Pattern Matching Journal of Functional Programming. 2007;17(3):387–421. doi:10.1017/S0956796807006223
+
 {title:Package details}
 
-Version      : {bf:pmatch} version 0.0.0
+Version      : {bf:pmatch} version 0.0.1
 Source       : {browse "https://github.com/MaelAstruc/stata_match":GitHub}
 
 Author       : {browse "https://github.com/MaelAstruc":Mael Astruc--Le Souder}
@@ -309,12 +315,12 @@ E-mail       : mael.astruc-le-souder@u-bordeaux.fr
 
 Suggested citation for this package:
 
-{p}Astruc--Le Souder, M. (2024). Stata package "pmatch" version 0.0.0. https://github.com/MaelAstruc/stata_match.{p_end}
+{p}Astruc--Le Souder, M. (2024). Stata package "pmatch" version 0.0.1. https://github.com/MaelAstruc/stata_match.{p_end}
 
 @software{pmatch,
    author = {Astruc--Le Souder Mael},
    title = {Stata package ``pmatch''},
    url = {https://github.com/MaelAstruc/stata_match},
-   version = {0.0.0},
-   date = {2024-08-15}
+   version = {0.0.1},
+   date = {2024-08-22}
 }

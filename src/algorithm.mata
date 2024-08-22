@@ -2,7 +2,7 @@ mata
 
 ////////////////////////////////////////////////////////////////// Main function
 
-class Arm vector function check_match( ///
+void function check_match( ///
         class Arm vector arms, ///
         class Variable vector variables ///
     ) {
@@ -30,8 +30,6 @@ class Arm vector function check_match( ///
     report.missings = missings.compress()
 
     report.print()
-
-    return(useful_arms)
 }
 
 /////////////////////////////////////////////////////////////// Check usefulness

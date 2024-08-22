@@ -1,4 +1,3 @@
-OFF
 v 3
 
 d 'PMATCH': Pattern matching in Stata
