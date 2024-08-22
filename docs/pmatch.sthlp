@@ -52,7 +52,10 @@ The different {help pmatch##examples:examples} illustrate how to use the differe
 {synopt: {opt Wildcard: } _} A pattern to cover all the possibilities that are not covered by the previous arms.{p_end}
 
 {synopt: {opt Tuple: } ({it:pattern}, {it:...}, {it:pattern})} A pattern ro use when multiple variables are provided for the matching. Each pattern matches with the corresponding variable.{p_end}
-{synoptline}
+{synoptline}{...}
+
+{pstd}
+{it:Note:} If a variable is {help encode:encoded} or if you defined {help label:label values}, you can use these labels to refer to the corresponding value.
 
 {marker examples}{title:Examples}
 
