@@ -44,6 +44,7 @@ run "dev/test/test_patterns.do"
 // TODO: run "dev/test/test_parser.do"
 // TODO: run "dev/test/test_algorithm.do"
 run "dev/test/test_end_to_end.do"
+run "dev/test/test_examples.do"
 
 mata: mata drop test_*()
 

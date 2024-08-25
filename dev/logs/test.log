@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
   log type:  text
- opened on:  25 Aug 2024, 16:51:00
+ opened on:  25 Aug 2024, 17:11:34
 
 . 
 . ////////////////////////////////////////////////////////////////////// RUN TESTS
@@ -22,6 +22,14 @@
         Warning : Arm 2 has overlaps
                 Arm 1: 1
 
+. run "dev/test/test_examples.do"
+        Warning : Missing values
+                .
+        Warning : Arm 2 has overlaps
+                Arm 1: 6000
+        Warning : Arm 3 has overlaps
+                Arm 2: 9000
+
 . 
 . mata: mata drop test_*()
 
@@ -31,9 +39,9 @@
 . mata: display_errors(ERRORS)
 
 . mata: printf("TEST TOTAL : %4.0f", TOTAL)
-TEST TOTAL :  183
+TEST TOTAL :  190
 . mata: printf("TEST PASSED: %4.0f", PASSED)
-TEST PASSED:  183
+TEST PASSED:  190
 . mata: printf("TEST FAILED: %4.0f", FAILED)
 TEST FAILED:    0
 . 
@@ -41,5 +49,5 @@ TEST FAILED:    0
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
   log type:  text
- closed on:  25 Aug 2024, 16:51:01
+ closed on:  25 Aug 2024, 17:11:34
 ---------------------------------------------------------------------------------------------------------------------------------------------------
