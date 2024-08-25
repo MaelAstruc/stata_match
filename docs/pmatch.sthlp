@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.0.1 22Aug2024}{...}
+{* *! version 0.0.2 25Aug2024}{...}
 {marker syntax}{title:Title}
 
 {p2colset 5 16 18 2}{...}
@@ -91,7 +91,6 @@ In this example, we use the values of the variable {bf:rep78} to create a new va
         
         * With the pmatch command
         
-        {cmd:gen var_2 = ""}
         {cmd:pmatch var_2, variables(rep78) body( ///}
         {cmd:    1 => "very low",                 ///}
         {cmd:    2 => "low",                      ///}
@@ -123,7 +122,6 @@ The Constant pattern is simple but not practical once we have many values or dec
         
         * With the pmatch command
         
-        {cmd:gen var_2 = ""}
         {cmd:pmatch var_2, variables(price) body( ///}
         {cmd:    min~!6000   => "cheap",          ///}
         {cmd:    6000~!9000  => "normal",         ///}
@@ -153,7 +151,6 @@ The Or pattern is used to combine multiple patterns with the '{hi:{help pmatch##
         
         * With the pmatch command
         
-        {cmd:gen var_2 = ""}
         {cmd:pmatch var_2, variables(rep78) body( ///}
         {cmd:    1 | 2   => "low",                ///}
         {cmd:    3       => "mid",                ///}
@@ -181,7 +178,6 @@ To define a default value, we can use the wildcard pattern '{hi:_}'. It covers a
         
         * With the pmatch command
         
-        {cmd:gen var_2 = ""}
         {cmd:pmatch var_2, variables(rep78) body( ///}
         {cmd:    1 => "very low",                 ///}
         {cmd:    2 => "low",                      ///}
@@ -210,7 +206,6 @@ To pmatch on multiple variables at the same time, we can use the Tuple pattern w
         
         * With the pmatch command
         
-        {cmd:gen var_2 = ""}
         {cmd:pmatch var_2, variables(rep78 price) body(  ///}
         {cmd:    (min~!3, min~!10000)   => "case 1",      ///}
         {cmd:    (min~!3, 10000~max)    => "case 2",      ///}
@@ -241,7 +236,6 @@ Coming back to {help pmatch##constant_example:Example 1}, if we forgot to includ
         
         * With the pmatch command
         
-        {cmd:gen var_2 = ""}
         {cmd:pmatch var_2, variables(rep78) body( ///}
         {cmd:    1 => "very low",                 ///}
         {cmd:    2 => "low",                      ///}
@@ -278,7 +272,6 @@ On the other hand, with {help pmatch##range_example:Example 2}, we can also do m
         
         * With the pmatch command
         
-        {cmd:gen var_2 = ""}
         {cmd:pmatch var_2, variables(price) body( ///}
         {cmd:    min~6000   => "cheap",           ///}
         {cmd:    6000~9000  => "normal",          ///}
@@ -301,7 +294,7 @@ On the other hand, with {help pmatch##range_example:Example 2}, we can also do m
 
 {title:Package details}
 
-Version      : {bf:pmatch} version 0.0.1
+Version      : {bf:pmatch} version 0.0.2
 Source       : {browse "https://github.com/MaelAstruc/stata_match":GitHub}
 
 Author       : {browse "https://github.com/MaelAstruc":Mael Astruc--Le Souder}
@@ -315,12 +308,12 @@ E-mail       : mael.astruc-le-souder@u-bordeaux.fr
 
 Suggested citation for this package:
 
-{p}Astruc--Le Souder, M. (2024). Stata package "pmatch" version 0.0.1. https://github.com/MaelAstruc/stata_match.{p_end}
+{p}Astruc--Le Souder, M. (2024). Stata package "pmatch" version 0.0.2. https://github.com/MaelAstruc/stata_match.{p_end}
 
 @software{pmatch,
    author = {Astruc--Le Souder Mael},
    title = {Stata package ``pmatch''},
    url = {https://github.com/MaelAstruc/stata_match},
-   version = {0.0.1},
-   date = {2024-08-22}
+   version = {0.0.2},
+   date = {2024-08-25}
 }
