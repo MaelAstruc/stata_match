@@ -507,3 +507,28 @@ pmatch y2, v(x2) b( ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: one integer")
+
+/////////////////////////////////////////////////////////////// Check '|pattern'
+
+clear
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 7)) // [1, 6]
+
+gen y1 = "d"
+replace y1 = "a" if x1 == 1
+replace y1 = "b" if x1 == 2 | x1 == 3
+replace y1 = "c" if x1 == 4 | x1 == 5
+
+gen y2 = ""
+
+pmatch y2, v(x1) b( ///
+    1      => "a",  ///
+    2 | 3  => "b",  ///
+    4 |5   => "c",  ///
+    _      => "d"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: check |pattern")
+

@@ -301,7 +301,7 @@ pointer scalar function tokenize(string scalar str) {
     pointer scalar t
     
     t = tokeninitstata()
-    tokenpchars(t, ("=>", ",", "~", "!~", "~!", "!!", "(", ")"))
+    tokenpchars(t, ("=>", ",", "~", "!~", "~!", "!!", "(", ")", "|"))
     tokenset(t, str)
     
     return(t)

@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
   log type:  text
- opened on:  22 Aug 2024, 18:28:19
+ opened on:  25 Aug 2024, 16:51:00
 
 . 
 . ////////////////////////////////////////////////////////////////////// RUN TESTS
@@ -31,9 +31,9 @@
 . mata: display_errors(ERRORS)
 
 . mata: printf("TEST TOTAL : %4.0f", TOTAL)
-TEST TOTAL :  182
+TEST TOTAL :  183
 . mata: printf("TEST PASSED: %4.0f", PASSED)
-TEST PASSED:  182
+TEST PASSED:  183
 . mata: printf("TEST FAILED: %4.0f", FAILED)
 TEST FAILED:    0
 . 
@@ -41,5 +41,5 @@ TEST FAILED:    0
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
   log type:  text
- closed on:  22 Aug 2024, 18:28:19
+ closed on:  25 Aug 2024, 16:51:01
 ---------------------------------------------------------------------------------------------------------------------------------------------------

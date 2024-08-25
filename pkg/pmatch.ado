@@ -1,4 +1,4 @@
-*! version 0.0.1  22 Aug 2024
+*! version 0.0.2  25 Aug 2024
 
 **#************************************************************ src/declare.mata
 
@@ -2681,7 +2681,7 @@ pointer scalar function tokenize(string scalar str) {
     pointer scalar t
     
     t = tokeninitstata()
-    tokenpchars(t, ("=>", ",", "~", "!~", "~!", "!!", "(", ")"))
+    tokenpchars(t, ("=>", ",", "~", "!~", "~!", "!!", "(", ")", "|"))
     tokenset(t, str)
     
     return(t)
