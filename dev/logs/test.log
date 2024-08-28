@@ -2,7 +2,8 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
   log type:  text
- opened on:  25 Aug 2024, 17:11:34
+ opened on:  28 Aug 2024, 16:49:49
+. }
 
 . 
 . ////////////////////////////////////////////////////////////////////// RUN TESTS
@@ -45,9 +46,10 @@ TEST PASSED:  190
 . mata: printf("TEST FAILED: %4.0f", FAILED)
 TEST FAILED:    0
 . 
-. log close
+. if (`add_log' == 1) {
+.     log close
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
   log type:  text
- closed on:  25 Aug 2024, 17:11:34
+ closed on:  28 Aug 2024, 16:49:50
 ---------------------------------------------------------------------------------------------------------------------------------------------------

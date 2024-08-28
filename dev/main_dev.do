@@ -5,23 +5,24 @@ Tests the code and runs benchmarks
 
 clear all
 
-local version = "0.0.2"
+local stata_version = `c(version)'
+local pmatch_version = "0.0.2"
 
 mata
-	files = (
-		"src/declare.mata",
-		"src/pattern_list.mata",
-		"src/pattern.mata",
-		"src/variable.mata",
-		"src/tuple.mata",
-		"src/arm.mata",
-		"src/parser.mata",
-		"src/usefulness.mata",
-		"src/match_report.mata",
-		"src/algorithm.mata",
-		"src/pmatch.mata",
-		"src/pmatch.ado"
-	)
+    files = (
+        "src/declare.mata",
+        "src/pattern_list.mata",
+        "src/pattern.mata",
+        "src/variable.mata",
+        "src/tuple.mata",
+        "src/arm.mata",
+        "src/parser.mata",
+        "src/usefulness.mata",
+        "src/match_report.mata",
+        "src/algorithm.mata",
+        "src/pmatch.mata",
+        "src/pmatch.ado"
+    )
 end
 
 // Clean up space
@@ -38,7 +39,7 @@ sthlp2pdf_dir "docs"
 
 // Build main file
 
-mata: combine_files(files, "pkg/pmatch.ado", "`version'", 0)
+mata: combine_files(files, "pkg/pmatch.ado", "`pmatch_version'", 0)
 
 // Reinstall command
 
@@ -47,8 +48,21 @@ net install pmatch, from("`c(pwd)'/pkg")
 
 // Run tests
 
-do "dev/test/test.do"
-mata: exit_if_errors()
+local add_log = ""
+
+forvalues test_version = 8/`stata_version' {
+    version `test_version'
+    
+    if (`test_version' == `stata_version') {
+        local add_log = "add_log"
+    }
+    
+    do "dev/test/test.do" `add_log'
+
+    mata: exit_if_errors()
+}
+
+version `stata_version'
 
 // Run benchmarks
 

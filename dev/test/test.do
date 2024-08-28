@@ -16,7 +16,11 @@ as I add new features.
 
 * Charge the package internals that are not installed
 
+capture program drop pmatch
+mata: mata clear
 run "pkg/pmatch.ado"
+
+local add_log = ("`0'" == "add_log")
 
 * Global variables to keep track of the results
 
@@ -33,8 +37,10 @@ run "dev/test/test_utils.do"
 
 //////////////////////////////////////////////////////////////////////////// LOG
 
-capture log close
-log using "dev/logs/test.log", replace
+if (`add_log' == 1) {
+    capture log close
+    log using "dev/logs/test.log", replace
+}
 
 ////////////////////////////////////////////////////////////////////// RUN TESTS
 
@@ -55,4 +61,6 @@ mata: printf("TEST TOTAL : %4.0f", TOTAL)
 mata: printf("TEST PASSED: %4.0f", PASSED)
 mata: printf("TEST FAILED: %4.0f", FAILED)
 
-log close
+if (`add_log' == 1) {
+    log close
+}

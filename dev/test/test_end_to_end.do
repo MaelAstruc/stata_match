@@ -1,6 +1,8 @@
 /////////////////////////////////////////////////////////// One variable integer
 
-clear
+// Use drop _all instead of clear to test with different versions
+// If clear <= 9, it also clears mata and we cannot run the command
+drop _all
 
 set obs 100
 
@@ -24,7 +26,7 @@ test_variables, expected(y1) result(y2) test("End to end: one integer")
 
 ///////////////////////////////////////////////// One variable integer with gaps
 
-clear
+drop _all
 
 set obs 100
 
@@ -48,7 +50,7 @@ test_variables, expected(y1) result(y2) test("End to end: one integer with gaps"
 
 ///////////////////////////////////////////////////////////// One variable float
 
-clear
+drop _all
 
 set obs 100
 
@@ -75,7 +77,7 @@ test_variables, expected(y1) result(y2) test("End to end: one float")
 
 /////////////////////////////////////////////////////// Float precision constant
 
-clear
+drop _all
 
 set obs 100
 
@@ -191,7 +193,7 @@ test_variables, expected(y1) result(y2) test("End to end: float precision consta
 
 /////////////////////////////////////////////////////////// One variable integer
 
-clear
+drop _all
 
 set obs 100
 
@@ -213,7 +215,7 @@ test_variables, expected(y1) result(y2) test("End to end: one string")
 
 ////////////////////////////////////////////////////////////////// Two variables
 
-clear
+drop _all
 
 set obs 100
 
@@ -242,7 +244,7 @@ test_variables, expected(y1) result(y2) test("End to end: two variables")
 
 /////////////////////////////////////////////////////////// Integer min constant
 
-clear
+drop _all
 
 set obs 100
 
@@ -264,7 +266,7 @@ test_variables, expected(y1) result(y2) test("End to end: 'min' as constant")
 
 /////////////////////////////////////////////////////////// Integer max constant
 
-clear
+drop _all
 
 set obs 100
 
@@ -287,7 +289,7 @@ test_variables, expected(y1) result(y2) test("End to end: 'max' as constant")
 
 ////////////////////////////////////////////////////////////// Integer min range
 
-clear
+drop _all
 
 set obs 100
 
@@ -309,7 +311,7 @@ test_variables, expected(y1) result(y2) test("End to end: 'min' in range")
 
 ////////////////////////////////////////////////////////////// Integer max range
 
-clear
+drop _all
 
 set obs 100
 
@@ -330,7 +332,7 @@ test_variables, expected(y1) result(y2) test("End to end: 'max' in range")
 
 ///////////////////////////////////////////////////////////////// Exhaustiveness
 
-clear
+drop _all
 
 set obs 100
 
@@ -351,7 +353,7 @@ test_variables, expected(y1) result(y2) test("End to end: non-exhaustive")
 
 /////////////////////////////////////////////////////////////////////// Overlaps
 
-clear
+drop _all
 
 set obs 100
 
@@ -374,7 +376,7 @@ test_variables, expected(y1) result(y2) test("End to end: overlaps")
 
 ///////////////////////////////////////////////////////////////////// Non-useful
 
-clear
+drop _all
 
 set obs 100
 
@@ -393,7 +395,7 @@ test_variables, expected(y1) result(y2) test("End to end: non-useful")
 
 /////////////////////////////////////////////////////////// Variable to generate
 
-clear
+drop _all
 
 set obs 100
 
@@ -415,7 +417,7 @@ test_variables, expected(y1) result(y2) test("End to end: gen new var")
 
 ///////////////////////////////////////////////////////////// Without checks int
 
-clear
+drop _all
 
 set obs 100
 
@@ -437,7 +439,7 @@ test_variables, expected(y1) result(y2) test("End to end: without checks")
 
 /////////////////////////////////////////////////////////// Without checks float
 
-clear
+drop _all
 
 set obs 100
 
@@ -459,7 +461,7 @@ test_variables, expected(y1) result(y2) test("End to end: without checks")
 
 ////////////////////////////////////////////////////////// Without checks string
 
-clear
+drop _all
 
 set obs 100
 
@@ -481,7 +483,7 @@ test_variables, expected(y1) result(y2) test("End to end: without checks")
 
 //////////////////////////////////////////////////////////// Match labeled value
 
-clear
+drop _all
 
 set obs 100
 
@@ -510,7 +512,7 @@ test_variables, expected(y1) result(y2) test("End to end: one integer")
 
 /////////////////////////////////////////////////////////////// Check '|pattern'
 
-clear
+drop _all
 
 set obs 100
 
