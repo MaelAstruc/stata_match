@@ -22,7 +22,7 @@ string vector Match_report::to_string() {
         return(strings)
     }
 
-    strings = strings, "Warning : Missing values"
+    strings = strings, "Warning : Missing cases"
 
     if (classname(this.missings) == "POr") {
         strings = strings, this.to_string_por(this.missings)
@@ -35,7 +35,7 @@ string vector Match_report::to_string() {
 }
 
 string scalar Match_report::to_string_pattern(class Pattern scalar pattern) {
-    return(sprintf("\t%s", pattern.to_string()))
+    return(sprintf("    %s", pattern.to_string()))
 }
 
 string vector Match_report::to_string_por(class POr scalar por) {

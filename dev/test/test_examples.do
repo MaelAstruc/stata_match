@@ -32,8 +32,8 @@ sysuse auto, clear
 * Usual way
 
 gen var_1 = ""
-replace var_1 = "cheap"     if price >= 0 & price < 6000
-replace var_1 = "normal"    if price >= 6000 & price < 9000
+replace var_1 = "cheap"     if price >= 0    & price <  6000
+replace var_1 = "normal"    if price >= 6000 & price <  9000
 replace var_1 = "expensive" if price >= 9000 & price <= 16000
 replace var_1 = "missing"   if price == .
 
@@ -98,7 +98,7 @@ sysuse auto, clear
 * Usual way
 
 gen var_1 = ""
-replace var_1 = "case 1"  if rep78 < 3 & price < 10000
+replace var_1 = "case 1"  if rep78 < 3 & price <  10000
 replace var_1 = "case 2"  if rep78 < 3 & price >= 10000
 replace var_1 = "case 3"  if rep78 >= 3
 replace var_1 = "missing" if rep78 == . | price == .
@@ -142,14 +142,14 @@ pmatch var_2, variables(rep78) body( ///
 
 test_variables, expected(var_1) result(var_2) test("End to end: Example 6")
 
-**# Example 7: Usefulness
+**# Example 7: Overlaps
 
 sysuse auto, clear
 
 * Usual way
 
 gen var_1 = ""
-replace var_1 = "cheap"     if price >= 0 & price <= 6000
+replace var_1 = "cheap"     if price >= 0    & price <= 6000
 replace var_1 = "normal"    if price >= 6000 & price <= 9000
 replace var_1 = "expensive" if price >= 9000 & price <= 16000
 replace var_1 = "missing"   if price == .
@@ -169,3 +169,49 @@ pmatch var_2, variables(price) body( ///
 //     Arm 2: 9000
 
 test_variables, expected(var_1) result(var_2) test("End to end: Example 7")
+
+**# Example 8: Usefulness
+
+sysuse auto, clear
+
+* Usual way
+
+gen var_1 = ""
+replace var_1 = "cheap"     if price >= 0    & price <  6000
+replace var_1 = "normal"    if price >= 6000 & price <= 9000
+replace var_1 = "expensive" if price >= 9000 & price <= 16000
+replace var_1 = "missing"   if price == .
+
+* With the pmatch command
+
+pmatch var_2, variables(price) body( ///
+    min~!6000  => "cheap",            ///
+    6000~!9000 => "normal",           ///
+    9000~max  => "expensive",        ///
+    min~max   => "oops",        ///
+    .         => "missing",          ///
+)
+
+// Warning : Arm 4 is not useful
+// Warning : Arm 4 has overlaps
+//     Arm 1: 3291~5999
+//     Arm 2: 6000~8999
+//     Arm 3: 9000~15906
+
+
+test_variables, expected(var_1) result(var_2) test("End to end: Example 8")
+
+**# Example 9: Label values
+
+drop _all
+
+set obs 100
+gen int color = runiform(1, 4)
+label define color_label 1 "Red" 2 "Green" 3 "Blue"
+label values color color_label 
+
+pmatch color_hex, variables(color) body ( ///
+    1     => "#FF0000" , ///
+    2     => "#00FF00" , ///
+   "Blue" => "#0000FF" , ///
+)

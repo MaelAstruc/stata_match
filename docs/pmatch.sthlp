@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.0.2 25Aug2024}{...}
+{* *! version 0.0.3 11Sep2024}{...}
 {marker syntax}{title:Title}
 
 {p2colset 5 16 18 2}{...}
@@ -69,7 +69,9 @@ The different {help pmatch##examples:examples} illustrate how to use the differe
 {phang}{help pmatch##wildcard_example:Example 4: Wildcard patterns}{p_end}
 {phang}{help pmatch##tuple_example:Example 5: Tuple patterns}{p_end}
 {phang}{help pmatch##exhaustiveness_example:Example 6: Exhaustiveness}{p_end}
-{phang}{help pmatch##usefulness_example:Example 7: Usefulness}{p_end}
+{phang}{help pmatch##overlaps_example:Example 7: Overlaps}{p_end}
+{phang}{help pmatch##usefulness_example:Example 8: Usefulness}{p_end}
+{phang}{help pmatch##labelvalues_example:Example 9: Label values}{p_end}
 
 {marker constant_example}{title:Example 1: Constant patterns}
 
@@ -199,8 +201,8 @@ To pmatch on multiple variables at the same time, we can use the Tuple pattern w
         * Usual way
         
         {cmd:gen var_1 = ""}
-        {cmd:replace var_1 = "case 1"        if rep78 < 3 & price < 10000}
-        {cmd:replace var_1 = "case 2"        if rep78 < 3 & price >= 10000}
+        {cmd:replace var_1 = "case 1"        if rep78 <  3 & price < 10000}
+        {cmd:replace var_1 = "case 2"        if rep78 <  3 & price >= 10000}
         {cmd:replace var_1 = "case 3"        if rep78 >= 3}
         {cmd:replace var_1 = "missing"       if rep78 == . | price == .}
         
@@ -244,7 +246,7 @@ Coming back to {help pmatch##constant_example:Example 1}, if we forgot to includ
         {cmd:    5 => "very high",                ///}
         {cmd:)}
 
-        // Warning : Missing values
+        // Warning : Missing cases
         //     .
         
         {cmd:assert var_1 == var_2}
@@ -254,7 +256,7 @@ Coming back to {help pmatch##constant_example:Example 1}, if we forgot to includ
 {pstd}
 Including a Wildcard pattern covers all the remaining cases by default. This should be used with caution, because you might cover some unexpected cases such as missing values.
 
-{marker usefulness_example}{title:Example 7: Usefulness}
+{marker overlaps_example}{title:Example 7: Overlaps}
 
 {pstd}
 On the other hand, with {help pmatch##range_example:Example 2}, we can also do mistakes with the ranges and cover some cases multiple times.
@@ -288,13 +290,75 @@ On the other hand, with {help pmatch##range_example:Example 2}, we can also do m
 
         {hline}
 
+{marker usefulness_example}{title:Example 8: Usefulness}
+
+{pstd}
+Finally, we can also include conditions which are already checked by the previous arms.
+
+        {hline}
+        {cmd:sysuse auto, clear}
+
+        * Usual way
+        
+        {cmd:gen var_1 = ""}
+        {cmd:replace var_1 = "cheap"        if price >= 0    & price <  6000}
+        {cmd:replace var_1 = "normal"       if price >= 6000 & price <  9000}
+        {cmd:replace var_1 = "expensive"    if price >= 9000 & price <= 16000}
+        {cmd:replace var_1 = "missing"      if price == .}
+        
+        * With the pmatch command
+        
+        {cmd:pmatch var_2, variables(price) body( ///}
+        {cmd:    min~!6000  => "cheap",           ///}
+        {cmd:    6000~!9000 => "normal",          ///}
+        {cmd:    9000~max   => "expensive",       ///}
+        {cmd:    min~max    => "oops",            ///}
+        {cmd:    .          => "missing",         ///}
+        {cmd:)}
+
+        // Warning : Arm 4 is not useful
+        // Warning : Arm 4 has overlaps
+        //     Arm 1: 3291~5999
+        //     Arm 2: 6000~8999
+        //     Arm 3: 9000~15906
+
+
+        {cmd:assert var_1 == var_2}
+
+        {hline}
+
+{marker labelvalues_example}{title:Example 9: Label values}
+
+{pstd}
+Some quality of life bonus is the possibility to use label values instead of the values.
+
+        {hline}
+        {cmd:drop _all}
+        
+        * Create a variable color with values 1, 2 or 3
+        
+        {cmd:set obs 100}
+        {cmd:gen int color = runiform(1, 4)}
+
+        * Define label values "Red", "Green" and "Blue"
+        
+        {cmd:label define color_label 1 "Red" 2 "Green" 3 "Blue"}
+        {cmd:label values color color_label}
+        {cmd:pmatch color_hex, variables(color) body ( ///}
+        {cmd:    1      => "#FF0000" ,                 ///}
+        {cmd:    2      => "#00FF00" ,                 ///}
+        {cmd:    "Blue" => "#0000FF" ,                 ///}
+        {cmd:)}
+
+        {hline}
+
 {title:References}
 
 {p}MARANGET L. Warnings for Pattern Matching Journal of Functional Programming. 2007;17(3):387–421. doi:10.1017/S0956796807006223
 
 {title:Package details}
 
-Version      : {bf:pmatch} version 0.0.2
+Version      : {bf:pmatch} version 0.0.3
 Source       : {browse "https://github.com/MaelAstruc/stata_match":GitHub}
 
 Author       : {browse "https://github.com/MaelAstruc":Mael Astruc--Le Souder}
@@ -308,12 +372,12 @@ E-mail       : mael.astruc-le-souder@u-bordeaux.fr
 
 Suggested citation for this package:
 
-{p}Astruc--Le Souder, M. (2024). Stata package "pmatch" version 0.0.2. https://github.com/MaelAstruc/stata_match.{p_end}
+{p}Astruc--Le Souder, M. (2024). Stata package "pmatch" version 0.0.3. https://github.com/MaelAstruc/stata_match.{p_end}
 
 @software{pmatch,
    author = {Astruc--Le Souder Mael},
    title = {Stata package ``pmatch''},
    url = {https://github.com/MaelAstruc/stata_match},
-   version = {0.0.2},
-   date = {2024-08-25}
+   version = {0.0.3},
+   date = {2024-09-11}
 }

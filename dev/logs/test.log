@@ -1,8 +1,8 @@
----------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
   log type:  text
- opened on:  28 Aug 2024, 16:49:49
+ opened on:  11 Sep 2024, 19:49:35
 . }
 
 . 
@@ -15,21 +15,26 @@
 . // TODO: run "dev/test/test_parser.do"
 . // TODO: run "dev/test/test_algorithm.do"
 . run "dev/test/test_end_to_end.do"
-        Warning : Missing values
-                4
+        Warning : Missing cases
+            4
         Warning : Arm 2 has overlaps
-                Arm 1: 2
+            Arm 1: 2
         Warning : Arm 2 is not useful
         Warning : Arm 2 has overlaps
-                Arm 1: 1
+            Arm 1: 1
 
 . run "dev/test/test_examples.do"
-        Warning : Missing values
-                .
+        Warning : Missing cases
+            .
         Warning : Arm 2 has overlaps
-                Arm 1: 6000
+            Arm 1: 6000
         Warning : Arm 3 has overlaps
-                Arm 2: 9000
+            Arm 2: 9000
+        Warning : Arm 4 is not useful
+        Warning : Arm 4 has overlaps
+            Arm 1: 3291~5999
+            Arm 2: 6000~8999
+            Arm 3: 9000~15906
 
 . 
 . mata: mata drop test_*()
@@ -40,9 +45,9 @@
 . mata: display_errors(ERRORS)
 
 . mata: printf("TEST TOTAL : %4.0f", TOTAL)
-TEST TOTAL :  190
+TEST TOTAL :  191
 . mata: printf("TEST PASSED: %4.0f", PASSED)
-TEST PASSED:  190
+TEST PASSED:  191
 . mata: printf("TEST FAILED: %4.0f", FAILED)
 TEST FAILED:    0
 . 
@@ -51,5 +56,5 @@ TEST FAILED:    0
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
   log type:  text
- closed on:  28 Aug 2024, 16:49:50
----------------------------------------------------------------------------------------------------------------------------------------------------
+ closed on:  11 Sep 2024, 19:49:36
+--------------------------------------------------------------------------------------------------------------------------------------------------------

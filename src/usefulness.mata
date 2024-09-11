@@ -35,7 +35,7 @@ string vector Usefulness::to_string() {
             
             if (classname(overlap) != "PEmpty") {
                 str = str,
-                    sprintf("\tArm %f: %s", lhs.arm_id, overlap.to_string())
+                    sprintf("    Arm %f: %s", lhs.arm_id, overlap.to_string())
             }
         }
     }

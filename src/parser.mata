@@ -61,7 +61,7 @@ class Pattern scalar function parse_pattern(
     class Variable scalar variable,
     real scalar arm_id
 ) {
-    string scalar tok
+    string scalar tok, var_label
     real scalar number
 
     tok = tokenget(t)
@@ -98,14 +98,24 @@ class Pattern scalar function parse_pattern(
             return(parse_number(t, number, arm_id, variable))
         }
         else if (isquoted(tok)) {
-            number = st_vlsearch(variable.name, unquote(tok))
+            var_label = st_varvaluelabel(variable.name)
+            
+            if (var_label == "") {
+                errprintf(
+                    "No label value defined for variable %s, unexpected label in arm %f, found: %s\n",
+                    variable.name, arm_id, tok
+                )
+                exit(_error(180))
+            }
+            
+            number = st_vlsearch(var_label, unquote(tok))
             if (number != .) {
                 return(parse_number(t, number, arm_id, variable))
             }
             else {
                 errprintf(
-                    "Unknown label value for variable %s in arm %f: %s\n",
-                    variable.name, arm_id, tok
+                    "Unknown label value for variable %s and value label %s in arm %f: %s\n",
+                    variable.name, var_label, arm_id, tok
                 )
                 exit(_error(180))
             }
