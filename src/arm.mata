@@ -22,7 +22,8 @@ void Arm::print() {
 void function eval_arms(
     string scalar varname,
     class Arm vector arms,
-    class Variable vector variables
+    class Variable vector variables,
+    real scalar gen_first
 ) {
     class Arm scalar arm
     class Pattern scalar pattern
@@ -36,7 +37,7 @@ void function eval_arms(
         arm = arms[i]
         pattern = *arm.lhs.pattern
         
-        if (i == n & _st_varindex(varname) == .) {
+        if (i == n & gen_first) {
             command = "generate"
         }
         else {

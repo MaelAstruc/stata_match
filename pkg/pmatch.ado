@@ -1,4 +1,4 @@
-*! version 0.0.4  17 Sep 2024
+*! version 0.0.5  17 Sep 2024
 
 **#************************************************************ src/declare.mata
 
@@ -2334,7 +2334,8 @@ void Arm::print() {
 void function eval_arms(
     string scalar varname,
     class Arm vector arms,
-    class Variable vector variables
+    class Variable vector variables,
+    real scalar gen_first
 ) {
     class Arm scalar arm
     class Pattern scalar pattern
@@ -2348,7 +2349,7 @@ void function eval_arms(
         arm = arms[i]
         pattern = *arm.lhs.pattern
         
-        if (i == n & _st_varindex(varname) == .) {
+        if (i == n & gen_first) {
             command = "generate"
         }
         else {
@@ -3145,7 +3146,13 @@ end
 // The // bench_on() and // bench_off() functions are not used in the online code)
 
 mata
-function pmatch(string scalar newvar, string scalar vars_exp, string scalar body, real scalar check) {
+function pmatch(
+    string scalar newvar,
+    string scalar vars_exp,
+    string scalar body,
+    real scalar check,
+    real scalar gen_first
+) {
     class Variable vector variables
     class Arm vector arms, useful_arms
 
@@ -3166,7 +3173,7 @@ function pmatch(string scalar newvar, string scalar vars_exp, string scalar body
     // bench_off("check")
     
     // bench_on("eval")
-    eval_arms(newvar, arms, variables)
+    eval_arms(newvar, arms, variables, gen_first)
     // bench_off("eval")
 
     // bench_off("total")
@@ -3182,11 +3189,44 @@ end
 program pmatch
     syntax namelist(min=1 max=1), ///
         Variables(varlist min=1) Body(str asis) ///
-        [NOCHECK]
+        [REPLACE NOCHECK]
     
-    local check = ("`nocheck'" == "")
+    local check     = ("`nocheck'" == "")
+    
+    check_replace `namelist', `replace'
+    local gen_first = ("`replace'" == "")
 
-    mata: pmatch("`namelist'", "`variables'", `"`body'"', `check')
+    mata: pmatch("`namelist'", "`variables'", `"`body'"', `check', `gen_first')
 end
 
+program check_replace
+    syntax namelist(min=1 max=1), [REPLACE]
+    
+    local gen_first = ("`replace'" == "")
+    
+    if (`gen_first') {
+        capture confirm new variable `namelist'
+        
+        if (_rc == 110) {
+            dis as error in smcl "variable {bf:`namelist'} already defined, use the 'replace' option to overwrite it"
+            exit 110
+        }
+        else if (_rc != 0) {
+            // Should be covered by the syntax command
+            exit _rc
+        }
+    }
+    else {
+        capture confirm variable `namelist'
+        
+        if (_rc == 111) {
+            dis as error in smcl "variable {bf:`namelist'} not found, option 'replace' cannot be used"
+            exit 111
+        }
+        else if (_rc != 0) {
+            // Should be covered by the syntax command
+            exit _rc
+        }
+    }
+end
 

@@ -2,7 +2,13 @@
 // The // bench_on() and // bench_off() functions are not used in the online code)
 
 mata
-function pmatch(string scalar newvar, string scalar vars_exp, string scalar body, real scalar check) {
+function pmatch(
+    string scalar newvar,
+    string scalar vars_exp,
+    string scalar body,
+    real scalar check,
+    real scalar gen_first
+) {
     class Variable vector variables
     class Arm vector arms, useful_arms
 
@@ -23,7 +29,7 @@ function pmatch(string scalar newvar, string scalar vars_exp, string scalar body
     // bench_off("check")
     
     // bench_on("eval")
-    eval_arms(newvar, arms, variables)
+    eval_arms(newvar, arms, variables, gen_first)
     // bench_off("eval")
 
     // bench_off("total")

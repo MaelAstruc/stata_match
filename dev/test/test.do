@@ -16,7 +16,7 @@ as I add new features.
 
 * Charge the package internals that are not installed
 
-capture program drop pmatch
+capture program drop pmatch check_replace
 mata: mata clear
 run "pkg/pmatch.ado"
 

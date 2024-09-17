@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.0.4 17Sep2024}{...}
+{* *! version 0.0.5 17Sep2024}{...}
 {marker syntax}{title:Title}
 
 {p2colset 5 16 18 2}{...}
@@ -13,7 +13,7 @@
 {cmd:[}{help pmatch##pattern:{it:pattern}} = {help exp},{cmd:]}{break}
 {cmd:[}{help pmatch##pattern:{it:pattern}} = {help exp},{cmd:]}{break}
 ...{p_end}
-{p 4}{cmd:)} [{it:nocheck}]{p_end}
+{p 4}{cmd:)} [{it:replace} {it:nocheck}]{p_end}
         
 {pstd}
 {varname} is the name of the variable (A) you would like to replace. If the variable does not exist, it will be created.
@@ -24,8 +24,13 @@
 {pstd}
 {cmd:Body}(...) contains the list of replacements you would like to do. It's composed of multiple arms. Each arm includes a {help pmatch##pattern:{it:pattern}} on the left hand side indicating the conditions of the replacement based on the values of the variables (B). It also contains an {help expression} on the right hand side to replace the values of your variable (A). They are separated by an equal sign {bf:=}.
 
-{pstd}
-{it:nocheck} skips the checks and directly performs the replacements. This allows to use the syntax of the command, without the performance cost of the verifications.
+{synoptset 20 tabbed}{...}
+{synopthdr}
+{synoptline}
+{synopt: {opt replace: }} replaces values in {varname}.{p_end}
+{synopt: {opt nocheck: }} skips the checks and directly performs the replacements. Avoids the performance cost of the verifications.{p_end}
+{synoptline}
+{p2colreset}{...}
 
 {marker description}{title:Description}
 
@@ -44,7 +49,7 @@ The different {help pmatch##examples:examples} illustrate how to use the differe
 
 {marker syntax}{title:Patterns}
 
-{synoptset 30}{...}
+{synoptset 20}{...}
 {synopthdr:Pattern}
 {synoptline}
 {synopt: {opt Constant: } {it:x}} A unique value, either a number or a string.{p_end}
@@ -358,7 +363,7 @@ Some quality of life bonus is the possibility to use label values instead of the
 
 {title:Package details}
 
-Version      : {bf:pmatch} version 0.0.4
+Version      : {bf:pmatch} version 0.0.5
 Source       : {browse "https://github.com/MaelAstruc/stata_match":GitHub}
 
 Author       : {browse "https://github.com/MaelAstruc":Mael Astruc--Le Souder}
@@ -372,12 +377,12 @@ E-mail       : mael.astruc-le-souder@u-bordeaux.fr
 
 Suggested citation for this package:
 
-{p}Astruc--Le Souder, M. (2024). Stata package "pmatch" version 0.0.4. https://github.com/MaelAstruc/stata_match.{p_end}
+{p}Astruc--Le Souder, M. (2024). Stata package "pmatch" version 0.0.5. https://github.com/MaelAstruc/stata_match.{p_end}
 
 @software{pmatch,
    author = {Astruc--Le Souder Mael},
    title = {Stata package ``pmatch''},
    url = {https://github.com/MaelAstruc/stata_match},
-   version = {0.0.4},
+   version = {0.0.5},
    date = {2024-09-17}
 }

@@ -4,7 +4,7 @@ clear all
 
 local obs = 100
 
-capture program drop pmatch
+capture program drop pmatch check_replace
 mata: mata clear
 run "pkg/pmatch.ado"
 
