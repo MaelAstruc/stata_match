@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
   log type:  text
- opened on:  11 Sep 2024, 19:49:35
+ opened on:  17 Sep 2024, 18:46:58
 . }
 
 . 
@@ -15,26 +15,26 @@
 . // TODO: run "dev/test/test_parser.do"
 . // TODO: run "dev/test/test_algorithm.do"
 . run "dev/test/test_end_to_end.do"
-        Warning : Missing cases
-            4
-        Warning : Arm 2 has overlaps
-            Arm 1: 2
-        Warning : Arm 2 is not useful
-        Warning : Arm 2 has overlaps
-            Arm 1: 1
+    Warning : Missing cases
+        4
+    Warning : Arm 2 has overlaps
+        Arm 1: 2
+    Warning : Arm 2 is not useful
+    Warning : Arm 2 has overlaps
+        Arm 1: 1
 
 . run "dev/test/test_examples.do"
-        Warning : Missing cases
-            .
-        Warning : Arm 2 has overlaps
-            Arm 1: 6000
-        Warning : Arm 3 has overlaps
-            Arm 2: 9000
-        Warning : Arm 4 is not useful
-        Warning : Arm 4 has overlaps
-            Arm 1: 3291~5999
-            Arm 2: 6000~8999
-            Arm 3: 9000~15906
+    Warning : Missing cases
+        .
+    Warning : Arm 2 has overlaps
+        Arm 1: 6000
+    Warning : Arm 3 has overlaps
+        Arm 2: 9000
+    Warning : Arm 4 is not useful
+    Warning : Arm 4 has overlaps
+        Arm 1: 3291/5999
+        Arm 2: 6000/8999
+        Arm 3: 9000/15906
 
 . 
 . mata: mata drop test_*()
@@ -56,5 +56,5 @@ TEST FAILED:    0
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
   log type:  text
- closed on:  11 Sep 2024, 19:49:36
+ closed on:  17 Sep 2024, 18:46:59
 --------------------------------------------------------------------------------------------------------------------------------------------------------

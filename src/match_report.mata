@@ -59,7 +59,7 @@ void Match_report::print() {
 
     displayas("error")
     for (i = 1; i <= length(strings); i++) {
-        printf("\t%s\n", strings[i])
+        printf("    %s\n", strings[i])
     }
 }
 

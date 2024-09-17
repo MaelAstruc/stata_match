@@ -32,10 +32,10 @@ program profile_obs_integer
         mata: bench_off("base")
 
         pmatch y, v(x) b(    ///
-            1         => "a",  ///
-            2 | 3 | 4 => "b",  ///
-            5~9       => "c",  ///
-            _         => "d"   ///
+            1         = "a",  ///
+            2 | 3 | 4 = "b",  ///
+            5/9       = "c",  ///
+            _         = "d"   ///
         ) `nocheck'
         
         assert y_base == y
@@ -63,10 +63,10 @@ program profile_obs_float
         mata: bench_off("base")
 
         pmatch y, v(x) b(    ///
-            1         => "a",  ///
-            2 | 3 | 4 => "b",  ///
-            5~9       => "c",  ///
-            _         => "d"   ///
+            1         = "a",  ///
+            2 | 3 | 4 = "b",  ///
+            5/9       = "c",  ///
+            _         = "d"   ///
         ) `nocheck'
         
         assert y_base == y
@@ -94,9 +94,9 @@ program profile_obs_string
         mata: bench_off("base")
 
         pmatch y, v(x) b(    ///
-            "1"             => "a",  ///
-            "2" | "3" | "4" => "b",  ///
-            _               => "c"   ///
+            "1"             = "a",  ///
+            "2" | "3" | "4" = "b",  ///
+            _               = "c"   ///
         ) `nocheck'
         
         assert y_base == y

@@ -15,12 +15,12 @@ replace var_1 = "missing"   if rep78 == .
 * With the pmatch command
 
 pmatch var_2, variables(rep78) body( ///
-    1 => "very low",                 ///
-    2 => "low",                      ///
-    3 => "mid",                      ///
-    4 => "high",                     ///
-    5 => "very high",                ///
-    . => "missing",                  ///
+    1 = "very low",                 ///
+    2 = "low",                      ///
+    3 = "mid",                      ///
+    4 = "high",                     ///
+    5 = "very high",                ///
+    . = "missing",                  ///
 )
 
 test_variables, expected(var_1) result(var_2) test("End to end: Example 1")
@@ -40,10 +40,10 @@ replace var_1 = "missing"   if price == .
 * With the pmatch command
 
 pmatch var_2, variables(price) body( ///
-    min~!6000   => "cheap",          ///
-    6000~!9000  => "normal",         ///
-    9000~max    => "expensive",      ///
-    .           => "missing",        ///
+    min/!6000   = "cheap",          ///
+    6000/!9000  = "normal",         ///
+    9000/max    = "expensive",      ///
+    .           = "missing",        ///
 )
 
 test_variables, expected(var_1) result(var_2) test("End to end: Example 2")
@@ -63,10 +63,10 @@ replace var_1 = "missing" if rep78 == .
 * With the pmatch command
 
 pmatch var_2, variables(rep78) body( ///
-    1 | 2  => "low",                 ///
-    3      => "mid",                 ///
-    4 | 5  => "high",                ///
-    .      => "missing",             ///
+    1 | 2  = "low",                 ///
+    3      = "mid",                 ///
+    4 | 5  = "high",                ///
+    .      = "missing",             ///
 )
 
 test_variables, expected(var_1) result(var_2) test("End to end: Example 3")
@@ -84,9 +84,9 @@ replace var_1 = "low"      if rep78 == 2
 * With the pmatch command
 
 pmatch var_2, variables(rep78) body( ///
-    1 => "very low",                 ///
-    2 => "low",                      ///
-    _ => "other",                    ///
+    1 = "very low",                 ///
+    2 = "low",                      ///
+    _ = "other",                    ///
 )
 
 test_variables, expected(var_1) result(var_2) test("End to end: Example 4")
@@ -106,10 +106,10 @@ replace var_1 = "missing" if rep78 == . | price == .
 * With the pmatch command
 
 pmatch var_2, variables(rep78 price) body( ///
-    (min~!3, min~!10000) => "case 1",      ///
-    (min~!3, 10000~max)  => "case 2",      ///
-    (3~max,  _)          => "case 3",      ///
-    (., _) | (_, .)      => "missing",     ///
+    (min/!3, min/!10000) = "case 1",      ///
+    (min/!3, 10000/max)  = "case 2",      ///
+    (3/max,  _)          = "case 3",      ///
+    (., _) | (_, .)      = "missing",     ///
 )
 
 test_variables, expected(var_1) result(var_2) test("End to end: Example 5")
@@ -130,11 +130,11 @@ replace var_1 = "very high" if rep78 == 5
 * With the pmatch command
 
 pmatch var_2, variables(rep78) body( ///
-    1 => "very low",                 ///
-    2 => "low",                      ///
-    3 => "mid",                      ///
-    4 => "high",                     ///
-    5 => "very high",                ///
+    1 = "very low",                 ///
+    2 = "low",                      ///
+    3 = "mid",                      ///
+    4 = "high",                     ///
+    5 = "very high",                ///
 )
 
 // Warning : Missing values
@@ -157,10 +157,10 @@ replace var_1 = "missing"   if price == .
 * With the pmatch command
 
 pmatch var_2, variables(price) body( ///
-    min~6000  => "cheap",            ///
-    6000~9000 => "normal",           ///
-    9000~max  => "expensive",        ///
-    .         => "missing",          ///
+    min/6000  = "cheap",            ///
+    6000/9000 = "normal",           ///
+    9000/max  = "expensive",        ///
+    .         = "missing",          ///
 )
 
 // Warning : Arm 2 has overlaps
@@ -185,18 +185,18 @@ replace var_1 = "missing"   if price == .
 * With the pmatch command
 
 pmatch var_2, variables(price) body( ///
-    min~!6000  => "cheap",            ///
-    6000~!9000 => "normal",           ///
-    9000~max  => "expensive",        ///
-    min~max   => "oops",        ///
-    .         => "missing",          ///
+    min/!6000  = "cheap",            ///
+    6000/!9000 = "normal",           ///
+    9000/max  = "expensive",        ///
+    min/max   = "oops",        ///
+    .         = "missing",          ///
 )
 
 // Warning : Arm 4 is not useful
 // Warning : Arm 4 has overlaps
-//     Arm 1: 3291~5999
-//     Arm 2: 6000~8999
-//     Arm 3: 9000~15906
+//     Arm 1: 3291/5999
+//     Arm 2: 6000/8999
+//     Arm 3: 9000/15906
 
 
 test_variables, expected(var_1) result(var_2) test("End to end: Example 8")
@@ -211,7 +211,7 @@ label define color_label 1 "Red" 2 "Green" 3 "Blue"
 label values color color_label 
 
 pmatch color_hex, variables(color) body ( ///
-    1     => "#FF0000" , ///
-    2     => "#00FF00" , ///
-   "Blue" => "#0000FF" , ///
+    1     = "#FF0000" , ///
+    2     = "#00FF00" , ///
+   "Blue" = "#0000FF" , ///
 )

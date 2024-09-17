@@ -47,7 +47,7 @@ class Arm scalar function parse_arm (
         arm.lhs.pattern = &parse_tuples(t, variables, arm_id)
     }
 
-    check_next(t, "=>", arm_id)
+    check_next(t, "=", arm_id)
 
     arm.value = parse_value(t)
     
@@ -203,15 +203,15 @@ class PRange scalar function parse_range(
         }
     }
 
-    if (symbole == "~") {
+    if (symbole == "/") {
         in_min = 1
         in_max = 1
     }
-    else if (symbole == "!~") {
+    else if (symbole == "!/") {
         in_min = 0
         in_max = 1
     }
-    else if (symbole == "~!") {
+    else if (symbole == "/!") {
         in_min = 1
         in_max = 0
     }
@@ -311,7 +311,7 @@ pointer scalar function tokenize(string scalar str) {
     pointer scalar t
     
     t = tokeninitstata()
-    tokenpchars(t, ("=>", ",", "~", "!~", "~!", "!!", "(", ")", "|"))
+    tokenpchars(t, ("=", ",", "/", "!/", "/!", "!!", "(", ")", "|"))
     tokenset(t, str)
     
     return(t)
@@ -370,7 +370,7 @@ string scalar function unquote(string scalar str) {
 }
 
 real scalar function israngesym(str) {
-    return(str == "~" | str == "!~" | str == "~!" | str == "!!")
+    return(str == "/" | str == "!/" | str == "/!" | str == "!!")
 }
 
 real scalar function check_wildcard(transmorphic scalar pattern) {

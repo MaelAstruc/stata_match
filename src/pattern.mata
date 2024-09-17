@@ -480,9 +480,9 @@ define :
 to_string :
     The min, the max and a symbol depending on their inclusion in the range.
     The symbol can be:
-        - ~   if min and max are included
-        - !~  if min is excluded and max included
-        - ~!  if min is included and max excluded
+        - /   if min and max are included
+        - !/  if min is excluded and max included
+        - /!  if min is included and max excluded
         - !!  if min and max are excluded
     arguments : nothing
     returns :   string scalar "'min''sym''max'" 
@@ -602,9 +602,9 @@ string scalar PRange::to_string() {
     string scalar sym
 
     if (in_min == 0 & in_max == 0) sym = "!!"
-    if (in_min == 0 & in_max == 1) sym = "!~"
-    if (in_min == 1 & in_max == 0) sym = "~!"
-    if (in_min == 1 & in_max == 1) sym = "~"
+    if (in_min == 0 & in_max == 1) sym = "!/"
+    if (in_min == 1 & in_max == 0) sym = "/!"
+    if (in_min == 1 & in_max == 1) sym = "/"
 
     return(sprintf("%f%s%f", this.min, sym, this.max))
 }

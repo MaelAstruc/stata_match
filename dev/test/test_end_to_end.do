@@ -16,10 +16,10 @@ replace y1 = "c" if x1 >= 4 & x1 <= 5
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    1      => "a",  ///
-    2 | 3  => "b",  ///
-    4~5    => "c",  ///
-    _      => "d"   ///
+    1      = "a",  ///
+    2 | 3  = "b",  ///
+    4/5    = "c",  ///
+    _      = "d"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: one integer")
@@ -41,9 +41,9 @@ replace y1 = "c" if x1 >= 8 & x1 <= 12
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    2      => "a",  ///
-    4 | 6  => "b",  ///
-    8~12   => "c",  ///
+    2      = "a",  ///
+    4 | 6  = "b",  ///
+    8/12   = "c",  ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: one integer with gaps")
@@ -67,10 +67,10 @@ replace y1 = "c" if x1 >= 4 & x1 <= 5
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    1      => "a",  ///
-    2 | 3  => "b",  ///
-    4~5    => "c",  ///
-    _      => "d"   ///
+    1      = "a",  ///
+    2 | 3  = "b",  ///
+    4/5    = "c",  ///
+    _      = "d"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: one float")
@@ -152,39 +152,39 @@ replace y1 = "1f" if x1 == 1.0x-1f
 gen y2 = ""
 
 pmatch y2, v(x1) b(   ///
-    1.0x-0  => "0" , ///
-    1.0x-1  => "1" , ///
-    1.0x-2  => "2" , ///
-    1.0x-3  => "3" , ///
-    1.0x-4  => "4" , ///
-    1.0x-5  => "5" , ///
-    1.0x-6  => "6" , ///
-    1.0x-7  => "7" , ///
-    1.0x-8  => "8" , ///
-    1.0x-9  => "9" , ///
-    1.0x-a  => "a" , ///
-    1.0x-b  => "b" , ///
-    1.0x-c  => "c" , ///
-    1.0x-d  => "d" , ///
-    1.0x-e  => "e" , ///
-    1.0x-f  => "f" , ///
-    1.0x-10 => "10", ///
-    1.0x-11 => "11", ///
-    1.0x-12 => "12", ///
-    1.0x-13 => "13", ///
-    1.0x-14 => "14", ///
-    1.0x-15 => "15", ///
-    1.0x-16 => "16", ///
-    1.0x-17 => "17", ///
-    1.0x-18 => "18", ///
-    1.0x-19 => "19", ///
-    1.0x-1a => "1a", ///
-    1.0x-1b => "1b", ///
-    1.0x-1c => "1c", ///
-    1.0x-1d => "1d", ///
-    1.0x-1e => "1e", ///
-    1.0x-1f => "1f", ///
-    _       => ""    ///
+    1.0x-0  = "0" , ///
+    1.0x-1  = "1" , ///
+    1.0x-2  = "2" , ///
+    1.0x-3  = "3" , ///
+    1.0x-4  = "4" , ///
+    1.0x-5  = "5" , ///
+    1.0x-6  = "6" , ///
+    1.0x-7  = "7" , ///
+    1.0x-8  = "8" , ///
+    1.0x-9  = "9" , ///
+    1.0x-a  = "a" , ///
+    1.0x-b  = "b" , ///
+    1.0x-c  = "c" , ///
+    1.0x-d  = "d" , ///
+    1.0x-e  = "e" , ///
+    1.0x-f  = "f" , ///
+    1.0x-10 = "10", ///
+    1.0x-11 = "11", ///
+    1.0x-12 = "12", ///
+    1.0x-13 = "13", ///
+    1.0x-14 = "14", ///
+    1.0x-15 = "15", ///
+    1.0x-16 = "16", ///
+    1.0x-17 = "17", ///
+    1.0x-18 = "18", ///
+    1.0x-19 = "19", ///
+    1.0x-1a = "1a", ///
+    1.0x-1b = "1b", ///
+    1.0x-1c = "1c", ///
+    1.0x-1d = "1d", ///
+    1.0x-1e = "1e", ///
+    1.0x-1f = "1f", ///
+    _       = ""    ///
 )
 
 assert y1 == y2
@@ -206,9 +206,9 @@ replace y1 = "b" if x1 == "2" | x1 == "3"
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    "1"        => "a",  ///
-    "2" | "3"  => "b",  ///
-    _          => "c"   ///
+    "1"        = "a",  ///
+    "2" | "3"  = "b",  ///
+    _          = "c"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: one string")
@@ -232,12 +232,12 @@ replace y1 = "e" if x1 >  2 & x1 <= 3 & x2 == "2"
 gen y2 = ""
 
 pmatch y2, v(x1 x2) b( ///
-    (1,     "1")       => "a",  ///
-    (1,     "2" | "3") => "b",  ///
-    (2~3,   "1")       => "c",  ///
-    (2~!3,  "2")       => "d",  ///
-    (2!~3,  "2")       => "e",  ///
-    (_, _)             => "f"   ///
+    (1,     "1")       = "a",  ///
+    (1,     "2" | "3") = "b",  ///
+    (2/3,   "1")       = "c",  ///
+    (2/!3,  "2")       = "d",  ///
+    (2!/3,  "2")       = "e",  ///
+    (_, _)             = "f"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: two variables")
@@ -257,9 +257,9 @@ replace y1 = "b" if x1 == 2 | x1 == 3
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    min    => "a",  ///
-    2 | 3  => "b",  ///
-    _      => "c"   ///
+    min    = "a",  ///
+    2 | 3  = "b",  ///
+    _      = "c"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: 'min' as constant")
@@ -280,9 +280,9 @@ replace y1 = "c" if x1 == 4
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    1      => "a",  ///
-    2 | 3  => "b",  ///
-    max    => "c"   ///
+    1      = "a",  ///
+    2 | 3  = "b",  ///
+    max    = "c"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: 'max' as constant")
@@ -302,9 +302,9 @@ replace y1 = "b" if x1 == 3
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    min~2  => "a",  ///
-    3      => "b",  ///
-    _      => "c"   ///
+    min/2  = "a",  ///
+    3      = "b",  ///
+    _      = "c"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: 'min' in range")
@@ -324,8 +324,8 @@ replace y1 = "b" if x1 >= 3 & x1 <= 4
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    1 | 2   => "a",  ///
-    3~max   => "b"   ///
+    1 | 2   = "a",  ///
+    3/max   = "b"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: 'max' in range")
@@ -345,8 +345,8 @@ replace y1 = "b" if x1 == 3
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    1 | 2   => "a",  ///
-    3   => "b"   ///
+    1 | 2   = "a",  ///
+    3   = "b"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: non-exhaustive")
@@ -365,10 +365,10 @@ replace y1 = "b" if x1 > 2
 
 gen y2 = ""
 
-// pmatch y2, v(x1) b( 1 | 2 => "a", 2~max => "b")
+// pmatch y2, v(x1) b( 1 | 2 = "a", 2/max = "b")
 pmatch y2, v(x1) b( ///
-    1 | 2   => "a",  ///
-    2~max   => "b"   ///
+    1 | 2   = "a",  ///
+    2/max   = "b"   ///
 )
 
 // We expect 2 to be "a", not "b" due to the overlap
@@ -387,8 +387,8 @@ gen y1 = "a"
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    _   => "a",  ///
-    1   => "b"   ///
+    _   = "a",  ///
+    1   = "b"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: non-useful")
@@ -407,10 +407,10 @@ replace y1 = "b" if x1 == 2 | x1 == 3
 replace y1 = "c" if x1 >= 4 & x1 <= 5
 
 pmatch y2, v(x1) b( ///
-    1      => "a",  ///
-    2 | 3  => "b",  ///
-    4~5    => "c",  ///
-    _      => "d"   ///
+    1      = "a",  ///
+    2 | 3  = "b",  ///
+    4/5    = "c",  ///
+    _      = "d"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: gen new var")
@@ -429,10 +429,10 @@ replace y1 = "b" if x1 == 2 | x1 == 3
 replace y1 = "c" if x1 >= 5 & x1 <= 6
 
 pmatch y2, nocheck v(x1) b( ///
-    min    => "a",  ///
-    2 | 3  => "b",  ///
-    5~max  => "c",  ///
-    _      => "d"   ///
+    min    = "a",  ///
+    2 | 3  = "b",  ///
+    5/max  = "c",  ///
+    _      = "d"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: without checks")
@@ -451,10 +451,10 @@ replace y1 = "b" if x1 == 2 | x1 == 3
 replace y1 = "c" if x1 >= 5 & x1 <= 6
 
 pmatch y2, nocheck v(x1) b( ///
-    min    => "a",  ///
-    2 | 3  => "b",  ///
-    5~max  => "c",  ///
-    _      => "d"   ///
+    min    = "a",  ///
+    2 | 3  = "b",  ///
+    5/max  = "c",  ///
+    _      = "d"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: without checks")
@@ -473,10 +473,10 @@ replace y1 = "b" if x1 == "2" | x1 == "3"
 replace y1 = "c" if x1 == "5" | x1 == "6"
 
 pmatch y2, nocheck v(x1) b( ///
-    "1"        => "a",  ///
-    "2" | "3"  => "b",  ///
-    "5" | "6"  => "c",  ///
-    _          => "d"   ///
+    "1"        = "a",  ///
+    "2" | "3"  = "b",  ///
+    "5" | "6"  = "c",  ///
+    _          = "d"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: without checks")
@@ -502,10 +502,10 @@ replace y1 = "b" if x2 == 2 | x2 == 3
 replace y1 = "c" if x2 == 4
 
 pmatch y2, v(x2) b( ///
-    1        => "a",  ///
-    "W" | 3  => "b",  ///
-    "Y"      => "c",  ///
-    _        => "d"   ///
+    1        = "a",  ///
+    "W" | 3  = "b",  ///
+    "Y"      = "c",  ///
+    _        = "d"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: one integer")
@@ -526,10 +526,10 @@ replace y1 = "c" if x1 == 4 | x1 == 5
 gen y2 = ""
 
 pmatch y2, v(x1) b( ///
-    1      => "a",  ///
-    2 | 3  => "b",  ///
-    4 |5   => "c",  ///
-    _      => "d"   ///
+    1      = "a",  ///
+    2 | 3  = "b",  ///
+    4 |5   = "c",  ///
+    _      = "d"   ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: check |pattern")

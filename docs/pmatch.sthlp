@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.0.3 11Sep2024}{...}
+{* *! version 0.0.4 17Sep2024}{...}
 {marker syntax}{title:Title}
 
 {p2colset 5 16 18 2}{...}
@@ -10,8 +10,8 @@
 
 {p 4 8}
 {cmd:pmatch} {varname}, {cmd:Variables}({varlist}) {cmd:Body(}{break}
-{cmd:[}{help pmatch##pattern:{it:pattern}} => {help exp},{cmd:]}{break}
-{cmd:[}{help pmatch##pattern:{it:pattern}} => {help exp},{cmd:]}{break}
+{cmd:[}{help pmatch##pattern:{it:pattern}} = {help exp},{cmd:]}{break}
+{cmd:[}{help pmatch##pattern:{it:pattern}} = {help exp},{cmd:]}{break}
 ...{p_end}
 {p 4}{cmd:)} [{it:nocheck}]{p_end}
         
@@ -22,7 +22,7 @@
 {cmd:Variables}({varlist}) contains the list of variables (B) you want to match on.
 
 {pstd}
-{cmd:Body}(...) contains the list of replacements you would like to do. It's composed of multiple arms. Each arm includes a {help pmatch##pattern:{it:pattern}} on the left hand side indicating the conditions of the replacement based on the values of the variables (B). It also contains an {help expression} on the right hand side to replace the values of your variable (A). They are separated by an arrow {bf:=>}.
+{cmd:Body}(...) contains the list of replacements you would like to do. It's composed of multiple arms. Each arm includes a {help pmatch##pattern:{it:pattern}} on the left hand side indicating the conditions of the replacement based on the values of the variables (B). It also contains an {help expression} on the right hand side to replace the values of your variable (A). They are separated by an equal sign {bf:=}.
 
 {pstd}
 {it:nocheck} skips the checks and directly performs the replacements. This allows to use the syntax of the command, without the performance cost of the verifications.
@@ -49,7 +49,7 @@ The different {help pmatch##examples:examples} illustrate how to use the differe
 {synoptline}
 {synopt: {opt Constant: } {it:x}} A unique value, either a number or a string.{p_end}
 
-{synopt: {opt Range: } {it:a}~{it:b}} A range from {it:a} to {it:b}, with {it:a} and {it:b} two numbers. The symbol {bf:~} indicates that both values are included. You can use {bf:!~} to exclude the min, {bf:~!} to exclude the max or {bf:!!} to exclude both. You can use {it:min} and {it:max} to refer to the minimum and maximum values of your variable.{p_end}
+{synopt: {opt Range: } {it:a}/{it:b}} A range from {it:a} to {it:b}, with {it:a} and {it:b} two numbers. The symbol {bf:/} indicates that both values are included. You can use {bf:!/} to exclude the min, {bf:/!} to exclude the max or {bf:!!} to exclude both. You can use {it:min} and {it:max} to refer to the minimum and maximum values of your variable.{p_end}
 
 {synopt: {opt Or: } {it:pattern} | {it:...} | {it:pattern}} A pattern to compose with multiple patterns for a variable.{p_end}
 
@@ -94,12 +94,12 @@ In this example, we use the values of the variable {bf:rep78} to create a new va
         * With the pmatch command
         
         {cmd:pmatch var_2, variables(rep78) body( ///}
-        {cmd:    1 => "very low",                 ///}
-        {cmd:    2 => "low",                      ///}
-        {cmd:    3 => "mid",                      ///}
-        {cmd:    4 => "high",                     ///}
-        {cmd:    5 => "very high",                ///}
-        {cmd:    . => "missing",                  ///}
+        {cmd:    1 = "very low",                 ///}
+        {cmd:    2 = "low",                      ///}
+        {cmd:    3 = "mid",                      ///}
+        {cmd:    4 = "high",                     ///}
+        {cmd:    5 = "very high",                ///}
+        {cmd:    . = "missing",                  ///}
         {cmd:)}
 
         {cmd:assert var_1 == var_2}
@@ -109,7 +109,7 @@ In this example, we use the values of the variable {bf:rep78} to create a new va
 {marker range_example}{title:Example 2: Range patterns}
 
 {pstd}
-The Constant pattern is simple but not practical once we have many values or decimals. In such cases we can us the Range pattern with the '{hi:{it:a}~{it:b}}' syntax.
+The Constant pattern is simple but not practical once we have many values or decimals. In such cases we can us the Range pattern with the '{hi:{it:a}/{it:b}}' syntax.
 
         {hline}
         {cmd:sysuse auto, clear}
@@ -125,10 +125,10 @@ The Constant pattern is simple but not practical once we have many values or dec
         * With the pmatch command
         
         {cmd:pmatch var_2, variables(price) body( ///}
-        {cmd:    min~!6000   => "cheap",          ///}
-        {cmd:    6000~!9000  => "normal",         ///}
-        {cmd:    9000~max    => "expensive",      ///}
-        {cmd:    .           => "missing",        ///}
+        {cmd:    min/!6000   = "cheap",          ///}
+        {cmd:    6000/!9000  = "normal",         ///}
+        {cmd:    9000/max    = "expensive",      ///}
+        {cmd:    .           = "missing",        ///}
         {cmd:)}
 
         {cmd:assert var_1 == var_2}
@@ -154,10 +154,10 @@ The Or pattern is used to combine multiple patterns with the '{hi:{help pmatch##
         * With the pmatch command
         
         {cmd:pmatch var_2, variables(rep78) body( ///}
-        {cmd:    1 | 2   => "low",                ///}
-        {cmd:    3       => "mid",                ///}
-        {cmd:    4 | 5   => "high",               ///}
-        {cmd:    .       => "missing",            ///}
+        {cmd:    1 | 2   = "low",                ///}
+        {cmd:    3       = "mid",                ///}
+        {cmd:    4 | 5   = "high",               ///}
+        {cmd:    .       = "missing",            ///}
         {cmd:)}
 
         {cmd:assert var_1 == var_2}
@@ -181,9 +181,9 @@ To define a default value, we can use the wildcard pattern '{hi:_}'. It covers a
         * With the pmatch command
         
         {cmd:pmatch var_2, variables(rep78) body( ///}
-        {cmd:    1 => "very low",                 ///}
-        {cmd:    2 => "low",                      ///}
-        {cmd:    _ => "other",                    ///}
+        {cmd:    1 = "very low",                 ///}
+        {cmd:    2 = "low",                      ///}
+        {cmd:    _ = "other",                    ///}
         {cmd:)}
 
         {cmd:assert var_1 == var_2}
@@ -209,10 +209,10 @@ To pmatch on multiple variables at the same time, we can use the Tuple pattern w
         * With the pmatch command
         
         {cmd:pmatch var_2, variables(rep78 price) body(  ///}
-        {cmd:    (min~!3, min~!10000)   => "case 1",      ///}
-        {cmd:    (min~!3, 10000~max)    => "case 2",      ///}
-        {cmd:    (3~max, _)             => "case 3",      ///}
-        {cmd:    (., _) | (_, .)        => "missing",     ///}
+        {cmd:    (min/!3, min/!10000)   = "case 1",      ///}
+        {cmd:    (min/!3, 10000/max)    = "case 2",      ///}
+        {cmd:    (3/max, _)             = "case 3",      ///}
+        {cmd:    (., _) | (_, .)        = "missing",     ///}
         {cmd:)}
 
         {cmd:assert var_1 == var_2}
@@ -239,11 +239,11 @@ Coming back to {help pmatch##constant_example:Example 1}, if we forgot to includ
         * With the pmatch command
         
         {cmd:pmatch var_2, variables(rep78) body( ///}
-        {cmd:    1 => "very low",                 ///}
-        {cmd:    2 => "low",                      ///}
-        {cmd:    3 => "mid",                      ///}
-        {cmd:    4 => "high",                     ///}
-        {cmd:    5 => "very high",                ///}
+        {cmd:    1 = "very low",                 ///}
+        {cmd:    2 = "low",                      ///}
+        {cmd:    3 = "mid",                      ///}
+        {cmd:    4 = "high",                     ///}
+        {cmd:    5 = "very high",                ///}
         {cmd:)}
 
         // Warning : Missing cases
@@ -275,10 +275,10 @@ On the other hand, with {help pmatch##range_example:Example 2}, we can also do m
         * With the pmatch command
         
         {cmd:pmatch var_2, variables(price) body( ///}
-        {cmd:    min~6000   => "cheap",           ///}
-        {cmd:    6000~9000  => "normal",          ///}
-        {cmd:    9000~max   => "expensive",       ///}
-        {cmd:    .          => "missing",         ///}
+        {cmd:    min/6000   = "cheap",           ///}
+        {cmd:    6000/9000  = "normal",          ///}
+        {cmd:    9000/max   = "expensive",       ///}
+        {cmd:    .          = "missing",         ///}
         {cmd:)}
 
         // Warning : Arm 2 has overlaps
@@ -309,18 +309,18 @@ Finally, we can also include conditions which are already checked by the previou
         * With the pmatch command
         
         {cmd:pmatch var_2, variables(price) body( ///}
-        {cmd:    min~!6000  => "cheap",           ///}
-        {cmd:    6000~!9000 => "normal",          ///}
-        {cmd:    9000~max   => "expensive",       ///}
-        {cmd:    min~max    => "oops",            ///}
-        {cmd:    .          => "missing",         ///}
+        {cmd:    min/!6000  = "cheap",           ///}
+        {cmd:    6000/!9000 = "normal",          ///}
+        {cmd:    9000/max   = "expensive",       ///}
+        {cmd:    min/max    = "oops",            ///}
+        {cmd:    .          = "missing",         ///}
         {cmd:)}
 
         // Warning : Arm 4 is not useful
         // Warning : Arm 4 has overlaps
-        //     Arm 1: 3291~5999
-        //     Arm 2: 6000~8999
-        //     Arm 3: 9000~15906
+        //     Arm 1: 3291/5999
+        //     Arm 2: 6000/8999
+        //     Arm 3: 9000/15906
 
 
         {cmd:assert var_1 == var_2}
@@ -345,9 +345,9 @@ Some quality of life bonus is the possibility to use label values instead of the
         {cmd:label define color_label 1 "Red" 2 "Green" 3 "Blue"}
         {cmd:label values color color_label}
         {cmd:pmatch color_hex, variables(color) body ( ///}
-        {cmd:    1      => "#FF0000" ,                 ///}
-        {cmd:    2      => "#00FF00" ,                 ///}
-        {cmd:    "Blue" => "#0000FF" ,                 ///}
+        {cmd:    1      = "#FF0000" ,                 ///}
+        {cmd:    2      = "#00FF00" ,                 ///}
+        {cmd:    "Blue" = "#0000FF" ,                 ///}
         {cmd:)}
 
         {hline}
@@ -358,7 +358,7 @@ Some quality of life bonus is the possibility to use label values instead of the
 
 {title:Package details}
 
-Version      : {bf:pmatch} version 0.0.3
+Version      : {bf:pmatch} version 0.0.4
 Source       : {browse "https://github.com/MaelAstruc/stata_match":GitHub}
 
 Author       : {browse "https://github.com/MaelAstruc":Mael Astruc--Le Souder}
@@ -372,12 +372,12 @@ E-mail       : mael.astruc-le-souder@u-bordeaux.fr
 
 Suggested citation for this package:
 
-{p}Astruc--Le Souder, M. (2024). Stata package "pmatch" version 0.0.3. https://github.com/MaelAstruc/stata_match.{p_end}
+{p}Astruc--Le Souder, M. (2024). Stata package "pmatch" version 0.0.4. https://github.com/MaelAstruc/stata_match.{p_end}
 
 @software{pmatch,
    author = {Astruc--Le Souder Mael},
    title = {Stata package ``pmatch''},
    url = {https://github.com/MaelAstruc/stata_match},
-   version = {0.0.3},
-   date = {2024-09-11}
+   version = {0.0.4},
+   date = {2024-09-17}
 }

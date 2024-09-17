@@ -96,12 +96,11 @@ replace y_base = "a" if x == 1
 replace y_base = "b" if x == 2 | x == 3 | x == 4
 replace y_base = "c" if x >= 5 & x <= 9
 
-gen y = ""
 pmatch y, v(x) b(    ///
-    1         => "a",  ///
-    2 | 3 | 4 => "b",  ///
-    5~9       => "c",  ///
-    _         => "d"   ///
+    1         = "a",  ///
+    2 | 3 | 4 = "b",  ///
+    5/9       = "c",  ///
+    _         = "d"   ///
 )
 
 assert y_base == y

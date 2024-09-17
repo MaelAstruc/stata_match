@@ -71,7 +71,7 @@ function test_prange_to_string() {
     prange.in_max = 1
     prange.discrete = 1
     
-    test_result("Test PRange::to_string(): integer range closed", prange.to_string(), "1~3")
+    test_result("Test PRange::to_string(): integer range closed", prange.to_string(), "1/3")
     
     prange.min = 1
     prange.max = 3
@@ -79,7 +79,7 @@ function test_prange_to_string() {
     prange.in_max = 1
     prange.discrete = 1
     
-    test_result("Test PRange::to_string(): integer range open min closed max", prange.to_string(), "1!~3")
+    test_result("Test PRange::to_string(): integer range open min closed max", prange.to_string(), "1!/3")
     
     prange.min = 1
     prange.max = 3
@@ -87,7 +87,7 @@ function test_prange_to_string() {
     prange.in_max = 0
     prange.discrete = 1
     
-    test_result("Test PRange::to_string(): integer range closed min open max", prange.to_string(), "1~!3")
+    test_result("Test PRange::to_string(): integer range closed min open max", prange.to_string(), "1/!3")
     
     prange.min = 1
     prange.max = 3
@@ -103,7 +103,7 @@ function test_prange_to_string() {
     prange.in_max = 1
     prange.discrete = 0
     
-    test_result("Test PRange::to_string(): float range closed", prange.to_string(), "1.1~3.1")
+    test_result("Test PRange::to_string(): float range closed", prange.to_string(), "1.1/3.1")
     
     prange.min = 1.1
     prange.max = 3.1
@@ -111,7 +111,7 @@ function test_prange_to_string() {
     prange.in_max = 1
     prange.discrete = 0
     
-    test_result("Test PRange::to_string(): float range open min closed max", prange.to_string(), "1.1!~3.1")
+    test_result("Test PRange::to_string(): float range open min closed max", prange.to_string(), "1.1!/3.1")
     
     prange.min = 1.1
     prange.max = 3.1
@@ -119,7 +119,7 @@ function test_prange_to_string() {
     prange.in_max = 0
     prange.discrete = 0
     
-    test_result("Test PRange::to_string(): float range closed min open max", prange.to_string(), "1.1~!3.1")
+    test_result("Test PRange::to_string(): float range closed min open max", prange.to_string(), "1.1/!3.1")
     
     prange.min = 1.1
     prange.max = 3.1
@@ -160,7 +160,7 @@ function test_por_to_string() {
     por.patterns.patterns[2] = &prange
     por.patterns.length = 2
     
-    test_result("Test POr::to_string(): two elements", por.to_string(), "1 | 1~3")
+    test_result("Test POr::to_string(): two elements", por.to_string(), "1 | 1/3")
 }
 
 // Tuple
@@ -192,7 +192,7 @@ function test_ptuple_to_string() {
     tuple.patterns = J(2, 1, NULL)
     tuple.patterns[1] = &pconstant
     tuple.patterns[2] = &prange
-    test_result("Test Tuple::to_string(): two elements", tuple.to_string(), "(1, 1~3)")
+    test_result("Test Tuple::to_string(): two elements", tuple.to_string(), "(1, 1/3)")
 }
 
 /////////////////////////////////////////////////////////////////////// define()
@@ -256,25 +256,25 @@ function test_prange_define() {
     prange = PRange()
     
     prange.define(1, 3, 1, 1, 1)
-    test_result("Test PRange::define(): integer range closed", prange.to_string(), "1~3")
+    test_result("Test PRange::define(): integer range closed", prange.to_string(), "1/3")
     
     prange.define(1, 3, 0, 1, 1)
-    test_result("Test PRange::define(): integer range open min closed max", prange.to_string(), "1!~3")
+    test_result("Test PRange::define(): integer range open min closed max", prange.to_string(), "1!/3")
     
     prange.define(1, 3, 1, 0, 1)
-    test_result("Test PRange::define(): integer range closed min open max", prange.to_string(), "1~!3")
+    test_result("Test PRange::define(): integer range closed min open max", prange.to_string(), "1/!3")
     
     prange.define(1, 3, 0, 0, 1)
     test_result("Test PRange::define(); integer range open", prange.to_string(), "1!!3")
     
     prange.define(1.1, 3.1, 1, 1, 0)
-    test_result("Test PRange::define(): float range closed", prange.to_string(), "1.1~3.1")
+    test_result("Test PRange::define(): float range closed", prange.to_string(), "1.1/3.1")
     
     prange.define(1.1, 3.1, 0, 1, 0)
-    test_result("Test PRange::define(): float range open min closed max", prange.to_string(), "1.1!~3.1")
+    test_result("Test PRange::define(): float range open min closed max", prange.to_string(), "1.1!/3.1")
     
     prange.define(1.1, 3.1, 1, 0, 0)
-    test_result("Test PRange::define(): float range closed min open max", prange.to_string(), "1.1~!3.1")
+    test_result("Test PRange::define(): float range closed min open max", prange.to_string(), "1.1/!3.1")
     
     prange.define(1.1, 3.1, 0, 0, 0)
     test_result("Test PRange::define(): float range open", prange.to_string(), "1.1!!3.1")
@@ -368,15 +368,15 @@ function test_prange_compress() {
     
     prange.define(1, 3, 1, 1, 1)
     compressed = prange.compress()
-    test_result("Test PRange::compress(): real range closed", compressed.to_string(), "1~3")
+    test_result("Test PRange::compress(): real range closed", compressed.to_string(), "1/3")
     
     prange.define(1, 3, 0, 1, 1)
     compressed = prange.compress()
-    test_result("Test PRange::compress(): real range open min closed max", compressed.to_string(), "2~3")
+    test_result("Test PRange::compress(): real range open min closed max", compressed.to_string(), "2/3")
     
     prange.define(1, 3, 1, 0, 1)
     compressed = prange.compress()
-    test_result("Test PRange::compress(): real range closed min open max", compressed.to_string(), "1~2")
+    test_result("Test PRange::compress(): real range closed min open max", compressed.to_string(), "1/2")
     
     prange.define(1, 3, 0, 0, 1)
     compressed = prange.compress()
@@ -384,15 +384,15 @@ function test_prange_compress() {
     
     prange.define(1.1, 3.1, 1, 1, 0)
     compressed = prange.compress()
-    test_result("Test PRange::compress(): float range closed", compressed.to_string(), "1.1~3.1")
+    test_result("Test PRange::compress(): float range closed", compressed.to_string(), "1.1/3.1")
     
     prange.define(1.1, 3.1, 0, 1, 0)
     compressed = prange.compress()
-    test_result("Test PRange::compress(): float range open min closed max", compressed.to_string(), "1.1!~3.1")
+    test_result("Test PRange::compress(): float range open min closed max", compressed.to_string(), "1.1!/3.1")
     
     prange.define(1.1, 3.1, 1, 0, 0)
     compressed = prange.compress()
-    test_result("Test PRange::compress(): float range closed min open max", compressed.to_string(), "1.1~!3.1")
+    test_result("Test PRange::compress(): float range closed min open max", compressed.to_string(), "1.1/!3.1")
     
     prange.define(1.1, 3.1, 0, 0, 0)
     compressed = prange.compress()
@@ -445,7 +445,7 @@ function test_por_compress() {
     por = POr()
     por.define((&pconstant_1, &prange_1))
     compressed = por.compress()
-    test_result("Test POr::compress(): compress each", compressed.to_string(), "1 | 2~3")
+    test_result("Test POr::compress(): compress each", compressed.to_string(), "1 | 2/3")
     
     por = POr()
     por.define((&prange_2, &prange_2))
@@ -482,7 +482,7 @@ function test_ptuple_compress() {
     
     tuple.patterns = (&por, &prange_1)
     compressed = tuple.compress()
-    test_result("Test Tuple::compress(): compress each", compressed.to_string(), "(1, 2~3)")
+    test_result("Test Tuple::compress(): compress each", compressed.to_string(), "(1, 2/3)")
     
     tuple.patterns = (&por, &prange_2)
     compressed = tuple.compress()
@@ -615,12 +615,12 @@ function test_prange_overlap() {
     prange_1 = PRange()
     prange_1.define(0, 3, 1, 1, 1)
     overlap = prange.overlap(prange_1)
-    test_result("Test PRange::overlap() same range", overlap.to_string(), "0~3")
+    test_result("Test PRange::overlap() same range", overlap.to_string(), "0/3")
     
     prange_2 = PRange()
     prange_2.define(1, 2, 1, 1, 1)
     overlap = prange.overlap(prange_2)
-    test_result("Test PRange::overlap() range in", overlap.to_string(), "1~2")
+    test_result("Test PRange::overlap() range in", overlap.to_string(), "1/2")
     
     prange_3 = PRange()
     prange_3.define(10, 20, 1, 1, 1)
@@ -630,22 +630,22 @@ function test_prange_overlap() {
     prange_4 = PRange()
     prange_4.define(0, 3, 0, 1, 1)
     overlap = prange.overlap(prange_4)
-    test_result("Test PRange::overlap() min out", overlap.to_string(), "1~3")
+    test_result("Test PRange::overlap() min out", overlap.to_string(), "1/3")
     
     prange_5 = PRange()
     prange_5.define(0, 3, 1, 0, 1)
     overlap = prange.overlap(prange_5)
-    test_result("Test PRange::overlap() max out", overlap.to_string(), "0~2")
+    test_result("Test PRange::overlap() max out", overlap.to_string(), "0/2")
     
     prange_6 = PRange()
     prange_6.define(-1, 1, 1, 1, 1)
     overlap = prange.overlap(prange_6)
-    test_result("Test PRange::overlap() low", overlap.to_string(), "0~1")
+    test_result("Test PRange::overlap() low", overlap.to_string(), "0/1")
     
     prange_7 = PRange()
     prange_7.define(2, 4, 1, 1, 1)
     overlap = prange.overlap(prange_7)
-    test_result("Test PRange::overlap() high", overlap.to_string(), "2~3")
+    test_result("Test PRange::overlap() high", overlap.to_string(), "2/3")
     
     prange = PRange()
     prange.define(0, 4, 0, 1, 0)
@@ -664,7 +664,7 @@ function test_prange_overlap() {
     por.push(pconstant_2)
     por.push(prange_8)
     overlap = prange.overlap(por)
-    test_result("Test PRange::overlap() or", overlap.to_string(), "1 | 2~3")
+    test_result("Test PRange::overlap() or", overlap.to_string(), "1 | 2/3")
 }
 
 // POr
@@ -675,7 +675,7 @@ function test_por_overlap() {
     class PConstant scalar pconstant_1, pconstant_2, pconstant_3
     class Pattern scalar overlap
     
-    // POr 1 : (0 | 1 | 2~4)
+    // POr 1 : (0 | 1 | 2/4)
     
     por_1 = POr()
     
@@ -692,7 +692,7 @@ function test_por_overlap() {
     por_1.push(pconstant_2)
     por_1.push(prange_1)
     
-    // POr 2 : (10~20 | 3 | 1)
+    // POr 2 : (10/20 | 3 | 1)
     
     por_2 = POr()
     
@@ -911,7 +911,7 @@ function test_por_includes() {
     class PRange scalar prange_1, prange_2, prange_3, prange_4
     real scalar included
     
-    // POr : (0 | 1~4)
+    // POr : (0 | 1/4)
     
     por = POr()
     
@@ -952,7 +952,7 @@ function test_por_includes() {
     test_result("Test POr::includes() range out", strofreal(included), "0")
     
     prange_4 = PRange()
-    prange_4.define(0, 2, 1, 1, 1) // = (0 | 1 | 2) in (0 | 1~4)
+    prange_4.define(0, 2, 1, 1, 1) // = (0 | 1 | 2) in (0 | 1/4)
     
     included = por.includes(prange_4)
     test_result("Test POr::includes() range in across patterns", strofreal(included), "1")
@@ -1137,7 +1137,7 @@ function test_prange_difference() {
     
     difference = *prange.difference(pempty)
 
-    test_result("Test PRange::difference() empty", difference.to_string(), "0~3")
+    test_result("Test PRange::difference() empty", difference.to_string(), "0/3")
 
     // PWild
 
@@ -1154,21 +1154,21 @@ function test_prange_difference() {
     
     difference = *prange.difference(pconstant_1)
 
-    test_result("Test PRange::difference() constant out", difference.to_string(), "0~3")
+    test_result("Test PRange::difference() constant out", difference.to_string(), "0/3")
 
     pconstant_2 = PConstant()
     pconstant_2.define(2)
     
     difference = *prange.difference(pconstant_2)
 
-    test_result("Test PRange::difference() constant middle", difference.to_string(), "0~1 | 3")
+    test_result("Test PRange::difference() constant middle", difference.to_string(), "0/1 | 3")
 
     pconstant_3 = PConstant()
     pconstant_3.define(3)
     
     difference = *prange.difference(pconstant_3)
 
-    test_result("Test PRange::difference() constant boundary", difference.to_string(), "0~2")
+    test_result("Test PRange::difference() constant boundary", difference.to_string(), "0/2")
 
     // PRange
 
@@ -1177,7 +1177,7 @@ function test_prange_difference() {
     
     difference = *prange.difference(prange_1)
 
-    test_result("Test PRange::difference() range out", difference.to_string(), "0~3")
+    test_result("Test PRange::difference() range out", difference.to_string(), "0/3")
     
     prange_2 = PRange()
     prange_2.define(1, 2, 1, 1, 1)
@@ -1201,13 +1201,13 @@ function test_prange_difference() {
     
     difference = *prange.difference(por)
 
-    test_result("Test PRange::difference() or out", difference.to_string(), "0~3")
+    test_result("Test PRange::difference() or out", difference.to_string(), "0/3")
     
     por.push(pconstant_3)
     
     difference = *prange.difference(por)
 
-    test_result("Test PRange::difference() or in 1", difference.to_string(), "0~2")
+    test_result("Test PRange::difference() or in 1", difference.to_string(), "0/2")
     
     por.push(prange_2)
     
@@ -1244,7 +1244,7 @@ function test_por_difference() {
     
     difference = *por.difference(pempty)
 
-    test_result("Test POr::difference() empty", difference.to_string(), "1 | 3~7")
+    test_result("Test POr::difference() empty", difference.to_string(), "1 | 3/7")
     
     // PWild
     
@@ -1258,21 +1258,21 @@ function test_por_difference() {
     
     difference = *por.difference(pconstant_1)
 
-    test_result("Test POr::difference() constant in 1", difference.to_string(), "3~7")
+    test_result("Test POr::difference() constant in 1", difference.to_string(), "3/7")
     
     pconstant_2 = PConstant()
     pconstant_2.define(5)
     
     difference = *por.difference(pconstant_2)
 
-    test_result("Test POr::difference() constant in 2", difference.to_string(), "1 | 3~4 | 6~7")
+    test_result("Test POr::difference() constant in 2", difference.to_string(), "1 | 3/4 | 6/7")
     
     pconstant_3 = PConstant()
     pconstant_3.define(8)
     
     difference = *por.difference(pconstant_3)
 
-    test_result("Test POr::difference() constant out", difference.to_string(), "1 | 3~7")
+    test_result("Test POr::difference() constant out", difference.to_string(), "1 | 3/7")
     
     // PRange
     
@@ -1285,14 +1285,14 @@ function test_por_difference() {
     
     difference = *por.difference(prange_2)
 
-    test_result("Test POr::difference() range across", difference.to_string(), "5~7")
+    test_result("Test POr::difference() range across", difference.to_string(), "5/7")
     
     prange_3 = PRange()
     prange_3.define(-5, 0, 1, 1, 1)
     
     difference = *por.difference(prange_3)
 
-    test_result("Test POr::difference() range out", difference.to_string(), "1 | 3~7")
+    test_result("Test POr::difference() range out", difference.to_string(), "1 | 3/7")
     
     prange_4 = PRange()
     prange_4.define(0, 8, 1, 1, 1)
@@ -1312,19 +1312,19 @@ function test_por_difference() {
     por.to_string()
     por_1.to_string()
 
-    test_result("Test POr::difference() or out", difference.to_string(), "1 | 3~7")
+    test_result("Test POr::difference() or out", difference.to_string(), "1 | 3/7")
     
     por_1.push(pconstant_2)
     
     difference = *por.difference(por_1)
 
-    test_result("Test POr::difference() or in 1", difference.to_string(), "1 | 3~4 | 6~7")
+    test_result("Test POr::difference() or in 1", difference.to_string(), "1 | 3/4 | 6/7")
     
     por_1.push(prange_2)
     
     difference = *por.difference(por_1)
 
-    test_result("Test POr::difference() or in 2", difference.to_string(), "6~7")
+    test_result("Test POr::difference() or in 2", difference.to_string(), "6/7")
     
     por_1.push(prange_4)
     
@@ -1457,7 +1457,7 @@ function test_ptuple_to_expr() {
 
     test_result("Test Tuple::to_expr(): one element", tuple_1.to_expr(variables), "test_var_1 == `one_21x'")
 
-    // (1, 1~3)
+    // (1, 1/3)
  
     prange = PRange()
     prange.min = 1
@@ -1476,7 +1476,7 @@ function test_ptuple_to_expr() {
 
     test_result("Test Tuple::to_expr(): two elements", tuple_1.to_expr(variables), "(test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x')")
 
-    // (1 | 1~3, _)
+    // (1 | 1/3, _)
 
     por_1 = POr()
     por_1.push(pconstant)
@@ -1494,7 +1494,7 @@ function test_ptuple_to_expr() {
 
     test_result("Test Tuple::to_expr(): wildcard", tuple_1.to_expr(variables), "(test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')")
 
-    // (1 | 1~3, _) | (1, 1~3)
+    // (1 | 1/3, _) | (1, 1/3)
     
     tuple_2.patterns = J(2, 1, NULL) 
     tuple_2.patterns[1] = &pconstant
