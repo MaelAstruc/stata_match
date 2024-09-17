@@ -1,0 +1,482 @@
+\documentclass[11pt]{beamer}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+
+\let\newsim\sim
+\renewcommand{\newsim}{\mathrel{\mathpalette\bueckirel\sim}}
+\newcommand{\bueckirel}[2]{%
+  \raisebox{\depth}{\scalebox{0.808}{$#1#2$}}%
+}
+
+\mode<presentation>
+{
+  \usetheme{Boadilla}
+  \usecolortheme{default}
+  \usefonttheme{default}
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamertemplate{caption}[numbered]
+} 
+
+\input{stata-lstlisting}
+
+\title{Pattern matching in Stata}
+\subtitle{Chasing the devil in the details}
+
+\author[Mael Astruc--Le Souder]{Mael Astruc--Le Souder}
+\institute[BSE]{Bordeaux School of Economics, France}
+
+\date{2024 Stata UK Conference}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}[fragile]{Motivation}
+In research, most of the time is spent preparing the data. \\~
+
+In Stata, most of this can be summarized with two statements: \\~
+\begin{lstlisting}[language=Stata]
+generate x = ... if ...
+replace  x = ... if ...
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Find the bug}
+Example: You have a variable $like$ with the answers for the question: \\~
+
+\qquad \textit{Do you like Stata ?} \\
+
+\qquad \quad \qquad 1 \qquad 2 \qquad 3 \qquad 4 \qquad 5 \\
+\qquad (Absolutely not) \qquad \qquad \qquad (Totally) \\~
+
+You want to summarize it with a new variable $opinion$ \\
+\begin{lstlisting}[language=Stata]
+generate opinion = "negative" if like <= 2
+replace  opinion = "neutral"  if like == 3
+replace  opinion = "positive" if like >= 4
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Proposition}
+The $pmatch$ command
+\begin{itemize}
+    \item A syntax similar to $switch$ / $match$ statements in other languages
+    \item Exhaustiveness and usefulness checks \\~
+\end{itemize}
+
+\begin{lstlisting}[language=Stata]
+pmatch opinion, variables(like) body(
+    1<@$\newsim$@>2 => "negative",
+    3   => "neutral",
+    4<@$\newsim$@>5 => "positive"
+)
+    <@\textcolor{red}{Warning : Missing cases}@>
+        <@\textcolor{red}{.}@>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Syntax overview}
+\begin{lstlisting}[language=Stata]
+pmatch varname, Variables(varlist) Body(
+    [pattern => exp,]
+    [pattern => exp,]
+    ...
+) [nocheck]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Syntax comparison}
+\begin{lstlisting}[language=Stata]
+generate varname = exp1 if conditions1 on varlist
+replace  varname = exp2 if conditions2 on varlist
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch varname, variables(varlist) body(
+    [pattern1 => exp1,]
+    [pattern2 => exp2,]
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Syntax: varname}
+\textcolor{LimeGreen}{varname}: the name of the variable you want to modify. \\~
+
+\begin{lstlisting}[language=Stata]
+generate <@\textcolor{LimeGreen}{varname}@> = exp1 if conditions1 on varlist
+replace  <@\textcolor{LimeGreen}{varname}@> = exp2 if conditions2 on varlist
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch <@\textcolor{LimeGreen}{varname}@>, variables(varlist) body(
+    [pattern1 => exp1,]
+    [pattern2 => exp2,]
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Syntax: expressions}
+\textcolor{RoyalBlue}{exp}: the new values you want. \\~
+
+\begin{lstlisting}[language=Stata]
+generate varname = <@\textcolor{RoyalBlue}{exp1}@> if conditions1 on varlist
+replace  varname = <@\textcolor{Purple}{exp2}@> if conditions2 on varlist
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch varname, variables(varlist) body(
+    [pattern1 => <@\textcolor{RoyalBlue}{exp1}@>,]
+    [pattern2 => <@\textcolor{Purple}{exp2}@>,]
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Syntax: conditions}
+\textcolor{RoyalBlue}{conditions}/\textcolor{RoyalBlue}{patterns}: the conditions for the replacements. \\~
+
+\begin{lstlisting}[language=Stata]
+generate varname = exp1 if <@\textcolor{RoyalBlue}{conditions1 on varlist}@>
+replace  varname = exp2 if <@\textcolor{Purple}{conditions2 on varlist}@>
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch varname, variables(varlist) body(
+    [<@\textcolor{RoyalBlue}{pattern1}@> => exp1,]
+    [<@\textcolor{Purple}{pattern2}@> => exp2,]
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Syntax: varlist}
+\textcolor{OrangeRed}{varlist} : the variables that determine the replacement. \\~
+
+\begin{lstlisting}[language=Stata]
+generate varname = exp1 if conditions1 on <@\textcolor{OrangeRed}{varlist}@>
+replace  varname = exp2 if conditions2 on <@\textcolor{OrangeRed}{varlist}@>
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch varname, variables(<@\textcolor{OrangeRed}{varlist}@>) body(
+    [pattern1 => exp1,]
+    [pattern2 => exp2,]
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Patterns}
+\begin{table}[]
+\scriptsize
+\renewcommand{\arraystretch}{1.5} 
+\begin{tabular}{|l|c|l|}
+\hline
+ \footnotesize \bf{Pattern} & \footnotesize \bf{Syntax} & \footnotesize \bf{Description} \\ \hline
+ Constant \; & $x$                                   & A simple value, a number, or a string. \\ \hline
+ Range \;    & $a \sim b$                            & A range between $a$ and $b$. \\ \hline
+ Or \;       & $pattern \; | \; ... \; | \; pattern$ & The union of multiple patterns for a variable. \\ \hline
+ Wildcard \; & $\_$                                  & Any pattern that has not been matched yet. \\ \hline
+ Tuple \;    & $(pattern, \; ..., \; pattern)$       & The intersection of patterns for different variables. \\ \hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}[fragile]{Example 1: Constant pattern}
+\label{example_1}
+
+\footnotesize
+\begin{lstlisting}[language=Stata]
+gen var_1 = ""
+replace var_1 = "very low"  if rep78 == 1
+replace var_1 = "low"       if rep78 == 2
+replace var_1 = "mid"       if rep78 == 3
+replace var_1 = "high"      if rep78 == 4
+replace var_1 = "very high" if rep78 == 5
+replace var_1 = "missing"   if rep78 == .
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch var_2, variables(rep78) body( ///
+    1 => "very low",                 ///
+    2 => "low",                      ///
+    3 => "mid",                      ///
+    4 => "high",                     ///
+    5 => "very high",                ///
+    . => "missing",                  ///
+)
+\end{lstlisting}
+
+\tikz[remember picture, overlay] {\node[anchor=south east, outer sep=10pt] at (current page.south east) {\hyperlink{example_6}{\beamerbutton{Example 6}}};}
+\end{frame}
+
+\begin{frame}[fragile]{Example 2: Range pattern}
+\label{example_2}
+
+\footnotesize
+\begin{lstlisting}[language=Stata]
+gen var_1 = ""
+replace var_1 = "cheap"     if price >= 0    & price <  6000
+replace var_1 = "normal"    if price >= 6000 & price <  9000
+replace var_1 = "expensive" if price >= 9000 & price <= 16000
+replace var_1 = "missing"   if price == .
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch var_2, variables(price) body( ///
+    min<@$\newsim$@>!6000   => "cheap",          ///
+    6000<@$\newsim$@>!9000  => "normal",         ///
+    9000<@$\newsim$@>max    => "expensive",      ///
+    .           => "missing",        ///
+)
+\end{lstlisting}
+
+\textit{Note:} the $!$ excludes the boundary.
+$a \newsim b$ includes $a$ and $b$, $a \newsim ! b$ includes $a$ but not $b$, $a !\newsim b$ excludes $a$ and includes $b$. $a !! b$ excludes both $a$ and $b$.
+
+\tikz[remember picture, overlay] {\node[anchor=south east, outer sep=10pt] at (current page.south east) {\hyperlink{example_7}{\beamerbutton{Example 7}}};}
+\end{frame}
+
+\begin{frame}[fragile]{Example 3: Or pattern}
+\label{example_3}
+
+\footnotesize
+\begin{lstlisting}[language=Stata]
+gen var_1 = ""
+replace var_1 = "low"     if rep78 == 1 | rep78 == 2
+replace var_1 = "mid"     if rep78 == 3
+replace var_1 = "high"    if rep78 == 4 | rep78 == 5
+replace var_1 = "missing" if rep78 == .
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch var_2, variables(rep78) body( ///
+    1 | 2  => "low",                 ///
+    3      => "mid",                 ///
+    4 | 5  => "high",                ///
+    .      => "missing",             ///
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Example 4: Wildcard pattern}
+\label{example_4}
+
+\footnotesize
+\begin{lstlisting}[language=Stata]
+gen var_1 = "other"
+replace var_1 = "very low" if rep78 == 1
+replace var_1 = "low"      if rep78 == 2
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch var_2, variables(rep78) body( ///
+    1 => "very low",                 ///
+    2 => "low",                      ///
+    _ => "other",                    ///
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Example 5: Tuple pattern}
+\label{example_5}
+
+\footnotesize
+\begin{lstlisting}[language=Stata]
+gen var_1 = ""
+replace var_1 = "case 1"  if rep78 <  3 & price <  10000
+replace var_1 = "case 2"  if rep78 <  3 & price >= 10000
+replace var_1 = "case 3"  if rep78 >= 3
+replace var_1 = "missing" if rep78 == . | price == .
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch var_2, variables(rep78 price) body( ///
+    (min<@\scriptsize{$\sim$!}@>3, min<@$\newsim$@>!10000) => "case 1",      ///
+    (min<@$\newsim$@>!3, 10000<@$\newsim$@>max)  => "case 2",      ///
+    (3<@$\newsim$@>max,  _)          => "case 3",      ///
+    (., _) | (_, .)      => "missing",     ///
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Checks}
+Convenient syntax, but that’s not the main benefit. \\~
+\begin{itemize}
+    \item Exhaustiveness
+    \begin{itemize}
+        \item Did you forgot some cases ? \\~
+    \end{itemize}
+    \item Usefulness
+    \begin{itemize}
+        \item Are all the conditions useful ?
+        \item Are there some overlaps between them ? \\~
+    \end{itemize}
+\end{itemize}
+
+No time for the algorithm, straight to the results.
+\end{frame}
+
+\begin{frame}[fragile]{Example 6: Exhaustiveness}
+\label{example_6}
+
+\footnotesize
+\begin{lstlisting}[language=Stata]
+gen var_1 = ""
+replace var_1 = "very low"  if rep78 == 1
+replace var_1 = "low"       if rep78 == 2
+replace var_1 = "mid"       if rep78 == 3
+replace var_1 = "high"      if rep78 == 4
+replace var_1 = "very high" if rep78 == 5
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch var_2, variables(rep78) body( ///
+    1 => "very low",                 ///
+    2 => "low",                      ///
+    3 => "mid",                      ///
+    4 => "high",                     ///
+    5 => "very high",                ///
+)
+    <@\textcolor{red}{Warning : Missing values}@>
+        <@\textcolor{red}{.}@>
+\end{lstlisting}
+
+\tikz[remember picture, overlay] {\node[anchor=south east, outer sep=10pt] at (current page.south east) {\hyperlink{example_1}{\beamerbutton{Example 1}}};}
+\end{frame}
+
+\begin{frame}[fragile]{Example 7: Overlaps}
+\label{example_7}
+
+\footnotesize
+\begin{lstlisting}[language=Stata]
+gen var_1 = ""
+replace var_1 = "cheap"     if price >= 0    & price <= 6000
+replace var_1 = "normal"    if price >= 6000 & price <= 9000
+replace var_1 = "expensive" if price >= 9000 & price <= 16000
+replace var_1 = "missing"   if price == .
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch var_2, variables(price) body( ///
+    min<@$\newsim$@>6000  => "cheap",            ///
+    6000<@$\newsim$@>9000 => "normal",           ///
+    9000<@$\newsim$@>max  => "expensive",        ///
+    .         => "missing",          ///
+)
+    <@\textcolor{red}{Warning : Arm 2 has overlaps}@>
+        <@\textcolor{red}{Arm 1: 6000}@>
+    <@\textcolor{red}{Warning : Arm 3 has overlaps}@>
+        <@\textcolor{red}{Arm 2: 9000}@>
+\end{lstlisting}
+
+\tikz[remember picture, overlay] {\node[anchor=south east, outer sep=10pt] at (current page.south east) {\hyperlink{example_2}{\beamerbutton{Example 2}}};}
+\end{frame}
+
+\begin{frame}[fragile]{Example 8: Usefulness}
+\label{example_8}
+
+\footnotesize
+\begin{lstlisting}[language=Stata]
+gen var_1 = ""
+replace var_1 = "cheap"     if price >= 0    & price <  6000
+replace var_1 = "normal"    if price >= 6000 & price <  9000
+replace var_1 = "expensive" if price >= 9000 & price <= 16000
+replace var_1 = "missing"   if price == .
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch var_2, variables(price) body( ///
+    min<@$\newsim$@>!6000  => "cheap",           ///
+    6000<@$\newsim$@>!9000 => "normal",          ///
+    9000<@$\newsim$@>max   => "expensive",       ///
+    min<@$\newsim$@>max    => "oops",            ///
+    .          => "missing",         ///
+)
+    <@\textcolor{red}{Warning : Arm 4 is not useful}@>
+    <@\textcolor{red}{Warning : Arm 4 has overlaps}@>
+        <@\textcolor{red}{Arm 1: 3291$\newsim$5999}@>
+        <@\textcolor{red}{Arm 2: 6000$\newsim$8999}@>
+        <@\textcolor{red}{Arm 3: 9000$\newsim$15906}@>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Limitations}
+What does it cost compare to `replace … if …` statements ?
+\begin{itemize}
+    \item It depends on your data
+    \item The command has 4 steps
+    \begin{itemize}
+        \item Checking the variables
+        \item Parsing the body
+        \item Checking the conditions
+        \item Evaluating each arm
+    \end{itemize}
+    \item $< 1$M observations, it’s less than 0.1s
+    \item $\geq 1$M observations, checking levels becomes costly
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Next steps}
+\label{next_steps}
+
+Supports byte, integer, long, float, double, and strings
+\begin{itemize}
+    \item Already supports using label values instead of values \hyperlink{example_9}{\beamerbutton{Example 9}}
+    \item Plan to add support for dates
+    \item Plan to add \textit{missing} and \textit{nonmissing} patterns
+    \item Plan to add examples in the warnings
+    \item Plan to add possibility to ignore impossible cases with tuples
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Conclusion}
+This project is still young, this is my first time presenting it
+\begin{itemize}
+    \item Tell me if you find it interesting, or what you think are the issues
+    \item Comments on the syntax, features, or anything else are welcomed \\~
+\end{itemize}
+
+You can find the project and the installation command on GitHub
+\begin{verbatim}
+    https://github.com/MaelAstruc/stata_match
+\end{verbatim}
+
+You can contact me by email
+\begin{verbatim}
+    mael.astruc-le-souder@u-bordeaux.fr
+
+\end{verbatim}
+
+\begin{center}
+Thank you for your attention!
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile, noframenumbering]{Example 9: Label values}
+\label{example_9}
+
+\footnotesize
+\begin{lstlisting}[language=Stata]
+drop _all
+set obs 100
+gen int color = runiform(1, 4)
+label define color_label 1 "Red" 2 "Green" 3 "Blue"
+label values color color_label 
+\end{lstlisting}
+
+\begin{lstlisting}[language=Stata]
+pmatch color_hex, variables(color) body( ///
+    1     => "#FF0000",                  ///
+    2     => "#00FF00",                  ///
+   "Blue" => "#0000FF",                  ///
+)
+\end{lstlisting}
+
+\tikz[remember picture, overlay] {\node[anchor=south east, outer sep=10pt] at (current page.south east) {\hyperlink{next_steps}{\beamerbutton{Next steps}}};}
+\end{frame}
+
+\end{document}
