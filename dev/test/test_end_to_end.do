@@ -506,3 +506,156 @@ pmatch y2, v(x1) b( ///
 
 test_variables, expected(y1) result(y2) test("End to end: check |pattern")
 
+/////////////////////////////////////////////////////////// Check data type byte
+
+drop _all
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 7)) // [1, 6]
+
+gen byte y1 = 4
+replace y1 = 1 if x1 == 1
+replace y1 = 2 if x1 == 2 | x1 == 3
+replace y1 = 3 if x1 >= 4 & x1 <= 5
+
+pmatch byte y2, v(x1) b( ///
+    1      = 1,          ///
+    2 | 3  = 2,          ///
+    4/5    = 3,          ///
+    _      = 4           ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: dtype byte")
+
+//////////////////////////////////////////////////////// Check data type integer
+
+drop _all
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 7)) // [1, 6]
+
+gen int y1 = 4
+replace y1 = 1 if x1 == 1
+replace y1 = 2 if x1 == 2 | x1 == 3
+replace y1 = 3 if x1 >= 4 & x1 <= 5
+
+pmatch int y2, v(x1) b( ///
+    1      = 1,         ///
+    2 | 3  = 2,         ///
+    4/5    = 3,         ///
+    _      = 4          ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: dtype int")
+
+/////////////////////////////////////////////////////////// Check data type long
+
+drop _all
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 7)) // [1, 6]
+
+gen long y1 = 4
+replace y1 = 1 if x1 == 1
+replace y1 = 2 if x1 == 2 | x1 == 3
+replace y1 = 3 if x1 >= 4 & x1 <= 5
+
+pmatch long y2, v(x1) b( ///
+    1      = 1,         ///
+    2 | 3  = 2,         ///
+    4/5    = 3,         ///
+    _      = 4          ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: dtype long")
+
+////////////////////////////////////////////////////////// Check data type float
+
+drop _all
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 7)) // [1, 6]
+
+gen float y1 = 4.1
+replace y1 = 1 if x1 == 1
+replace y1 = 2 if x1 == 2 | x1 == 3
+replace y1 = 3 if x1 >= 4 & x1 <= 5
+
+pmatch float y2, v(x1) b( ///
+    1      = 1,           ///
+    2 | 3  = 2,           ///
+    4/5    = 3,           ///
+    _      = 4.1          ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: dtype float")
+
+///////////////////////////////////////////////////////// Check data type double
+
+drop _all
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 7)) // [1, 6]
+
+gen double y1 = 4
+replace y1 = 1 if x1 == 1
+replace y1 = 2 if x1 == 2 | x1 == 3
+replace y1 = 3 if x1 >= 4 & x1 <= 5
+
+pmatch double y2, v(x1) b( ///
+    1      = 1,            ///
+    2 | 3  = 2,            ///
+    4/5    = 3,            ///
+    _      = 4             ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: dtype double")
+
+/////////////////////////////////////////////////////////// Check data type str#
+
+drop _all
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 7)) // [1, 6]
+
+gen str1 y1 = "4"
+replace y1 = "1" if x1 == 1
+replace y1 = "2" if x1 == 2 | x1 == 3
+replace y1 = "3" if x1 >= 4 & x1 <= 5
+
+pmatch str1 y2, v(x1) b( ///
+    1      = "1",        ///
+    2 | 3  = "2",        ///
+    4/5    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: dtype str1")
+
+/////////////////////////////////////////////////////////// Check data type strL
+
+drop _all
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 7)) // [1, 6]
+
+gen strL y1 = "4"
+replace y1 = "1" if x1 == 1
+replace y1 = "2" if x1 == 2 | x1 == 3
+replace y1 = "3" if x1 >= 4 & x1 <= 5
+
+pmatch strL y2, v(x1) b( ///
+    1      = "1",        ///
+    2 | 3  = "2",        ///
+    4/5    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: dtype str1")

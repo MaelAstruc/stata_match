@@ -6,8 +6,9 @@ function pmatch(
     string scalar newvar,
     string scalar vars_exp,
     string scalar body,
-    real scalar check,
-    real scalar gen_first
+    real   scalar check,
+    real   scalar gen_first,
+    string scalar dtype
 ) {
     class Variable vector variables
     class Arm vector arms, useful_arms
@@ -29,7 +30,7 @@ function pmatch(
     // bench_off("check")
     
     // bench_on("eval")
-    eval_arms(newvar, arms, variables, gen_first)
+    eval_arms(newvar, arms, variables, gen_first, dtype)
     // bench_off("eval")
 
     // bench_off("total")

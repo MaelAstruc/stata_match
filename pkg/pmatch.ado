@@ -1,4 +1,4 @@
-*! version 0.0.5  17 Sep 2024
+*! version 0.0.6  18 Sep 2024
 
 **#************************************************************ src/declare.mata
 
@@ -2335,12 +2335,13 @@ void function eval_arms(
     string scalar varname,
     class Arm vector arms,
     class Variable vector variables,
-    real scalar gen_first
+    real   scalar gen_first,
+    string scalar dtype
 ) {
     class Arm scalar arm
     class Pattern scalar pattern
     string scalar command, condition, statement
-    real scalar i, n
+    real scalar i, n, _rc
 
     n = length(arms)
     
@@ -2350,7 +2351,12 @@ void function eval_arms(
         pattern = *arm.lhs.pattern
         
         if (i == n & gen_first) {
-            command = "generate"
+            if (dtype != "") {
+                command = "generate " + dtype
+            }
+            else {
+                command = "generate"
+            }
         }
         else {
             command = "replace"
@@ -2370,7 +2376,12 @@ void function eval_arms(
             statement = sprintf(`"%s %s = %s if %s"', command, varname, arm.value, condition)
         }
 
-        stata(statement, 1)
+        _rc = _stata(statement, 1)
+        
+        if (_rc) {
+            errprintf("Stata encountered an error when evaluating arm %f\n", i)
+            exit(error(_rc))
+        }
     }
 }
 
@@ -3150,8 +3161,9 @@ function pmatch(
     string scalar newvar,
     string scalar vars_exp,
     string scalar body,
-    real scalar check,
-    real scalar gen_first
+    real   scalar check,
+    real   scalar gen_first,
+    string scalar dtype
 ) {
     class Variable vector variables
     class Arm vector arms, useful_arms
@@ -3173,7 +3185,7 @@ function pmatch(
     // bench_off("check")
     
     // bench_on("eval")
-    eval_arms(newvar, arms, variables, gen_first)
+    eval_arms(newvar, arms, variables, gen_first, dtype)
     // bench_off("eval")
 
     // bench_off("total")
@@ -3187,18 +3199,28 @@ end
 // see "src/pmatch.mata" for the entry point in the algorithm
 
 program pmatch
-    syntax namelist(min=1 max=1), ///
+    syntax namelist(min=1 max=2), ///
         Variables(varlist min=1) Body(str asis) ///
         [REPLACE NOCHECK]
     
-    local check     = ("`nocheck'" == "")
+    local check = ("`nocheck'" == "")
+    local dtype = ""
+    
+    if (wordcount("`namelist'") == 2) {
+        local dtype    = word("`namelist'", 1)
+        local namelist = word("`namelist'", 2)
+        check_dtype `dtype', `replace'
+    }
     
     check_replace `namelist', `replace'
     local gen_first = ("`replace'" == "")
 
-    mata: pmatch("`namelist'", "`variables'", `"`body'"', `check', `gen_first')
+    mata: pmatch("`namelist'", "`variables'", `"`body'"', `check', `gen_first', "`dtype'")
 end
 
+// Util functions to check the inputs
+
+// Check that replace is correctly used for new and existing variable names
 program check_replace
     syntax namelist(min=1 max=1), [REPLACE]
     
@@ -3227,6 +3249,34 @@ program check_replace
             // Should be covered by the syntax command
             exit _rc
         }
+    }
+end
+
+// If two names are provided, check that the first is a data type
+program check_dtype
+    syntax namelist(min=1 max=1), [REPLACE]
+    
+    scalar is_dtype = 0
+    
+    if (inlist("`namelist'", "byte", "int", "long", "float", "double", "strL")) {
+        scalar is_dtype = 1
+    }
+    else if (regexm("`namelist'", "^str")) {
+        local str_end = regexr("`namelist'", "^str", "")
+        local str_end = real("`str_end'")
+        if (`str_end' == int(`str_end') & `str_end' >= 1 & `str_end' <= 2045) {
+            scalar is_dtype = 1
+        }
+    }
+    
+    if (!is_dtype) {
+        dis as error in smcl "{bf:`dtype'} is not a data type, too many variables specified"
+        exit 103
+    }
+    
+    if ("`replace'" != "") {
+        dis as error in smcl "options {bf:data type `namelist'} and {bf:replace} may not be combined"
+        exit 184
     }
 end
 

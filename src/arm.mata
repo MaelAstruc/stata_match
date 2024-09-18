@@ -23,12 +23,13 @@ void function eval_arms(
     string scalar varname,
     class Arm vector arms,
     class Variable vector variables,
-    real scalar gen_first
+    real   scalar gen_first,
+    string scalar dtype
 ) {
     class Arm scalar arm
     class Pattern scalar pattern
     string scalar command, condition, statement
-    real scalar i, n
+    real scalar i, n, _rc
 
     n = length(arms)
     
@@ -38,7 +39,12 @@ void function eval_arms(
         pattern = *arm.lhs.pattern
         
         if (i == n & gen_first) {
-            command = "generate"
+            if (dtype != "") {
+                command = "generate " + dtype
+            }
+            else {
+                command = "generate"
+            }
         }
         else {
             command = "replace"
@@ -58,7 +64,12 @@ void function eval_arms(
             statement = sprintf(`"%s %s = %s if %s"', command, varname, arm.value, condition)
         }
 
-        stata(statement, 1)
+        _rc = _stata(statement, 1)
+        
+        if (_rc) {
+            errprintf("Stata encountered an error when evaluating arm %f\n", i)
+            exit(error(_rc))
+        }
     }
 }
 

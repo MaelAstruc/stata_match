@@ -1,3 +1,5 @@
+{smcl}
+{* *! version 0.0.6 18/09/2024}{...}
 {marker syntax}{title:Title}
 
 {p2colset 5 16 18 2}{...}
@@ -359,3 +361,29 @@ Some quality of life bonus is the possibility to use label values instead of the
 {title:References}
 
 {p}MARANGET L. Warnings for Pattern Matching Journal of Functional Programming. 2007;17(3):387–421. doi:10.1017/S0956796807006223
+
+{title:Package details}
+
+Version      : {bf:pmatch} version 0.0.6
+Source       : {browse "https://github.com/MaelAstruc/stata_match":GitHub}
+
+Author       : {browse "https://github.com/MaelAstruc":Mael Astruc--Le Souder}
+E-mail       : mael.astruc-le-souder@u-bordeaux.fr
+
+{title:Feedback}
+
+{p}Please submit bugs, errors, feature requests on {browse "https://github.com/MaelAstruc/stata_match/issues":GitHub} by opening a new issue, or by sending me an email.{p_end}
+
+{title:Citation guidelines}
+
+Suggested citation for this package:
+
+{p}Astruc--Le Souder, M. (2024). Stata package 'pmatch' version 0.0.6 https://github.com/MaelAstruc/stata_match.{p_end}
+
+@software{pmatch,
+   author = {Astruc--Le Souder Mael},
+   title = {Stata package },
+   url = {https://github.com/MaelAstruc/stata_match},
+   version = {0.0.6},
+  date = {2024-09-18}
+}

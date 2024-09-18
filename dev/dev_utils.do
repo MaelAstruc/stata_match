@@ -46,7 +46,7 @@ mata
     
 end
 
-// Translate the help files in docs to pdf
+**#************************************* Translate the help files in docs to pdf
 
 capture program drop sthlp2pdf_file sthlp2pdf_dir
 
@@ -75,16 +75,23 @@ program sthlp2pdf_dir
     }
 end
 
-// Combine all files, add file name and remove bench_*()
+**#*********************** Combine all files, add file name and remove bench_*()
 
 mata
-function combine_files(string vector files, string scalar file_out, string scalar version_str, real scalar use_bench) {
+function combine_files(
+    string vector files,
+    string scalar file_out,
+    string scalar version_str,
+    real scalar use_bench
+) {
     real scalar fh_in, fh_out, i
-    string scalar file_name, head_line, line
+    string scalar date, file_name, head_line, line
+    
+    date = st_global("c(current_date)")
     
     unlink(file_out)
     fh_out = fopen(file_out, "w")
-    fput(fh_out, "*! version " + version_str + "  `c(current_date)'")
+    fput(fh_out, "*! version " + version_str + "  " + date)
     
     for (i = 1; i <= length(files); i++) {
         file_name = files[i]
@@ -109,5 +116,144 @@ function combine_files(string vector files, string scalar file_out, string scala
     }
     
     fclose(fh_out)
+}
+end
+
+**#************************************************************** Write pkg file
+
+mata
+function write_pkg(
+    string scalar file_out
+) {
+    real   scalar date, fh_out
+    string scalar date_fmt
+    
+    date     = date(st_global("c(current_date)"), "DMY")
+    date_fmt = sprintf("%02.0f/%02.0f/%04.0f", day(date), month(date), year(date))
+    
+    unlink(file_out)
+    fh_out = fopen(file_out, "w")
+    
+    fput(fh_out, "v 3")
+    fput(fh_out, "")
+    fput(fh_out, "d {bf:PMATCH}: Pattern matching in Stata.")
+    fput(fh_out, "d")
+    fput(fh_out, "d Distribution-Date: " + date_fmt)
+    fput(fh_out, "")
+    fput(fh_out, "f pmatch.ado")
+    fput(fh_out, "f ../docs/pmatch.sthlp")
+    fput(fh_out, "f ../docs/pmatch.pdf")
+    
+    fclose(fh_out)
+}
+end
+
+**#********************************************* Write full sthlp file from body
+
+mata
+// Rewrite sthlp file from body and other informations
+function write_sthlp_file(
+    string scalar file_in,
+    string scalar file_out,
+    string scalar pkg_version
+) {
+    real scalar fh_out
+    
+    unlink(file_out)
+    fh_out = fopen(file_out, "w")
+    
+    sthlp_header(fh_out, pkg_version)
+    copy_file(file_in, fh_out)
+    write_pkg_details(fh_out, pkg_version)
+    write_feedback(fh_out)
+    write_citation(fh_out, pkg_version)
+    
+    fclose(fh_out)
+}
+
+function write_sthlp_dir(
+    string scalar dir_in,
+    string scalar dir_out,
+    string scalar pkg_version
+) {
+    string vector files
+    string scalar file_in, file_out
+    real scalar i
+    
+    files = dir(dir_in, "files", "*.sthlp")
+    
+    for (i = 1; i <= length(files); i++) {
+        file_in  = dir_in  + "/" + files[i]
+        file_out = dir_out + "/" + files[i]
+        write_sthlp_file(file_in, file_out, pkg_version)
+    }
+}
+
+// Add header to sthlp file
+function sthlp_header(real scalar fh_out, string scalar pkg_version) {
+    real   scalar date
+    string scalar date_fmt
+    
+    date     = date(st_global("c(current_date)"), "DMY")
+    date_fmt = sprintf("%02.0f/%02.0f/%04.0f", day(date), month(date), year(date))
+    
+    fput(fh_out, "{smcl}")
+    fput(fh_out, "{* *! version " + pkg_version + " " + date_fmt + "}{...}")
+}
+
+// Copy main file from file name to file handle
+function copy_file(string scalar file_in, real scalar fh_out) {
+    real   scalar fh_in
+    string scalar line
+    
+    fh_in = fopen(file_in, "r")
+    while ((line = fget(fh_in)) != J(0, 0, "")) {
+        fput(fh_out, line)
+    }
+    fclose(fh_in)
+}
+
+// Write package details
+function write_pkg_details(real scalar fh, string scalar pkg_version) {
+    fput(fh, `""')
+    fput(fh, `"{title:Package details}"')
+    fput(fh, `""')
+    fput(fh, `"Version      : {bf:pmatch} version "' + pkg_version)
+    fput(fh, `"Source       : {browse "https://github.com/MaelAstruc/stata_match":GitHub}"')
+    fput(fh, `""')
+    fput(fh, `"Author       : {browse "https://github.com/MaelAstruc":Mael Astruc--Le Souder}"')
+    fput(fh, `"E-mail       : mael.astruc-le-souder@u-bordeaux.fr"')
+}
+
+// Write feedback
+function write_feedback(real scalar fh) {
+    fput(fh, `""')
+    fput(fh, `"{title:Feedback}"')
+    fput(fh, `""')
+    fput(fh, `"{p}Please submit bugs, errors, feature requests on {browse "https://github.com/MaelAstruc/stata_match/issues":GitHub} by opening a new issue, or by sending me an email.{p_end}"')
+}
+
+// Write citation
+function write_citation(real scalar fh, string scalar pkg_version) {
+    real   scalar date
+    string scalar date_fmt
+    
+    date  = date(st_global("c(current_date)"), "DMY")
+    date_fmt = sprintf("%04.0f-%02.0f-%02.0f", year(date), month(date), day(date))
+    
+    fput(fh, `""')
+    fput(fh, "{title:Citation guidelines}")
+    fput(fh, "")
+    fput(fh, "Suggested citation for this package:")
+    fput(fh, "")
+    fput(fh, "{p}Astruc--Le Souder, M. (" + strofreal(year(date), "%04.0f") + "). Stata package 'pmatch' version " + pkg_version + " https://github.com/MaelAstruc/stata_match.{p_end}")
+    fput(fh, "")
+    fput(fh, "@software{pmatch,")
+    fput(fh, "   author = {Astruc--Le Souder Mael},")
+     fput(fh, "   title = {Stata package ``pmatch''},")
+    fput(fh, "   url = {https://github.com/MaelAstruc/stata_match},")
+    fput(fh, "   version = {" + pkg_version + "},")
+     fput(fh, "  date = {" + date_fmt + "}")
+    fput(fh, "}")
 }
 end

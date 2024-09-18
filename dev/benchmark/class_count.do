@@ -4,7 +4,7 @@ clear all
 
 local obs = 100
 
-capture program drop pmatch check_replace
+capture program drop pmatch check_dtype check_replace
 mata: mata clear
 run "pkg/pmatch.ado"
 
@@ -108,9 +108,6 @@ assert y_base == y
 
 capture log close
 log using "dev/logs/class_count.log", replace
-
-dis "`c(current_date)'"
-dis "`c(current_time)'"
 
 mata
 N_PEmpty

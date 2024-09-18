@@ -70,7 +70,7 @@ void function bench_print(struct Bench scalar bench) {
     
     results[K, n_stats] = results[K, 4] - results[1, 4]
     
-    printf("{txt}{hline}\n")
+    printf("{txt}{hline 110}\n")
     printf("{txt}profiler report\n")
     printf(
         "{txt}  %10s   %12s %8s %8s %8s %8s %8s %8s %8s %8s %8s\n",
@@ -104,7 +104,7 @@ void function bench_print(struct Bench scalar bench) {
         )
     }
     
-    printf("{txt}{hline}\n")
+    printf("{txt}{hline 110}\n")
 }
 
 void function bench_on(string scalar name) {

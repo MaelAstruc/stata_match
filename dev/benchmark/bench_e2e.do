@@ -108,9 +108,6 @@ end
 capture log close
 log using "dev/logs/bench_e2e.log", replace
 
-dis "`c(current_date)'"
-dis "`c(current_time)'"
-
 ///////////////////////////////////////////////////////// Benchmarks with checks
 
 profile_obs_integer, obs(1000)     rep(1000)

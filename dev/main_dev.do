@@ -5,8 +5,13 @@ Tests the code and runs benchmarks
 
 clear all
 
-local stata_version = `c(version)'
-local pmatch_version = "0.0.5"
+**#********************************************************************** Locals
+
+local pkg_version    = "0.0.6"
+local stata_version  = "`c(version)'"
+local date           = "`c(current_date)'"
+local date_fmt       = string(date("`date'", "DMY"), "%tdDD/NN/CCYY")
+local pwd            = ustrregexra("`c(pwd)'", "\\", "/") + "/"
 
 mata
     files = (
@@ -25,28 +30,45 @@ mata
     )
 end
 
-// Clean up space
+**#******************************************** Change directory to project root
+
+if (regexm("`pwd'", "/stata_match/.*$")) {
+	local pwd = regexr("`pwd'", "/stata_match/.*$", "") + "/stata_match"
+	cd `pwd'
+}
+else {
+	dis as error "Invalid working directory"
+	exit 170
+}
+
+**#**************************************************************** Charge utils
 
 do "dev/dev_utils.do"
 
-* Remove tabs from files in "src"
+**#*************************************************************** Build package
+
+// Remove tabs from files in "src"
+
 mata: rm_tabs_dir("src")
 mata: rm_tabs_dir("dev/benchmark")
 mata: rm_tabs_dir("dev/test")
 
-* Translate all .sthlp help files to pdf
-sthlp2pdf_dir "docs"
+// Build main files
 
-// Build main file
+mata: combine_files(files, "pkg/pmatch.ado", st_local("pkg_version"), 0)
+mata: write_pkg("pkg/pmatch.pkg")
+mata: write_sthlp_dir("docs", "pkg", st_local("pkg_version"))
 
-mata: combine_files(files, "pkg/pmatch.ado", "`pmatch_version'", 0)
+// Translate all .sthlp help files to pdf
 
-// Reinstall command
+sthlp2pdf_dir "pkg"
+
+**#*********************************************************** Reinstall command
 
 capture net uninstall pmatch
 net install pmatch, from("`c(pwd)'/pkg")
 
-// Run tests
+**#******************************************************************* Run tests
 
 local add_log = ""
 
@@ -64,7 +86,7 @@ forvalues test_version = 8/`stata_version' {
 
 version `stata_version'
 
-// Run benchmarks
+**#************************************************************** Run benchmarks
 
 do "dev/benchmark/class_count.do"
 do "dev/benchmark/bench_e2e.do"
