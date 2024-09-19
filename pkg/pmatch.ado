@@ -1,4 +1,4 @@
-*! version 0.0.6  18 Sep 2024
+*! version 0.0.7  19 Sep 2024
 
 **#************************************************************ src/declare.mata
 
@@ -1878,13 +1878,9 @@ void Variable::init_levels() {
         this.levels = uniqrowsofinteger(x_num)
     }
     else if (this.type == "float") {
-        this.set_minmax()
+        st_view(x_num = ., ., this.name)
         
-        this.levels = this.get_min(), this.get_max()
-        
-        if (hasmissing(x_num) > 0) {
-            this.levels = this.levels, .
-        }
+        this.levels = uniqrowssort(x_num)
     }
     else {
         errprintf(
