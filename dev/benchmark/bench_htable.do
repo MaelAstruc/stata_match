@@ -91,7 +91,7 @@ mata
         n = length(x)
 
         for (i = 1; i <= n; i++) {
-        	res = htable_index(levels, x[i])
+            res = htable_index(levels, x[i])
             if (!res[1]) {
                 htable_add_at(levels, x[i], res[2])
             }
@@ -121,22 +121,22 @@ end
 
 mata
     string colvector function unique_htable_newloc(string scalar name) {
-        string matrix x, _
+        string matrix x
         real scalar i, n
         struct Htable scalar levels
-
+        
         st_sview(x="", ., name)
         levels = htable_create("")
 
         n = length(x)
 
         for (i = 1; i <= n; i++) {
-        	h = htable_newloc(levels, x[i])
+            h = htable_newloc(levels, x[i])
             if (h) {
                 htable_add_at(levels, x[i], h)
             }
         }
-
+        
         return(htable_keys(levels))
     }
 end

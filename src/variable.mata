@@ -88,28 +88,14 @@ void Variable::init_type() {
 }
 
 void Variable::init_levels() {
-    string vector x_str
-    real vector x_num
-    real scalar i
-
     if (this.type == "string") {
-        st_sview(x_str = "", ., this.name)
-
-        this.levels = uniqrowssort(x_str)
-
-        for (i = 1; i <= length(this.levels); i++) {
-            this.levels[i] = `"""' + this.levels[i] + `"""'
-        }
+        this.init_levels_string()
     }
     else if (this.type == "int") {
-        st_view(x_num = ., ., this.name)
-
-        this.levels = uniqrowsofinteger(x_num)
+        this.init_levels_int()
     }
     else if (this.type == "float") {
-        st_view(x_num = ., ., this.name)
-        
-        this.levels = uniqrowssort(x_num)
+        this.init_levels_float()
     }
     else {
         errprintf(
@@ -117,6 +103,40 @@ void Variable::init_levels() {
             this.name, this.stata_type
         )
         exit(_error(3256))
+    }
+}
+
+void Variable::init_levels_int() {
+    real vector x_num
+    
+    st_view(x_num = ., ., this.name)
+    
+    this.levels = uniqrowsofinteger(x_num)
+}
+
+void Variable::init_levels_float() {
+    real vector x_num
+    
+    st_view(x_num = ., ., this.name)
+    
+    this.levels = uniqrowssort(x_num)
+}
+
+void Variable::init_levels_string() {
+    string vector x_str
+    real scalar i
+    
+    if (this.stata_type == "strL") {
+        exit
+    }
+    else {
+        st_sview(x_str = "", ., this.name)
+
+        this.levels = uniqrowssort(x_str)
+    }
+    
+    for (i = 1; i <= length(this.levels); i++) {
+        this.levels[i] = `"""' + this.levels[i] + `"""'
     }
 }
 

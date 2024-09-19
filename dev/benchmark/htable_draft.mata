@@ -41,7 +41,7 @@ void htable_add(struct Htable H, transmorphic scalar key) {
         htable_add_dup(H, key, h)
     }
     else {
-    	htable_add_at(H, key, h)
+        htable_add_at(H, key, h)
     }
 }
 
@@ -76,7 +76,7 @@ void htable_add_at(struct Htable H, transmorphic scalar key, real scalar h) {
 }
 
 void htable_add_new(struct Htable H, transmorphic scalar key) {
-	res = htable_index(H, key)
+    res = htable_index(H, key)
     if (!res[1]) {
         htable_add_at(H, key, res[2])
     }
@@ -187,7 +187,7 @@ void htable_expand(struct Htable H) {
     
     for (i = 1; i <= H.capacity; i++) {
         if (H.status[i]) {
-        	// Can create copy with no check for the need to expand
+            // Can create copy with no check for the need to expand
             htable_add(newH, H.keys[i])
         }
     }
@@ -196,6 +196,6 @@ void htable_expand(struct Htable H) {
 }
 
 transmorphic colvector htable_keys(struct Htable H) {
-	return(sort(select(H.keys, H.status)', 1))
+    return(sort(select(H.keys, H.status)', 1))
 }
 end

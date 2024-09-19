@@ -207,6 +207,9 @@ class Variable {
     void init()                                                                 // Initialize the variable given its name
     void init_type()                                                            // Initialize the type
     void init_levels()                                                          // Initialize the levels
+    void init_levels_int()
+    void init_levels_float()
+    void init_levels_string()
     void set_minmax()                                                           // Set min and max levels
     real scalar get_min()                                                       // Get minimum level
     real scalar get_max()                                                       // Get maximum level

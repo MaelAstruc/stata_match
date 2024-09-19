@@ -73,8 +73,8 @@ function unique_integers_4(string scalar name) {
     n = length(x)
     
     for (i = 1; i <= n; i++) {
-    	if (!asarray_contains(levels, x[i])) {
-        	asarray(levels, x[i], .)
+        if (!asarray_contains(levels, x[i])) {
+            asarray(levels, x[i], .)
         }
     }
     
@@ -180,8 +180,8 @@ function unique_reals_4(string scalar name) {
     n = length(x)
     
     for (i = 1; i <= n; i++) {
-    	if (!asarray_contains(levels, x[i])) {
-        	asarray(levels, x[i], .)
+        if (!asarray_contains(levels, x[i])) {
+            asarray(levels, x[i], .)
         }
     }
     
@@ -306,8 +306,8 @@ function unique_strings_5(string scalar name) {
     n = length(x)
     
     for (i = 1; i <= n; i++) {
-    	if (!asarray_contains(levels, x[i])) {
-        	asarray(levels, x[i], .)
+        if (!asarray_contains(levels, x[i])) {
+            asarray(levels, x[i], .)
         }
     }
     
