@@ -87,6 +87,7 @@ void Variable::init_type() {
     }
 }
 
+// Different functions based on the `levelsof` command
 void Variable::init_levels() {
     if (this.type == "string") {
         this.init_levels_string()
@@ -123,21 +124,48 @@ void Variable::init_levels_float() {
 }
 
 void Variable::init_levels_string() {
-    string vector x_str
     real scalar i
     
     if (this.stata_type == "strL") {
-        exit
+        this.init_levels_strL()
     }
     else {
-        st_sview(x_str = "", ., this.name)
-
-        this.levels = uniqrowssort(x_str)
+        this.init_levels_strN()
     }
     
     for (i = 1; i <= length(this.levels); i++) {
         this.levels[i] = `"""' + this.levels[i] + `"""'
     }
+}
+
+// Similar to the `levelsof` command internals
+// Removed some things not needed such as the frequency
+// Benchmarks in dev/benchmark/levelsof_strL.do
+void Variable::init_levels_strL() {
+    string scalar n_init, indices
+    real matrix cond, i, w
+    transmorphic vector levels
+    
+    n_init = st_tempname()
+    indices = st_tempname()
+    
+    stata("gen " + n_init + " = _n")
+    stata("bysort " + this.name + ": gen " + indices + " = _n == 1")
+     
+    st_view(cond, ., indices)
+    maxindex(cond, 1, i, w)
+    
+    this.levels = st_sdata(i, this.name)
+    
+    stata("sort " + n_init)
+}
+
+void Variable::init_levels_strN() {
+    string vector x_str
+    
+    st_sview(x_str = "", ., this.name)
+
+    this.levels = uniqrowssort(x_str)
 }
 
 void Variable::set_minmax() {

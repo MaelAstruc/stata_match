@@ -250,10 +250,10 @@ function write_citation(real scalar fh, string scalar pkg_version) {
     fput(fh, "")
     fput(fh, "@software{pmatch,")
     fput(fh, "   author = {Astruc--Le Souder Mael},")
-     fput(fh, "   title = {Stata package ``pmatch''},")
+    fput(fh, "   title = {Stata package ``pmatch''},")
     fput(fh, "   url = {https://github.com/MaelAstruc/stata_match},")
     fput(fh, "   version = {" + pkg_version + "},")
-     fput(fh, "  date = {" + date_fmt + "}")
+    fput(fh, "   date = {" + date_fmt + "}")
     fput(fh, "}")
 }
 end

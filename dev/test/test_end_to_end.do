@@ -183,7 +183,7 @@ assert y1 == y2
 
 test_variables, expected(y1) result(y2) test("End to end: float precision constant")
 
-/////////////////////////////////////////////////////////// One variable integer
+//////////////////////////////////////////////////////////// One variable string
 
 drop _all
 
@@ -202,6 +202,26 @@ pmatch y2, v(x1) b( ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: one string")
+
+////////////////////////////////////////////////////////////// One variable strL
+
+drop _all
+
+set obs 100
+
+gen strL x1 = string(floor(runiform(1, 5)))
+
+gen y1 = "c"
+replace y1 = "a" if x1 == "1"
+replace y1 = "b" if x1 == "2" | x1 == "3"
+
+pmatch y2, v(x1) b( ///
+    "1"        = "a",  ///
+    "2" | "3"  = "b",  ///
+    _          = "c"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: one strL")
 
 ////////////////////////////////////////////////////////////////// Two variables
 
