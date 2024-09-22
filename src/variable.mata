@@ -69,14 +69,14 @@ void Variable::init_type() {
     var_type = st_vartype(this.name)
     this.stata_type = var_type
 
-    if (substr(var_type, 1, 3) == "str") {
-        this.type = "string"
-    }
-    else if (var_type == "byte" | var_type == "int" | var_type == "long") {
+    if (var_type == "byte" | var_type == "int" | var_type == "long") {
         this.type = "int"
     }
     else if (var_type == "float" | var_type == "double") {
         this.type = "float"
+    }
+    else if (substr(var_type, 1, 3) == "str") {
+        this.type = "string"
     }
     else {
         errprintf(
@@ -86,17 +86,24 @@ void Variable::init_type() {
         exit(_error(3256))
     }
 }
+end
 
 // Different functions based on the `levelsof` command
+local N_MATA_SORT 2000
+local N_SAMPLE    200
+local N_USE_TAB   50
+local N_MATA_HASH 100000
+
+mata
 void Variable::init_levels() {
-    if (this.type == "string") {
-        this.init_levels_string()
-    }
-    else if (this.type == "int") {
+    if (this.type == "int") {
         this.init_levels_int()
     }
     else if (this.type == "float") {
         this.init_levels_float()
+    }
+    else if (this.type == "string") {
+        this.init_levels_string()
     }
     else {
         errprintf(
@@ -108,34 +115,60 @@ void Variable::init_levels() {
 }
 
 void Variable::init_levels_int() {
-    real vector x_num
-    
-    st_view(x_num = ., ., this.name)
-    
-    this.levels = uniqrowsofinteger(x_num)
+    if (st_nobs() < `N_MATA_SORT') {
+        this.init_levels_int_base()
+    }
+    if (this.should_tab()) {
+        this.init_levels_tab()
+    }
+    else {
+        this.init_levels_int_base()
+    }
 }
 
 void Variable::init_levels_float() {
-    real vector x_num
-    
-    st_view(x_num = ., ., this.name)
-    
-    this.levels = uniqrowssort(x_num)
+    if (st_nobs() < `N_MATA_SORT') {
+        this.init_levels_float_base()
+    }
+    if (this.should_tab()) {
+        this.init_levels_tab()
+    }
+    if (st_nobs() > `N_MATA_HASH') {
+        this.init_levels_hash()
+    }
+    else {
+        this.init_levels_float_base()
+    }
 }
 
 void Variable::init_levels_string() {
-    real scalar i
-    
     if (this.stata_type == "strL") {
         this.init_levels_strL()
+    }
+    else if (st_nobs() > `N_MATA_HASH') {
+        this.init_levels_hash()
     }
     else {
         this.init_levels_strN()
     }
     
-    for (i = 1; i <= length(this.levels); i++) {
-        this.levels[i] = `"""' + this.levels[i] + `"""'
-    }
+    this.quote_levels()
+}
+
+void Variable::init_levels_int_base() {
+    real vector x
+    
+    st_view(x = ., ., this.name)
+    
+    this.levels = uniqrowsofinteger(x)
+}
+
+void Variable::init_levels_float_base() {
+    real vector x
+    
+    st_view(x = ., ., this.name)
+    
+    this.levels = uniqrowssort(x)
 }
 
 // Similar to the `levelsof` command internals
@@ -144,7 +177,6 @@ void Variable::init_levels_string() {
 void Variable::init_levels_strL() {
     string scalar n_init, indices
     real matrix cond, i, w
-    transmorphic vector levels
     
     n_init = st_tempname()
     indices = st_tempname()
@@ -161,11 +193,103 @@ void Variable::init_levels_strL() {
 }
 
 void Variable::init_levels_strN() {
-    string vector x_str
+    string vector x
     
-    st_sview(x_str = "", ., this.name)
+    st_sview(x = "", ., this.name)
 
-    this.levels = uniqrowssort(x_str)
+    this.levels = uniqrowssort(x)
+}
+
+void Variable::init_levels_tab() {
+    string scalar matname
+    
+    matname = st_tempname()
+    
+    stata("quietly tab " + this.name + ", missing matrow(" + matname + ")")
+    this.levels = st_matrix(matname)
+}
+
+void Variable::init_levels_hash() {
+    transmorphic vector x
+    transmorphic scalar key
+    struct Htable scalar levels
+    real scalar n, h, res, i
+
+    if (this.type == "string") {
+        st_sview(x="", ., this.name)
+        levels = htable_create("")
+    }
+    else {
+        st_view(x=., ., this.name)
+        levels = htable_create(.)
+    }
+    
+    n = length(x)
+
+    for (i = 1; i <= n; i++) {
+        key = x[i]
+
+        h = hash1(key, levels.capacity)
+
+        if (levels.status[h]) {
+            res = htable_newloc_dup(levels, key, h)
+        }
+        else {
+            res = h
+        }
+
+        if (res) {
+            (void) levels.N++
+            levels.keys[res] = key
+            levels.status[res] = 1
+
+            if (levels.N * 2 >= levels.capacity) {
+                htable_expand(levels)
+            }
+        }
+    }
+
+    this.levels = htable_keys(levels)
+}
+
+real scalar Variable::should_tab() {
+    real scalar     n, s, N, S, multi
+    string scalar   state
+    real colvector  x, y
+    real matrix     t
+    
+    // Create a view
+    st_view(x, ., this.name)
+
+    // Take a random sample of x
+    state = rngstate()
+    rseed(987654321)
+    y = srswor(x, `N_SAMPLE')
+    rngstate(state)
+
+    // Compute the number of unique levels in sample
+    t = uniqrows(y, 1)
+    n = rows(t)
+
+    // If too many unique values in sample, return
+    if (n >= `N_USE_TAB') {
+        return(0)
+    }
+
+    // Compute the number of unique values that appear only once
+    s = sum(t[., 2] :== 1)
+    
+    // Estimate multiplicity in the sample
+    multi = multiplicity(sum(t[., 2] :== 1), rows(t))
+    return(multi <= `N_USE_TAB')
+}
+
+void Variable::quote_levels() {
+    real scalar i
+    
+    for (i = 1; i <= length(this.levels); i++) {
+        this.levels[i] = `"""' + this.levels[i] + `"""'
+    }
 }
 
 void Variable::set_minmax() {
@@ -200,5 +324,13 @@ real scalar Variable::get_max() {
     
     return(this.max)
 }
+end
 
+**#************************************************************** Levelsof utils
+
+mata
+// From levelsof functions
+real scalar multiplicity(real scalar s, real scalar n) {
+        return(1/(1 - (s/n)^(1/(n - 1))))
+}
 end

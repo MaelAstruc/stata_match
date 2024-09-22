@@ -7,8 +7,8 @@ clear all
 
 **#********************************************************************** Locals
 
-local pkg_version    = "0.0.8"
-local distrib_date   = "20 Sep 2024"
+local pkg_version    = "0.0.9"
+local distrib_date   = "22 Sep 2024"
 local stata_version  = "`c(version)'"
 local date_fmt       = string(date("`distrib_date'", "DMY"), "%tdDD/NN/CCYY")
 local pwd            = ustrregexra("`c(pwd)'", "\\", "/") + "/"
@@ -18,6 +18,7 @@ mata
         "src/declare.mata",
         "src/pattern_list.mata",
         "src/pattern.mata",
+        "src/htable.mata",
         "src/variable.mata",
         "src/tuple.mata",
         "src/arm.mata",

@@ -210,13 +210,28 @@ class Variable {
     void init_levels_int()
     void init_levels_float()
     void init_levels_string()
+    void init_levels_int_base()
+    void init_levels_float_base()
     void init_levels_strL()
     void init_levels_strN()
+    void init_levels_tab()
+    void init_levels_hash()
+    real scalar should_tab()
+    void quote_levels()
     void set_minmax()                                                           // Set min and max levels
     real scalar get_min()                                                       // Get minimum level
     real scalar get_max()                                                       // Get maximum level
 }
 
+///////////////////////////////////////////////////////////////////// Hash Table
+
+struct Htable {
+    real         scalar    capacity
+    real         scalar    N
+    transmorphic scalar    dkey
+    transmorphic rowvector keys
+    real         rowvector status
+}
 //////////////////////////////////////////////////////////////////////////// Arm
 
 // The condition part of the Arm
