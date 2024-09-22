@@ -8,9 +8,9 @@ clear all
 **#********************************************************************** Locals
 
 local pkg_version    = "0.0.8"
+local distrib_date   = "20 Sep 2024"
 local stata_version  = "`c(version)'"
-local date           = "`c(current_date)'"
-local date_fmt       = string(date("`date'", "DMY"), "%tdDD/NN/CCYY")
+local date_fmt       = string(date("`distrib_date'", "DMY"), "%tdDD/NN/CCYY")
 local pwd            = ustrregexra("`c(pwd)'", "\\", "/") + "/"
 
 mata
@@ -55,9 +55,9 @@ mata: rm_tabs_dir("dev/test")
 
 // Build main files
 
-mata: combine_files(files, "pkg/pmatch.ado", st_local("pkg_version"), 0)
-mata: write_pkg("pkg/pmatch.pkg")
-mata: write_sthlp_dir("docs", "pkg", st_local("pkg_version"))
+mata: combine_files(files, "pkg/pmatch.ado", st_local("pkg_version"), st_local("distrib_date"), 0)
+mata: write_pkg("pkg/pmatch.pkg", st_local("distrib_date"))
+mata: write_sthlp_dir("docs", "pkg", st_local("pkg_version"), st_local("distrib_date"))
 
 // Translate all .sthlp help files to pdf
 

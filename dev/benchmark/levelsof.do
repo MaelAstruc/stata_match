@@ -122,12 +122,12 @@ end
 
 mata
 function unique_integers_6(string scalar name) {
-	string scalar matname
+    string scalar matname
     real matrix _
     
     matname = st_tempname()
     
-	stata("quietly tab " + name + ", missing matrow(" + matname + ")")
+    stata("quietly tab " + name + ", missing matrow(" + matname + ")")
     _ = st_matrix(matname)
 }
 end
@@ -228,7 +228,7 @@ function should_tab(real colvector x) {
 
 function unique_integers_9(string scalar name) {
     real matrix x, _
-	string scalar matname
+    string scalar matname
     
     st_view(x=., ., name)
     
@@ -357,12 +357,12 @@ end
 
 mata
 function unique_reals_6(string scalar name) {
-	string scalar matname
+    string scalar matname
     real matrix _
     
     matname = st_tempname()
     
-	stata("quietly tab " + name + ", missing matrow(" + matname + ")")
+    stata("quietly tab " + name + ", missing matrow(" + matname + ")")
     _ = st_matrix(matname)
 }
 end
@@ -405,7 +405,7 @@ transmorphic colvector levels_htable_float(transmorphic matrix x) {
 
 function unique_reals_9(string scalar name) {
     real matrix x, _
-	string scalar matname
+    string scalar matname
     
     st_view(x=., ., name)
     

@@ -39,7 +39,7 @@ real vector bench_summary(real vector values) {
     values = sort(values, 1)
     
     val_total = sum(values)
-    val_N = length(values)
+    val_N = nonmissing(values)
     val_min = values[1]
     val_mean = mean(values)
     val_median = values[ceil(val_N / 2)]

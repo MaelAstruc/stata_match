@@ -679,3 +679,201 @@ pmatch strL y2, v(x1) b( ///
 )
 
 test_variables, expected(y1) result(y2) test("End to end: dtype str1")
+
+/////////////////////////////////////////////////// Check few levels int and obs
+
+drop _all
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 11)) // [1, 6]
+
+gen strL y1 = "4"
+replace y1 = "1" if x1 == 1
+replace y1 = "2" if x1 == 2 | x1 == 3
+replace y1 = "3" if x1 >= 4 & x1 <= 5
+
+pmatch strL y2, v(x1) b( ///
+    1      = "1",        ///
+    2 | 3  = "2",        ///
+    4/5    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: int 10 levels, 100 obs")
+
+////////////////////////////////////////////// Check few levels int and many obs
+
+drop _all
+
+set obs 10000
+
+gen int x1 = floor(runiform(1, 11)) // [1, 6]
+
+gen strL y1 = "4"
+replace y1 = "1" if x1 == 1
+replace y1 = "2" if x1 == 2 | x1 == 3
+replace y1 = "3" if x1 >= 4 & x1 <= 5
+
+pmatch strL y2, v(x1) b( ///
+    1      = "1",        ///
+    2 | 3  = "2",        ///
+    4/5    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: int 10 levels, 10K obs")
+
+////////////////////////////////////////////////////////// Check many levels int
+
+drop _all
+
+set obs 10000
+
+gen int x1 = floor(runiform(1, 1001)) // [1, 6]
+
+gen strL y1 = "4"
+replace y1 = "1" if x1 == 1
+replace y1 = "2" if x1 == 2 | x1 == 3
+replace y1 = "3" if x1 >= 4 & x1 <= 5
+
+pmatch strL y2, v(x1) b( ///
+    1      = "1",        ///
+    2 | 3  = "2",        ///
+    4/5    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: int 1000 levels")
+
+///////////////////////////////////////////////// Check few levels float and obs
+
+drop _all
+
+set obs 10000
+
+gen float x1 = floor(runiform(1, 11)) // [1, 6]
+
+gen strL y1 = "4"
+replace y1 = "1" if x1 == 1
+replace y1 = "2" if x1 == 2 | x1 == 3
+replace y1 = "3" if x1 >= 4 & x1 <= 5
+
+pmatch strL y2, v(x1) b( ///
+    1      = "1",        ///
+    2 | 3  = "2",        ///
+    4/5    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: float 10 levels, 10K obs")
+
+//////////////////////////////////////////// Check few levels float and many obs
+
+drop _all
+
+set obs 10000
+
+gen float x1 = floor(runiform(1, 11)) // [1, 6]
+
+gen strL y1 = "4"
+replace y1 = "1" if x1 == 1
+replace y1 = "2" if x1 == 2 | x1 == 3
+replace y1 = "3" if x1 >= 4 & x1 <= 5
+
+pmatch strL y2, v(x1) b( ///
+    1      = "1",        ///
+    2 | 3  = "2",        ///
+    4/5    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: float 10 levels, 10K obs")
+
+//////////////////////////////////////////////////////// Check many levels float
+
+drop _all
+
+set obs 10000
+
+gen float x1 = floor(runiform(1, 1001)) // [1, 6]
+
+gen strL y1 = "4"
+replace y1 = "1" if x1 == 1
+replace y1 = "2" if x1 == 2 | x1 == 3
+replace y1 = "3" if x1 >= 4 & x1 <= 5
+
+pmatch strL y2, v(x1) b( ///
+    1      = "1",        ///
+    2 | 3  = "2",        ///
+    4/5    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: float 1000 levels, 10K obs")
+
+//////////////////////////////////////////////// Check many levels float and obs
+
+drop _all
+
+set obs 1000000
+
+gen float x1 = floor(runiform(1, 1001)) // [1, 6]
+
+gen strL y1 = "4"
+replace y1 = "1" if x1 == 1
+replace y1 = "2" if x1 == 2 | x1 == 3
+replace y1 = "3" if x1 >= 4 & x1 <= 5
+
+pmatch strL y2, v(x1) b( ///
+    1      = "1",        ///
+    2 | 3  = "2",        ///
+    4/5    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: float 1000 levels, 1M obs")
+
+/////////////////////////////////////////////////////////// Check string few obs
+
+drop _all
+
+set obs 100
+
+gen str2 x1 = string(floor(runiform(1, 11))) // [1, 10]
+
+gen strL y1 = "4"
+replace y1 = "1" if x1 == "1"
+replace y1 = "2" if x1 == "2"
+replace y1 = "3" if x1 == "3"
+
+pmatch strL y2, v(x1) b( ///
+    "1"    = "1",        ///
+    "2"    = "2",        ///
+    "3"    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: string 100 obs")
+
+//////////////////////////////////////////////// Check many levels float and obs
+
+drop _all
+
+set obs 1000000
+
+gen str2 x1 = string(floor(runiform(1, 11))) // [1, 10]
+
+gen strL y1 = "4"
+replace y1 = "1" if x1 == "1"
+replace y1 = "2" if x1 == "2"
+replace y1 = "3" if x1 == "3"
+
+pmatch strL y2, v(x1) b( ///
+    "1"    = "1",        ///
+    "2"    = "2",        ///
+    "3"    = "3",        ///
+    _      = "4"         ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: string 1M levels")

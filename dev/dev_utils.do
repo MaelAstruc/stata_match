@@ -82,16 +82,15 @@ function combine_files(
     string vector files,
     string scalar file_out,
     string scalar version_str,
+    string scalar distrib_date,
     real scalar use_bench
 ) {
     real scalar fh_in, fh_out, i
-    string scalar date, file_name, head_line, line
-    
-    date = st_global("c(current_date)")
+    string scalar file_name, head_line, line
     
     unlink(file_out)
     fh_out = fopen(file_out, "w")
-    fput(fh_out, "*! version " + version_str + "  " + date)
+    fput(fh_out, "*! version " + version_str + "  " + distrib_date)
     
     for (i = 1; i <= length(files); i++) {
         file_name = files[i]
@@ -123,12 +122,13 @@ end
 
 mata
 function write_pkg(
-    string scalar file_out
+    string scalar file_out,
+    string scalar distrib_date
 ) {
     real   scalar date, fh_out
     string scalar date_fmt
     
-    date     = date(st_global("c(current_date)"), "DMY")
+    date     = date(distrib_date, "DMY")
     date_fmt = sprintf("%02.0f/%02.0f/%04.0f", day(date), month(date), year(date))
     
     unlink(file_out)
@@ -155,18 +155,19 @@ mata
 function write_sthlp_file(
     string scalar file_in,
     string scalar file_out,
-    string scalar pkg_version
+    string scalar pkg_version,
+    string scalar distrib_date
 ) {
     real scalar fh_out
     
     unlink(file_out)
     fh_out = fopen(file_out, "w")
     
-    sthlp_header(fh_out, pkg_version)
+    sthlp_header(fh_out, pkg_version, distrib_date)
     copy_file(file_in, fh_out)
     write_pkg_details(fh_out, pkg_version)
     write_feedback(fh_out)
-    write_citation(fh_out, pkg_version)
+    write_citation(fh_out, pkg_version, distrib_date)
     
     fclose(fh_out)
 }
@@ -174,7 +175,8 @@ function write_sthlp_file(
 function write_sthlp_dir(
     string scalar dir_in,
     string scalar dir_out,
-    string scalar pkg_version
+    string scalar pkg_version,
+    string scalar distrib_date
 ) {
     string vector files
     string scalar file_in, file_out
@@ -185,16 +187,20 @@ function write_sthlp_dir(
     for (i = 1; i <= length(files); i++) {
         file_in  = dir_in  + "/" + files[i]
         file_out = dir_out + "/" + files[i]
-        write_sthlp_file(file_in, file_out, pkg_version)
+        write_sthlp_file(file_in, file_out, pkg_version, distrib_date)
     }
 }
 
 // Add header to sthlp file
-function sthlp_header(real scalar fh_out, string scalar pkg_version) {
+function sthlp_header(
+    real scalar fh_out,
+    string scalar pkg_version,
+    string scalar distrib_date
+) {
     real   scalar date
     string scalar date_fmt
     
-    date     = date(st_global("c(current_date)"), "DMY")
+    date     = date(distrib_date, "DMY")
     date_fmt = sprintf("%02.0f/%02.0f/%04.0f", day(date), month(date), year(date))
     
     fput(fh_out, "{smcl}")
@@ -234,11 +240,15 @@ function write_feedback(real scalar fh) {
 }
 
 // Write citation
-function write_citation(real scalar fh, string scalar pkg_version) {
+function write_citation(
+    real scalar fh,
+    string scalar pkg_version,
+    string scalar distrib_date
+) {
     real   scalar date
     string scalar date_fmt
     
-    date  = date(st_global("c(current_date)"), "DMY")
+    date  = date(distrib_date, "DMY")
     date_fmt = sprintf("%04.0f-%02.0f-%02.0f", year(date), month(date), day(date))
     
     fput(fh, `""')
