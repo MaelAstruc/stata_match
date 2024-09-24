@@ -6,9 +6,25 @@ local obs = 100
 
 capture program drop pmatch check_dtype check_replace
 mata: mata clear
+
+run "dev/main_utils.do"
 run "pkg/pmatch.ado"
 
 mata
+
+CLASS_NAMES = (
+    "PEmpty",
+    "PWild",
+    "PConstant",
+    "PRange",
+    "POr",
+    "PatternList",
+    "Tuple",
+    "Variable",
+    "Arm",
+    "Match_report",
+    "Usefulness"
+)
 
 N_PEmpty = 0
 N_PWild = 0
@@ -21,6 +37,34 @@ N_Variable = 0
 N_Arm = 0
 N_Match_report = 0
 N_Usefulness = 0
+
+void reset_class_count() {
+    string scalar class_names
+    pointer(real scalar) N
+    real scalar i
+    
+    class_names = *findexternal("CLASS_NAMES")
+    
+    for (i = 1; i <= length(class_names); i++) {
+        N = findexternal("N_" + class_names[i])
+        *N = 0
+    }
+}
+
+void print_class_count() {
+    string scalar class_names
+    pointer(real scalar) N
+    real scalar i, n
+    
+    class_names = *findexternal("CLASS_NAMES")
+    
+    printf("%-15s %12s\n", "CLASS NAME", "INSTANCES")
+    
+    for (i = 1; i <= length(class_names); i++) {
+        n = *findexternal("N_" + class_names[i])
+        printf("  %-15s %10.0f\n", class_names[i], n)
+    }
+}
 
 void increase_class_count(transmorphic instance) {
     pointer(real scalar) N
@@ -86,7 +130,8 @@ end
 
 clear
 
-clear
+mata: reset_class_count()
+
 set obs `obs'
 
 gen int x = runiform(0, 15) + 1 // [1, 15]
@@ -105,22 +150,9 @@ pmatch y, v(x) b(    ///
 
 assert y_base == y
 
-
 capture log close
 log using "dev/logs/class_count.log", replace
 
-mata
-N_PEmpty
-N_PWild
-N_PConstant
-N_PRange
-N_POr
-N_PatternList
-N_Tuple
-N_Variable
-N_Arm
-N_Match_report
-N_Usefulness
-end
+mata: print_class_count()
 
 log close

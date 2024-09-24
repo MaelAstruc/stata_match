@@ -1,52 +1,28 @@
-----------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/class_count.log
   log type:  text
- opened on:  22 Sep 2024, 22:59:21
+ opened on:  24 Sep 2024, 16:18:13
 
 . 
-. mata
-------------------------------------------------- mata (type end to exit) --------------------------------------------------------------
-: N_PEmpty
-  84
-
-: N_PWild
-  2
-
-: N_PConstant
-  8
-
-: N_PRange
-  3
-
-: N_POr
-  33
-
-: N_PatternList
-  35
-
-: N_Tuple
-  1
-
-: N_Variable
-  1
-
-: N_Arm
-  66
-
-: N_Match_report
-  1
-
-: N_Usefulness
-  21
-
-: end
-----------------------------------------------------------------------------------------------------------------------------------------
+. mata: print_class_count()
+CLASS NAME         INSTANCES
+  PEmpty                  84
+  PWild                    2
+  PConstant                8
+  PRange                   3
+  POr                     33
+  PatternList             35
+  Tuple                    1
+  Variable                 1
+  Arm                     66
+  Match_report             1
+  Usefulness              21
 
 . 
 . log close
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/class_count.log
   log type:  text
- closed on:  22 Sep 2024, 22:59:21
-----------------------------------------------------------------------------------------------------------------------------------------
+ closed on:  24 Sep 2024, 16:18:13
+---------------------------------------------------------------------------------------------------------------------------

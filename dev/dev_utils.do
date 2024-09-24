@@ -4,6 +4,8 @@ Util functions when developing
 
 // Replace all the tabs in the code by 4 spaces
 
+capture mata: mata drop rm_tabs_file() rm_tabs_dir()
+
 mata
     // Copy each line of file to tempfile without tabs and replace the original
     void function rm_tabs_file(string scalar file) {
@@ -77,6 +79,8 @@ end
 
 **#*********************** Combine all files, add file name and remove bench_*()
 
+capture mata: mata drop combine_files() rm_tabs_dir()
+
 mata
 function combine_files(
     string vector files,
@@ -120,6 +124,8 @@ end
 
 **#************************************************************** Write pkg file
 
+capture mata: mata drop write_pkg()
+
 mata
 function write_pkg(
     string scalar file_out,
@@ -149,6 +155,9 @@ function write_pkg(
 end
 
 **#********************************************* Write full sthlp file from body
+
+capture mata: mata drop write_sthlp_file() write_sthlp_dir() sthlp_header() ///
+    copy_file() write_pkg_details() write_feedback() write_citation()
 
 mata
 // Rewrite sthlp file from body and other informations
