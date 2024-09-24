@@ -1,8 +1,8 @@
----------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/class_count.log
   log type:  text
- opened on:  24 Sep 2024, 16:18:13
+ opened on:  24 Sep 2024, 20:30:08
 
 . 
 . mata: print_class_count()
@@ -10,7 +10,7 @@ CLASS NAME         INSTANCES
   PEmpty                  84
   PWild                    2
   PConstant                8
-  PRange                   3
+  PRange                   1
   POr                     33
   PatternList             35
   Tuple                    1
@@ -24,5 +24,5 @@ CLASS NAME         INSTANCES
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/class_count.log
   log type:  text
- closed on:  24 Sep 2024, 16:18:13
----------------------------------------------------------------------------------------------------------------------------
+ closed on:  24 Sep 2024, 20:30:08
+------------------------------------------------------------------------------------------------------------------------

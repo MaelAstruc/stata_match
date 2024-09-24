@@ -205,7 +205,6 @@ difference :
 void PWild::new() {}
 
 void PWild::define(class Variable scalar variable) { 
-    class PRange scalar prange
     class PConstant scalar pconstant
     real scalar i
 
@@ -227,11 +226,8 @@ void PWild::define(class Variable scalar variable) {
         }
     }
     else if (variable.type == "float") {
-        prange.define(variable.levels[1], variable.levels[2], 1, 1, 0)
-        this.push(prange)
-
-        if (length(variable.levels) == 3) {
-            pconstant.define(.)
+        for (i = 1; i <= length(variable.levels); i++) {
+            pconstant.define(variable.levels[i])
             this.push(pconstant)
         }
     }
