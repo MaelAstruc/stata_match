@@ -5,7 +5,19 @@
 capture mata: mata drop bench_init() bench_summary() bench_print() bench_on() bench_off()
 
 mata
-BENCH_NAMES = ("base", "init", "parse", "check", "eval", "total")
+BENCH_NAMES = (
+    "base",
+    "init",
+    "parse",
+    "check",
+    "- usefulness",
+    "- combine",
+    "- exhaustiveness",
+    "- compress",
+    "- print",
+    "eval",
+    "total"
+)
 
 struct Bench {
     real matrix results
@@ -41,6 +53,10 @@ real vector bench_summary(real vector values) {
     
     values = sort(values, 1)
     
+    if (values[1] == .) {
+    	return(J(1, 7, .))
+    }
+    
     val_total = sum(values)
     val_N = nonmissing(values)
     val_min = values[1]
@@ -73,10 +89,10 @@ void function bench_print(struct Bench scalar bench) {
     
     results[K, n_stats] = results[K, 4] - results[1, 4]
     
-    printf("{txt}{hline 110}\n")
+    printf("{txt}{hline 115}\n")
     printf("{txt}profiler report\n")
     printf(
-        "{txt}%-10s     %12s %8s %8s %8s %8s %8s %8s %8s %8s %8s\n",
+        "{txt}%-15s     %12s %8s %8s %8s %8s %8s %8s %8s %8s %8s\n",
         "Name",
         "Total",
         "N",
@@ -92,7 +108,7 @@ void function bench_print(struct Bench scalar bench) {
     
     for (i = 1; i <= K; i++) {
         printf(
-            "{txt}  %-12s %12.3f %8.0f %8.3f %8.3f %8.3f %8.3f %8.3f %8.2f %8.2f %8.3f\n",
+            "{txt}  %-17s %12.3f %8.0f %8.3f %8.3f %8.3f %8.3f %8.3f %8.2f %8.2f %8.3f\n",
             bench.names[i],
             results[i, 1],
             results[i, 2],
@@ -107,7 +123,7 @@ void function bench_print(struct Bench scalar bench) {
         )
     }
     
-    printf("{txt}{hline 110}\n")
+    printf("{txt}{hline 115}\n")
 }
 
 void function bench_on(string scalar name) {

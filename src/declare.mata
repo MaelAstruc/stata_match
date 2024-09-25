@@ -13,6 +13,9 @@ class Pattern {
     virtual transmorphic scalar overlap()                                       // Returns the set of common values with another pattern
     virtual real scalar includes()                                              // Check if the pattern is included in another
     virtual pointer scalar difference()                                         // Returns the set of values not included in another patterns 
+    
+    // Other methods
+    void new()
 }
 
 // Empty pattern

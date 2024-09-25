@@ -13,10 +13,13 @@ void function check_match( ///
     class Arm vector useful_arms
     real scalar i
 
+    // bench_on("- usefulness")
     report.usefulness = check_useful(arms)
+    // bench_off("- usefulness")
 
     useful_arms = Arm(0)
 
+    // bench_on("- combine")
     for (i = 1; i <= length(report.usefulness); i++) {
         usefulness = report.usefulness[i]
         if (usefulness.useful == 1) {
@@ -25,11 +28,19 @@ void function check_match( ///
             useful_arms = useful_arms, arm
         }
     }
+    // bench_off("- combine")
 
-    missings = check_completeness(useful_arms, variables)
+    // bench_on("- exhaustiveness")
+    missings = check_exhaustiveness(useful_arms, variables)
+    // bench_off("- exhaustiveness")
+    
+    // bench_on("- compress")
     report.missings = missings.compress()
+    // bench_off("- compress")
 
+    // bench_on("- print")
     report.print()
+    // bench_off("- print")
 }
 
 /////////////////////////////////////////////////////////////// Check usefulness
@@ -160,7 +171,7 @@ function get_and_compress(struct LHS vector overlaps, i) {
 
 ///////////////////////////////////////////////////////////// Check completeness
 
-class Tuple vector function check_completeness( ///
+class Tuple vector function check_exhaustiveness( ///
         class Arm vector arms, ///
         class Variable vector variables ///
     ) {

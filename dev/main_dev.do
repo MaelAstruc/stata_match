@@ -57,6 +57,7 @@ mata: rm_tabs_dir("dev/test")
 // Build main files
 
 mata: combine_files(files, "pkg/pmatch.ado", st_local("pkg_version"), st_local("distrib_date"), 0)
+mata: combine_files(files, "dev/benchmark/pmatch_bench.ado", st_local("pkg_version"), st_local("distrib_date"), 1)
 mata: write_pkg("pkg/pmatch.pkg", st_local("distrib_date"))
 mata: write_sthlp_dir("docs", "pkg", st_local("pkg_version"), st_local("distrib_date"))
 
