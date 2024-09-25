@@ -13,6 +13,7 @@ run "pkg/pmatch.ado"
 mata
 
 CLASS_NAMES = (
+    "Pattern",
     "PEmpty",
     "PWild",
     "PConstant",
@@ -26,6 +27,7 @@ CLASS_NAMES = (
     "Usefulness"
 )
 
+N_Pattern = 0
 N_PEmpty = 0
 N_PWild = 0
 N_PConstant = 0
@@ -77,7 +79,10 @@ void increase_class_count(transmorphic instance) {
     // printf("new %s; ", class_name)
 }
 
-mata drop PEmpty::new()
+void Pattern::new() {
+    increase_class_count(this)
+}
+
 void PEmpty::new() {
     increase_class_count(this)
 }

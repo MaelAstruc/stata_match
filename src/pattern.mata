@@ -76,6 +76,8 @@ difference :
     returns :   a pointer to apattern
 */
 
+void Pattern::new() {}
+
 ///////////////////////////////////////////////////////////////////////// PEmpty
 
 /*
@@ -215,18 +217,21 @@ void PWild::define(class Variable scalar variable) {
 
     if (variable.type == "string") {
         for (i = 1; i <= length(variable.levels); i++) {
+            pconstant = PConstant()
             pconstant.define(variable.levels[i])
             this.push(pconstant)
         }
     }
     else if (variable.type == "int") {
         for (i = 1; i <= length(variable.levels); i++) {
+            pconstant = PConstant()
             pconstant.define(variable.levels[i])
             this.push(pconstant)
         }
     }
     else if (variable.type == "float") {
         for (i = 1; i <= length(variable.levels); i++) {
+            pconstant = PConstant()
             pconstant.define(variable.levels[i])
             this.push(pconstant)
         }
@@ -241,7 +246,6 @@ void PWild::define(class Variable scalar variable) {
 }
 
 string scalar PWild::to_string(| real scalar all) {
-    
     if (args() == 0) {
         return("_")
     }
