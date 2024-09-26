@@ -2,10 +2,11 @@
 
 **#****************************************************** Extand timer functions
 
-capture mata: mata drop bench_init() bench_summary() bench_print() bench_on() bench_off()
+capture mata: mata drop Bench() bench_init() bench_summary() bench_print() bench_on() bench_off()
 
 mata
 BENCH_NAMES = (
+    "build data",
     "base",
     "init",
     "parse",
@@ -84,10 +85,10 @@ void function bench_print(struct Bench scalar bench) {
     
     for (i = 1; i <= K; i++) {
         results[i, n_stats - 2] = results[i, 4] / results[K, 4] * 100
-        results[i, n_stats - 1] = results[i, 4] / results[1, 4] * 100
+        results[i, n_stats - 1] = results[i, 4] / results[2, 4] * 100
     }
     
-    results[K, n_stats] = results[K, 4] - results[1, 4]
+    results[K, n_stats] = results[K, 4] - results[2, 4]
     
     printf("{txt}{hline 115}\n")
     printf("{txt}profiler report\n")
@@ -134,7 +135,7 @@ void function bench_on(string scalar name) {
     
     index = asarray(bench->names_index, name)
     
-    if (name == "base") {
+    if (name == "build data") {
         bench->iter = bench->iter + 1
         timer_clear()
     }
@@ -166,10 +167,12 @@ program compare_num
     local n = (`levels' / 10)
     
     // Prepare data
+    if ("`nobench'" == "") mata: bench_on("build data")
     clear
     set obs `obs'
     gen `type' x = mod(_n, `levels') + 1
     bsample
+    if ("`nobench'" == "") mata: bench_off("build data")
     
     // Run base commands
     if ("`nobench'" == "") mata: bench_on("base")
@@ -215,10 +218,12 @@ program compare_str
     local n = (`levels' / 10)
     
     // Prepare data
+    if ("`nobench'" == "") mata: bench_on("build data")
     clear
     set obs `obs'
     gen x = string(mod(_n, `levels') + 1)
     bsample
+    if ("`nobench'" == "") mata: bench_off("build data")
     
     // Run base commands
     if ("`nobench'" == "") mata: bench_on("base")
@@ -277,7 +282,7 @@ program profile_obs_string
     
     if ("`nobench'" == "") mata: BENCH = bench_init(`rep')
     
-    quietly forvalues i = 1/`rep' {
+    quietly: forvalues i = 1/`rep' {
         compare_str, obs(`obs') levels(`levels') `nocheck' `nobench'
     }
 

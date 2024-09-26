@@ -58,19 +58,19 @@ profile_obs_integer, obs(1000)     levels(1000) rep(1)
 profile_obs_integer, obs(10000)    levels(1000) rep(1)
 profile_obs_integer, obs(100000)   levels(1000) rep(1)
 profile_obs_integer, obs(1000000)  levels(1000) rep(1)
-profile_obs_integer, obs(10000000) levels(1000) rep(1)
+// profile_obs_integer, obs(10000000) levels(1000) rep(1)
 
 profile_obs_float,   obs(1000)     levels(1000) rep(1)
 profile_obs_float,   obs(10000)    levels(1000) rep(1)
 profile_obs_float,   obs(100000)   levels(1000) rep(1)
 profile_obs_float,   obs(1000000)  levels(1000) rep(1)
-profile_obs_float,   obs(10000000) levels(1000) rep(1)
+// profile_obs_float,   obs(10000000) levels(1000) rep(1)
 
 profile_obs_string,  obs(1000)     levels(1000) rep(1)
 profile_obs_string,  obs(10000)    levels(1000) rep(1)
 profile_obs_string,  obs(100000)   levels(1000) rep(1)
 profile_obs_string,  obs(1000000)  levels(1000) rep(1)
-profile_obs_string,  obs(10000000) levels(1000) rep(1)
+// profile_obs_string,  obs(10000000) levels(1000) rep(1)
 
 
 ////////////////////////////////////////////////////// Benchmarks without checks

@@ -68,19 +68,22 @@ void print_class_count() {
     }
 }
 
-void increase_class_count(transmorphic instance) {
+void increase_class_count(transmorphic scalar instance) {
     pointer(real scalar) N
     string scalar class_name
     
     class_name = classname(instance)
-    
     N = findexternal("N_" + class_name)
     *N = *N + 1
     // printf("new %s; ", class_name)
 }
 
 void Pattern::new() {
-    increase_class_count(this)
+    // Pattern::new() is called for before all new() child classes
+    // Need to filter the cases
+    if (classname(this) == "Pattern") {
+        increase_class_count(this)
+    }
 }
 
 void PEmpty::new() {
