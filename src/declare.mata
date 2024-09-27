@@ -84,9 +84,7 @@ class PRange extends Pattern {
     // Members
     real scalar min                                                             // Minimum value
     real scalar max                                                             // Maximum value
-    real scalar in_min                                                          // 1 if the minimum is included, 0 otherwize
-    real scalar in_max                                                          // 1 if the maximum is included, 0 otherwize
-    real scalar discrete                                                        // 1 if the variable is discrete, 0 otherwize
+    real scalar type_nb                                                         // 1 int, 2 float, 3 double
 
     // Pattern methods
     void define()
@@ -224,6 +222,7 @@ class Variable {
     void set_minmax()                                                           // Set min and max levels
     real scalar get_min()                                                       // Get minimum level
     real scalar get_max()                                                       // Get maximum level
+    real scalar get_type_nb()                                                   // Get type number
 }
 
 ///////////////////////////////////////////////////////////////////// Hash Table

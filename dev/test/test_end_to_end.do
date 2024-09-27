@@ -183,6 +183,109 @@ assert y1 == y2
 
 test_variables, expected(y1) result(y2) test("End to end: float precision constant")
 
+////////////////////////////////////////////////////////// Float precision range
+
+drop _all
+
+set obs 100
+
+gen double x1 = .
+replace x1 = 1.0x-0  in 1
+replace x1 = 1.0x-1  in 2
+replace x1 = 1.0x-2  in 3
+replace x1 = 1.0x-3  in 4
+replace x1 = 1.0x-4  in 5
+replace x1 = 1.0x-5  in 6
+replace x1 = 1.0x-6  in 7
+replace x1 = 1.0x-7  in 8
+replace x1 = 1.0x-8  in 9
+replace x1 = 1.0x-9  in 10
+replace x1 = 1.0x-a  in 11
+replace x1 = 1.0x-b  in 12
+replace x1 = 1.0x-c  in 13
+replace x1 = 1.0x-d  in 14
+replace x1 = 1.0x-e  in 15
+replace x1 = 1.0x-f  in 16
+replace x1 = 1.0x-10 in 17
+replace x1 = 1.0x-11 in 18
+replace x1 = 1.0x-12 in 19
+replace x1 = 1.0x-13 in 20
+replace x1 = 1.0x-14 in 21
+replace x1 = 1.0x-15 in 22
+replace x1 = 1.0x-16 in 23
+replace x1 = 1.0x-17 in 24
+replace x1 = 1.0x-18 in 25
+replace x1 = 1.0x-19 in 26
+replace x1 = 1.0x-1a in 27
+replace x1 = 1.0x-1b in 28
+replace x1 = 1.0x-1c in 29
+replace x1 = 1.0x-1d in 30
+replace x1 = 1.0x-1e in 31
+replace x1 = 1.0x-1f in 32
+replace x1 = 1.0000000000000X+001 in 33
+replace x1 = 1.0000000000001X+001 in 34
+replace x1 = 1.0000000000002X+001 in 35
+replace x1 = 1.0000000000003X+001 in 36
+replace x1 = 1.0000000000004X+001 in 37
+replace x1 = 1.0000000000005X+001 in 38
+replace x1 = 1.0000000000006X+001 in 39
+replace x1 = 1.0000000000007X+001 in 40
+replace x1 = 1.0000000000008X+001 in 41
+replace x1 = 1.0000000000009X+001 in 42
+replace x1 = 1.000000000000aX+001 in 43
+replace x1 = 1.000000000000bX+001 in 44
+
+gen y1 = ""
+replace y1 = "1" if x1 == 1.0x-0 
+replace y1 = "2" if x1 >= 1.0x-9  & x1 <= 1.0x-1 
+replace y1 = "3" if x1 >= 1.0x-f  & x1 <  1.0x-9 
+replace y1 = "4" if x1 >  1.0x-1a & x1 <= 1.0x-10
+replace y1 = "5" if x1 == 1.0x-1a
+replace y1 = "6" if x1 >  1.0x-20 & x1 <  1.0x-1a
+replace y1 = "7" if x1 >= 1.0000000000000X+001 & x1 <= 1.0000000000002X+001
+replace y1 = "8" if x1 == 1.0000000000003X+001
+replace y1 = "9" if x1 >  1.0000000000003X+001 & x1 <= 1.0000000000005X+001
+replace y1 = "a" if x1 >= 1.0000000000006X+001 & x1 <  1.0000000000008X+001
+replace y1 = "b" if x1 == 1.0000000000008X+001
+replace y1 = "c" if x1 >  1.0000000000008X+001 & x1 <  1.000000000000bX+001
+replace y1 = "d" if x1 == 1.000000000000bX+001
+
+// Double check that I do what I expect
+assert y1 == "1" in 1
+assert y1 == "2" in 2/10
+assert y1 == "3" in 11/16
+assert y1 == "4" in 17/26
+assert y1 == "5" in 27
+assert y1 == "6" in 28/32
+assert y1 == "7" in 33/35
+assert y1 == "8" in 36
+assert y1 == "9" in 37/38
+assert y1 == "a" in 39/40
+assert y1 == "b" in 41
+assert y1 == "c" in 42/43
+assert y1 == "d" in 44
+
+pmatch y2, v(x1) b(   ///
+    1.0x-0                                     = "1", ///
+    1.0x-9/1.0x-1                              = "2", ///
+    1.0x-f/!1.0x-9                             = "3", ///
+    1.0x-1a!/1.0x-10                           = "4", ///
+    1.0x-1a                                    = "5", ///
+    1.0x-20!!1.0x-1a                           = "6", ///
+    1.0000000000000X+001/1.0000000000002X+001  = "7", ///
+    1.0000000000003X+001                       = "8", ///
+    1.0000000000003X+001!/1.0000000000005X+001 = "9", ///
+    1.0000000000006X+001/!1.0000000000008X+001 = "a", ///
+    1.0000000000008X+001                       = "b", ///
+    1.0000000000008X+001!!1.000000000000bX+001 = "c", ///
+    1.000000000000bX+001                       = "d", ///
+    _                                          = ""   ///
+)
+
+assert y1 == y2
+
+test_variables, expected(y1) result(y2) test("End to end: float precision range")
+
 //////////////////////////////////////////////////////////// One variable string
 
 drop _all

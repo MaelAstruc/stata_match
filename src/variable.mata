@@ -30,7 +30,7 @@ string scalar Variable::to_string() {
     levels_str = J(1, length(this.levels), "")
 
     for (i = 1; i <= length(this.levels); i++) {
-        if (this.type == "int" | this.type == "float") {
+        if (this.type == "int" | this.type == "float" | this.type == "double") {
             levels_str[i] = strofreal(this.levels[i])
         }
         else {
@@ -72,8 +72,11 @@ void Variable::init_type() {
     if (var_type == "byte" | var_type == "int" | var_type == "long") {
         this.type = "int"
     }
-    else if (var_type == "float" | var_type == "double") {
+    else if (var_type == "float") {
         this.type = "float"
+    }
+    else if (var_type == "double") {
+        this.type = "double"
     }
     else if (substr(var_type, 1, 3) == "str") {
         this.type = "string"
@@ -99,7 +102,7 @@ void Variable::init_levels() {
     if (this.type == "int") {
         this.init_levels_int()
     }
-    else if (this.type == "float") {
+    else if (this.type == "float" | this.type == "double") {
         this.init_levels_float()
     }
     else if (this.type == "string") {
@@ -323,6 +326,25 @@ real scalar Variable::get_max() {
     }
     
     return(this.max)
+}
+
+real scalar Variable::get_type_nb() {
+    if (this.type == "int") {
+        return(1)
+    }
+    else if (this.type == "float") {
+        return(2)
+    }
+    else if (this.type == "double") {
+        return(3)
+    }
+    else if (this.type == "string") {
+        return(4)
+    }
+    else {
+        // TODO: improve error
+        exit(1)
+    }
 }
 end
 

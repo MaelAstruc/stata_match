@@ -81,7 +81,7 @@ class Pattern scalar function parse_pattern(
             exit(_error(3254))
         }
     }
-    else if (variable.type == "int" | variable.type == "float") {
+    else if (variable.type == "int" | variable.type == "float" | variable.type == "double") {
         if (tok == "_") {
             return(parse_wild(variable))
         }
@@ -185,7 +185,7 @@ class PRange scalar function parse_range(
 ) {
     class PRange scalar prange
     string scalar next
-    real scalar max, in_min, in_max
+    real scalar max, epsilon
     
     next = tokenget(t)
     
@@ -202,30 +202,64 @@ class PRange scalar function parse_range(
             exit(_error(3498))
         }
     }
-
+    
     if (symbole == "/") {
-        in_min = 1
-        in_max = 1
     }
     else if (symbole == "!/") {
-        in_min = 0
-        in_max = 1
+        min = min + get_epsilon(min, variable.get_type_nb())
     }
     else if (symbole == "/!") {
-        in_min = 1
-        in_max = 0
+        max = max - get_epsilon(max, variable.get_type_nb())
     }
     else if (symbole == "!!") {
-        in_min = 0
-        in_max = 0
+        min = min + get_epsilon(min, variable.get_type_nb())
+        max = max - get_epsilon(max, variable.get_type_nb())
     }
     else {
         "Unexpected symbole: " + symbole
     }
 
-    prange.define(min, max, in_min, in_max, variable.type == "int")
+    prange.define(min, max, variable.get_type_nb())
 
     return(prange)
+}
+
+// We to shift the epsilon depending on the precision of x in base 2
+real scalar get_epsilon(real scalar x, real scalar type_nb) {
+    real scalar epsilon, epsilon0, x_log2, epsilon_log2, epsilon0_log2
+    
+    // We define epsilon and epsilon0 depending on the type
+    //    epsilon  is the smallest 'e' such that x != x + e
+    //    epsilon0 is the smallest 'e' such that 0 != 0 + e
+    
+    if (type_nb == 1) {
+        return(1)
+    }
+    else if (type_nb == 2) {
+        epsilon = 1.0000000000000X-017
+        epsilon0 = 1.0000000000000X-07f
+    }
+    else if (type_nb == 3) {
+        epsilon = 1.0000000000000X-034
+        epsilon0 = 1.0000000000000X-3fe
+    }
+    else {
+        // TODO: improve error
+        exit(1)
+    }
+    
+    x_log2 = log(abs(x)) / log(2)
+    epsilon_log2 = log(abs(epsilon)) / log(2)
+    epsilon0_log2 = log(abs(epsilon0)) / log(2)
+
+    if (x_log2 <  epsilon0_log2 - epsilon_log2) {
+        // x is too close to zero, the epsilon will always be the minimum one
+        return(epsilon0)
+    }
+    else {
+        // epsilon needs to be shifted based on x value in base 2
+        return(epsilon * exp(floor(x_log2) * log(2)))
+    }
 }
 
 class POr scalar function parse_or(

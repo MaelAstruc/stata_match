@@ -88,9 +88,7 @@ class PRange extends Pattern {
     // Members
     real scalar min                                                             // Minimum value
     real scalar max                                                             // Maximum value
-    real scalar in_min                                                          // 1 if the minimum is included, 0 otherwize
-    real scalar in_max                                                          // 1 if the maximum is included, 0 otherwize
-    real scalar discrete                                                        // 1 if the variable is discrete, 0 otherwize
+    real scalar type_nb                                                         // 1 int, 2 float, 3 double
 
     // Pattern methods
     void define()
@@ -228,6 +226,7 @@ class Variable {
     void set_minmax()                                                           // Set min and max levels
     real scalar get_min()                                                       // Get minimum level
     real scalar get_max()                                                       // Get maximum level
+    real scalar get_type_nb()                                                   // Get type number
 }
 
 ///////////////////////////////////////////////////////////////////// Hash Table
@@ -774,6 +773,13 @@ void PWild::define(class Variable scalar variable) {
             this.push(pconstant)
         }
     }
+    else if (variable.type == "double") {
+        for (i = 1; i <= length(variable.levels); i++) {
+            pconstant = PConstant()
+            pconstant.define(variable.levels[i])
+            this.push(pconstant)
+        }
+    }
     else {
         errprintf(
             "Unexpected variable type for variable '%s': '%s'\n",
@@ -974,9 +980,7 @@ real scalar PConstant::includes_pconstant(class PConstant scalar pconstant) {
 real scalar PConstant::includes_prange(class PRange scalar prange) {
     return(
         this.value == prange.min
-        & prange.in_min == 1
         & this.value == prange.max
-        & prange.in_max == 1
     )
 }
 
@@ -1093,27 +1097,16 @@ void PRange::new() {}
 void PRange::define( ///
         real scalar min, ///
         real scalar max, ///
-        real scalar in_min, ///
-        real scalar in_max, ///
-        real scalar discrete ///
+        real scalar type_nb ///
 ) {
-    if (isbool(discrete)) {
-        this.discrete = discrete
+    if (isint(type_nb) & type_nb >= 1 & type_nb <= 3) {
+        this.type_nb = type_nb
     }
     else {
-        errprintf("Range discrete field should be 0 or 1\n")
+        errprintf("Range type number field should be 1, 2 or 3\n")
         exit(_error(3498))
     }
 
-    if (isbool(in_min) & isbool(in_max)) {
-        this.in_min = in_min
-        this.in_max = in_max
-    }
-    else {
-        errprintf("Range pattern min and max inclusion should be 0 or 1\n")
-        exit(_error(3498))
-    }
-    
     if (min == . | max == .) {
         errprintf("Range boundaries should be non-missing reals\n")
         exit(_error(3253))
@@ -1125,7 +1118,7 @@ void PRange::define( ///
     //     exit(_error(3498))
     // }
     
-    if (this.discrete == 1) {
+    if (this.type_nb == 1) {
         if (!isint(min) | !isint(max)) {
             errprintf("Range is discrete but boundaries are not integers\n")
             exit(_error(3498))
@@ -1137,14 +1130,7 @@ void PRange::define( ///
 }
 
 string scalar PRange::to_string() {
-    string scalar sym
-
-    if (in_min == 0 & in_max == 0) sym = "!!"
-    if (in_min == 0 & in_max == 1) sym = "!/"
-    if (in_min == 1 & in_max == 0) sym = "/!"
-    if (in_min == 1 & in_max == 1) sym = "/"
-
-    return(sprintf("%f%s%f", this.min, sym, this.max))
+    return(sprintf("%f/%f", this.min, this.max))
 }
 
 void PRange::print() {
@@ -1153,55 +1139,22 @@ void PRange::print() {
 }
 
 string scalar PRange::to_expr(string scalar variable) {
-    string scalar min_sym, max_sym
-
-    if (this.in_min == 1) {
-        min_sym = ">="
-    }
-    else {
-        min_sym = ">"
-    }
-
-    if (this.in_max == 1) {
-        max_sym = "<="
-    }
-    else {
-        max_sym = "<"
-    }
-
     return(sprintf(
-        "%s %s %21x & %s %s %21x",
-        variable, min_sym, this.min, variable, max_sym, this.max
+        "%s >= %21x & %s <= %21x",
+        variable, this.min, variable, this.max
     ))
 }
 
 transmorphic scalar PRange::compress() {
     class PConstant scalar pconstant
 
-    // Move boundaries if the range is discrete and they are not included
-    if (this.discrete == 1) {
-        if (this.in_min == 0) {
-            this.min = this.min + 1
-            this.in_min = 1
-        }
-        if (this.in_max == 0) {
-            this.max = this.max - 1
-            this.in_max = 1
-        }
-    }
-
     // The range can also be empty or a constant
     if (this.min > this.max) {
         return(PEmpty())
     }
     else if (this.min == this.max) {
-        if (this.in_min & this.in_max) {
-            pconstant.define(this.min)
-            return(pconstant)
-        }
-        else {
-            return(PEmpty())
-        }
+        pconstant.define(this.min)
+        return(pconstant)
     }
     else {
         return(this)
@@ -1283,34 +1236,22 @@ transmorphic scalar PRange::overlap_prange(class PRange scalar prange) {
     if (this.min > prange.max) return(PEmpty())
     if (this.max < prange.min) return(PEmpty())
 
-    inter_range.discrete = this.discrete
+    inter_range.type_nb = this.type_nb
 
     // Determine the minimum
-    if (this.min > prange.min) {
+    if (this.min >= prange.min) {
         inter_range.min = this.min
-        inter_range.in_min = this.in_min
-    }
-    else if (this.min == prange.min) {
-        inter_range.min = this.min
-        inter_range.in_min = this.in_min && prange.in_min
     }
     else {
         inter_range.min = prange.min
-        inter_range.in_min = prange.in_min
     }
 
     // Determine the maximum
-    if (this.max < prange.max) {
+    if (this.max <= prange.max) {
         inter_range.max = this.max
-        inter_range.in_max = this.in_max
-    }
-    else if (this.max == prange.max) {
-        inter_range.max = this.max
-        inter_range.in_max = this.in_max && prange.in_max
     }
     else {
         inter_range.max = prange.max
-        inter_range.in_max = prange.in_max
     }
 
     // Return the compressed version
@@ -1326,31 +1267,11 @@ real scalar PRange::includes_pwild(class PWild scalar pwild) {
 }
 
 real scalar PRange::includes_pconstant(class PConstant scalar pconstant) {
-    real scalar above_min, below_max, value
-    
-    value = pconstant.value
-
-    // The constant is above the minimum
-    above_min = value > this.min | (value == this.min & this.in_min)
-    below_max = value < this.max | (value == this.max & this.in_max)
-
-    return(above_min & below_max)
+    return(pconstant.value >= this.min & pconstant.value <= this.max)
 }
 
 real scalar PRange::includes_prange(class PRange scalar prange) {
-    real scalar above_min, below_max
-    
-    // The other min value is above the minimum
-    above_min = prange.min > this.min |
-        (prange.min == this.min & this.in_min == 1) |
-        (prange.min == this.min & this.in_min == 0 & prange.in_min == 0)
-
-    // The other max value is below the maximum
-    below_max = prange.max < this.max |
-        (prange.max == this.max & this.in_max == 1) |
-        (prange.max == this.max & this.in_max == 0 & prange.in_max == 0)
-
-    return(above_min & below_max)
+    return(prange.min >= this.min & prange.max <= this.max)
 }
 
 real scalar PRange::includes_por(class POr scalar por) {
@@ -1367,18 +1288,21 @@ real scalar PRange::includes_por(class POr scalar por) {
 pointer scalar PRange::difference_pconstant(class PConstant scalar pconstant) {
     class PRange scalar prange_1, prange_2
     class POr scalar pranges
+    real scalar new_min, new_max
     
     if (pconstant.value < this.min | pconstant.value > this.max) {
         return(&this)
     }
     
     if (pconstant.value != this.min) {
-        prange_1.define(this.min, pconstant.value, this.in_min, 0, this.discrete)
+        new_max = pconstant.value - get_epsilon(pconstant.value, this.type_nb)
+        prange_1.define(this.min, new_max, this.type_nb)
         pranges.push(&prange_1)
     }
     
     if (pconstant.value != this.max) {
-        prange_2.define(pconstant.value, this.max, 0, this.in_max, this.discrete)
+        new_min = pconstant.value + get_epsilon(pconstant.value, this.type_nb)
+        prange_2.define(new_min, this.max, this.type_nb)
         pranges.push(&prange_2)
     }
     
@@ -1387,57 +1311,30 @@ pointer scalar PRange::difference_pconstant(class PConstant scalar pconstant) {
 
 pointer scalar PRange::difference_prange(class PRange scalar prange) {
     class PRange scalar prange_1, prange_2
-    class PConstant scalar pconstant_min, pconstant_max
     class POr scalar result
-    real scalar new_in_min, new_in_max
+    real scalar new_min, new_max
     
     if (prange.max < this.min | prange.min > this.max) {
         return(&this)
     }
     
     // First half
-    if (prange.min < this.min) {
+    if (prange.min <= this.min) {
         // Nothing there is no first half
     }
-    if (prange.min == this.min) {
-        // Only possible value: the min if included in this but not in other
-        if (this.in_min & !prange.in_min) {
-            pconstant_min.define(this.min)
-            result.push(&pconstant_min)
-        }
-    }
     else {
-        if (prange.min == this.max) {
-            new_in_max = this.in_max & !prange.in_min
-        }
-        else {
-            new_in_max = !prange.in_min
-        }
-        
-        prange_1.define(this.min, prange.min, this.in_min, new_in_max, this.discrete)
+        new_max = prange.min - get_epsilon(prange.min, this.type_nb)
+        prange_1.define(this.min, new_max, this.type_nb)
         result.push(&prange_1)
     }
     
     // Second half
-    if (prange.max > this.max) {
+    if (prange.max >= this.max) {
         // Nothing there is no second half
     }
-    if (prange.max == this.max) {
-        // Only possible value: the max if included in this but not in other
-        if (this.in_max & !prange.in_max) {
-            pconstant_max.define(this.max)
-            result.push(&pconstant_max)
-        }
-    }
     else {
-        if (prange.max == this.min) {
-            new_in_min = this.in_min & !prange.in_max
-        }
-        else {
-            new_in_min = !prange.in_max
-        }
-        
-        prange_2.define(prange.max, this.max, new_in_min, this.in_max, this.discrete)
+        new_min = prange.max + get_epsilon(prange.max, this.type_nb)
+        prange_2.define(new_min, this.max, this.type_nb)
         result.push(&prange_2)
     }
     
@@ -1921,7 +1818,7 @@ string scalar Variable::to_string() {
     levels_str = J(1, length(this.levels), "")
 
     for (i = 1; i <= length(this.levels); i++) {
-        if (this.type == "int" | this.type == "float") {
+        if (this.type == "int" | this.type == "float" | this.type == "double") {
             levels_str[i] = strofreal(this.levels[i])
         }
         else {
@@ -1963,8 +1860,11 @@ void Variable::init_type() {
     if (var_type == "byte" | var_type == "int" | var_type == "long") {
         this.type = "int"
     }
-    else if (var_type == "float" | var_type == "double") {
+    else if (var_type == "float") {
         this.type = "float"
+    }
+    else if (var_type == "double") {
+        this.type = "double"
     }
     else if (substr(var_type, 1, 3) == "str") {
         this.type = "string"
@@ -1990,7 +1890,7 @@ void Variable::init_levels() {
     if (this.type == "int") {
         this.init_levels_int()
     }
-    else if (this.type == "float") {
+    else if (this.type == "float" | this.type == "double") {
         this.init_levels_float()
     }
     else if (this.type == "string") {
@@ -2214,6 +2114,25 @@ real scalar Variable::get_max() {
     }
     
     return(this.max)
+}
+
+real scalar Variable::get_type_nb() {
+    if (this.type == "int") {
+        return(1)
+    }
+    else if (this.type == "float") {
+        return(2)
+    }
+    else if (this.type == "double") {
+        return(3)
+    }
+    else if (this.type == "string") {
+        return(4)
+    }
+    else {
+        // TODO: improve error
+        exit(1)
+    }
 }
 end
 
@@ -2769,7 +2688,7 @@ class Pattern scalar function parse_pattern(
             exit(_error(3254))
         }
     }
-    else if (variable.type == "int" | variable.type == "float") {
+    else if (variable.type == "int" | variable.type == "float" | variable.type == "double") {
         if (tok == "_") {
             return(parse_wild(variable))
         }
@@ -2873,7 +2792,7 @@ class PRange scalar function parse_range(
 ) {
     class PRange scalar prange
     string scalar next
-    real scalar max, in_min, in_max
+    real scalar max, epsilon
     
     next = tokenget(t)
     
@@ -2890,30 +2809,64 @@ class PRange scalar function parse_range(
             exit(_error(3498))
         }
     }
-
+    
     if (symbole == "/") {
-        in_min = 1
-        in_max = 1
     }
     else if (symbole == "!/") {
-        in_min = 0
-        in_max = 1
+        min = min + get_epsilon(min, variable.get_type_nb())
     }
     else if (symbole == "/!") {
-        in_min = 1
-        in_max = 0
+        max = max - get_epsilon(max, variable.get_type_nb())
     }
     else if (symbole == "!!") {
-        in_min = 0
-        in_max = 0
+        min = min + get_epsilon(min, variable.get_type_nb())
+        max = max - get_epsilon(max, variable.get_type_nb())
     }
     else {
         "Unexpected symbole: " + symbole
     }
 
-    prange.define(min, max, in_min, in_max, variable.type == "int")
+    prange.define(min, max, variable.get_type_nb())
 
     return(prange)
+}
+
+// We to shift the epsilon depending on the precision of x in base 2
+real scalar get_epsilon(real scalar x, real scalar type_nb) {
+    real scalar epsilon, epsilon0, x_log2, epsilon_log2, epsilon0_log2
+    
+    // We define epsilon and epsilon0 depending on the type
+    //    epsilon  is the smallest 'e' such that x != x + e
+    //    epsilon0 is the smallest 'e' such that 0 != 0 + e
+    
+    if (type_nb == 1) {
+        return(1)
+    }
+    else if (type_nb == 2) {
+        epsilon = 1.0000000000000X-017
+        epsilon0 = 1.0000000000000X-07f
+    }
+    else if (type_nb == 3) {
+        epsilon = 1.0000000000000X-034
+        epsilon0 = 1.0000000000000X-3fe
+    }
+    else {
+        // TODO: improve error
+        exit(1)
+    }
+    
+    x_log2 = log(abs(x)) / log(2)
+    epsilon_log2 = log(abs(epsilon)) / log(2)
+    epsilon0_log2 = log(abs(epsilon0)) / log(2)
+
+    if (x_log2 <  epsilon0_log2 - epsilon_log2) {
+        // x is too close to zero, the epsilon will always be the minimum one
+        return(epsilon0)
+    }
+    else {
+        // epsilon needs to be shifted based on x value in base 2
+        return(epsilon * exp(floor(x_log2) * log(2)))
+    }
 }
 
 class POr scalar function parse_or(
