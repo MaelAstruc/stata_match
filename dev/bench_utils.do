@@ -171,7 +171,9 @@ program compare_num
     clear
     set obs `obs'
     gen `type' x = mod(_n, `levels') + 1
-    bsample
+    gen random = rnormal()
+    sort random
+    drop random
     if ("`nobench'" == "") mata: bench_off("build data")
     
     // Run base commands
@@ -215,14 +217,19 @@ end
 program compare_str
     syntax, OBS(integer) LEVELS(integer) [NOCHECK NOBENCH]
     
-    local n = (`levels' / 10)
+    local n = floor(`levels' / 10) - 1
     
     // Prepare data
     if ("`nobench'" == "") mata: bench_on("build data")
     clear
     set obs `obs'
     gen x = string(mod(_n, `levels') + 1)
-    bsample
+    forvalues i = 1/9 {
+        replace x = "0`i'" if x == "`i'"
+    }
+    gen random = rnormal()
+    sort random
+    drop random
     if ("`nobench'" == "") mata: bench_off("build data")
     
     // Run base commands

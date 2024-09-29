@@ -50,12 +50,6 @@ function test_pconstant_to_string() {
     
     pconstant.value = .
     test_result("Test PConstant::to_string(): missing real", pconstant.to_string(), ".")
-    
-    pconstant.value = "a"
-    test_result("Test PConstant::to_string(): string", pconstant.to_string(), "a")
-    
-    pconstant.value = ""
-    test_result("Test PConstant::to_string(): missing string", pconstant.to_string(), "")
 }
 
 // PRange
@@ -189,13 +183,8 @@ function test_pconstant_define() {
     pconstant.define(.)
     test_result("Test PConstant::define(): missing real", pconstant.to_string(), ".")
     
-    pconstant.define("a")
-    test_result("Test PConstant::define(): string", pconstant.to_string(), "a")
-    
-    pconstant.define("")
-    test_result("Test PConstant::define(): missing string", pconstant.to_string(), "")
-    
-    // TODO: test error with non real or string value
+    pconstant.define(.a)
+    test_result("Test PConstant::define(): missing real .a", pconstant.to_string(), ".a")
 }
 
 // PRange
@@ -1240,58 +1229,63 @@ function test_por_difference() {
 
 function test_pempty_to_expr() {
     class PEmpty scalar pempty
-    string scalar var_name
+    class Variable scalar variable
 
-    var_name = "test_var"
+    variable.name = "test_var"
 
     pempty = PEmpty()
 
-    test_result("Test PEmpty::to_expr()", pempty.to_expr(var_name), "")
+    test_result("Test PEmpty::to_expr()", pempty.to_expr(variable), "")
 }
 
 // PWild
 
 function test_pwild_to_expr() {
     class PWild scalar pwild
-    string scalar var_name
+    class Variable scalar variable
 
-    var_name = "test_var"
+    variable.name = "test_var"
 
     pwild = PWild()
 
-    test_result("Test PWild::to_expr()", pwild.to_expr(var_name), "1")
+    test_result("Test PWild::to_expr()", pwild.to_expr(variable), "1")
 }
 
 // PConstant
 
 function test_pconstant_to_expr() {
     class PConstant scalar pconstant
-    string scalar var_name
+    class Variable scalar variable
 
-    var_name = "test_var"
+    variable.name  = "test_var"
+    variable.type  = "int"
+    variable.check = 0
+    variable.levels_len = 0
 
     pconstant = PConstant()
     pconstant.value = 1
 
-    test_result("Test PConstant::to_expr() real", pconstant.to_expr(var_name), "test_var == `one_21x'")
+    test_result("Test PConstant::to_expr() real", pconstant.to_expr(variable), "test_var == `one_21x'")
 
-    pconstant.value = `""a""'
+    variable.type = "string"
+    pconstant.value = variable.get_level_index(`""a""')
 
-    test_result("Test PConstant::to_expr() string", pconstant.to_expr(var_name), `"test_var == "a""')
+    test_result("Test PConstant::to_expr() string", pconstant.to_expr(variable), `"test_var == "a""')
 }
 
 // PRange
 
 function test_prange_to_expr() {
     class PRange scalar prange
-    string scalar var_name
+    class Variable scalar variable
 
-    var_name = "test_var"
+    variable.name = "test_var"
+    variable.type = "int"
     
     prange = PRange()
 
     prange.define(0, 2, 1)
-    test_result("Test PRange::to_expr() [0, 2]", prange.to_expr(var_name), "test_var >= `zero_21x' & test_var <= `two_21x'")
+    test_result("Test PRange::to_expr() [0, 2]", prange.to_expr(variable), "test_var >= `zero_21x' & test_var <= `two_21x'")
 }
 
 // POr
@@ -1300,27 +1294,28 @@ function test_por_to_expr() {
     class POr scalar por
     class PConstant scalar pconstant
     class PRange scalar prange
-    string scalar var_name
+    class Variable scalar variable
 
-    var_name = "test_var"
+    variable.name = "test_var"
+    variable.type = "int"
 
     por = POr()
 
-    test_result("Test POr::to_expr() empty", por.to_expr(var_name), "")
+    test_result("Test POr::to_expr() empty", por.to_expr(variable), "")
 
     pconstant = PConstant()
     pconstant.value = 1
 
     por.push(pconstant)
 
-    test_result("Test POr::to_expr()", por.to_expr(var_name), "test_var == `one_21x'")
+    test_result("Test POr::to_expr()", por.to_expr(variable), "test_var == `one_21x'")
 
     prange = PRange()
     prange.define(2, 3, 1)
 
     por.push(prange)
 
-    test_result("Test POr::to_expr()", por.to_expr(var_name), "(test_var == `one_21x') | (test_var >= `two_21x' & test_var <= `three_21x')")
+    test_result("Test POr::to_expr()", por.to_expr(variable), "(test_var == `one_21x') | (test_var >= `two_21x' & test_var <= `three_21x')")
 }
 
 // Tuple
@@ -1345,6 +1340,7 @@ function test_ptuple_to_expr() {
 
     variables = Variable(1)
     variables[1].name = "test_var_1"
+    variables[1].type = "int"
 
     test_result("Test Tuple::to_expr(): one element", tuple_1.to_expr(variables), "test_var_1 == `one_21x'")
 
@@ -1361,7 +1357,9 @@ function test_ptuple_to_expr() {
 
     variables = Variable(2)
     variables[1].name = "test_var_1"
+    variables[1].type = "int"
     variables[2].name = "test_var_2"
+    variables[2].type = "int"
 
     test_result("Test Tuple::to_expr(): two elements", tuple_1.to_expr(variables), "(test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x')")
 
@@ -1379,7 +1377,9 @@ function test_ptuple_to_expr() {
 
     variables = Variable(2)
     variables[1].name = "test_var_1"
+    variables[1].type = "int"
     variables[2].name = "test_var_2"
+    variables[2].type = "int"
 
     test_result("Test Tuple::to_expr(): wildcard", tuple_1.to_expr(variables), "(test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')")
 
@@ -1395,7 +1395,9 @@ function test_ptuple_to_expr() {
     
     variables = Variable(2)
     variables[1].name = "test_var_1"
+    variables[1].type = "int"
     variables[2].name = "test_var_2"
+    variables[2].type = "int"
     
     test_result("Test Tuple::to_expr(): POr of tuples", por_2.to_expr(variables), "((test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')) | ((test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x'))")
 }

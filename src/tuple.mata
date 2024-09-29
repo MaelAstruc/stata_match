@@ -58,7 +58,7 @@ string scalar Tuple::to_expr(class Variable vector variables) {
         pattern = pattern.compress()
         if (classname(pattern) != "PWild" & classname(pattern) != "PEmpty") {
             k++
-            exprs[k] = pattern.to_expr(variables[i].name)
+            exprs[k] = pattern.to_expr(variables[i])
         }
     }
     

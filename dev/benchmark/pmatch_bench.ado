@@ -1,4 +1,4 @@
-*! version 0.0.10  24 Sep 2024
+*! version 0.0.11  29 Sep 2024
 
 **#************************************************************ src/declare.mata
 
@@ -63,7 +63,7 @@ class PWild extends Pattern {
 // Constant
 class PConstant extends Pattern {
     // Members
-    transmorphic scalar value                                                   // The value (real or string)
+    real scalar value                                                           // The value (real or string index)
 
     // Pattern methods
     void define()
@@ -203,8 +203,10 @@ class Variable {
     string scalar stata_type                                                    // Stata type of the variable
     string scalar type                                                          // Internal type of the variable
     transmorphic rowvector levels                                               // The corresponding sorted vector of levels
+    real scalar levels_len                                                      // Number of levels
     private real scalar min
     private real scalar max
+    real scalar check                                                           // Is the variable checked
 
     void new()
     string scalar to_string()
@@ -223,6 +225,7 @@ class Variable {
     void init_levels_hash()
     real scalar should_tab()
     void quote_levels()
+    real scalar get_level_index()                                               // Retrieve index of level
     void set_minmax()                                                           // Set min and max levels
     real scalar get_min()                                                       // Get minimum level
     real scalar get_max()                                                       // Get maximum level
@@ -671,7 +674,7 @@ void PEmpty::print() {
     printf("%s\n", this.to_string())
 }
 
-string scalar PEmpty::to_expr(string scalar variable) {
+string scalar PEmpty::to_expr(class Variable scalar variable) {
     return("")
 }
 
@@ -745,7 +748,7 @@ void PWild::new() {}
 
 void PWild::define(class Variable scalar variable) { 
     class PConstant scalar pconstant
-    real scalar i
+    real scalar i, index
 
     if (length(variable.levels) == 0) {
         this.push(PEmpty())
@@ -755,7 +758,7 @@ void PWild::define(class Variable scalar variable) {
     if (variable.type == "string") {
         for (i = 1; i <= length(variable.levels); i++) {
             pconstant = PConstant()
-            pconstant.define(variable.levels[i])
+            pconstant.define(i)
             this.push(pconstant)
         }
     }
@@ -813,7 +816,7 @@ void PWild::print(| real scalar all) {
     printf("%s\n", this.to_string(all))
 }
 
-string scalar PWild::to_expr(string scalar variable) {
+string scalar PWild::to_expr(class Variable scalar variable) {
     return("1")
 }
 
@@ -897,35 +900,20 @@ difference :
 
 void PConstant::new() {}
 
-void PConstant::define(transmorphic scalar value) {
-    if (isreal(value) | isstring(value)) {
-        this.value = value
-    }
-    else {
-        errprintf("Constant pattern value should be real or string")
-        error(_error(3254))
-    }
+void PConstant::define(real scalar value) {
+    this.value = value
 }
 
 string scalar PConstant::to_string() {
-    if (isstring(this.value)) {
-        return(this.value)
-    }
-    else if (isreal(this.value)) {
-        return(strofreal(this.value))
-    }
-    else {
-        errprintf("Constant pattern value should be real or string")
-        error(_error(3254))
-    }
+    return(strofreal(this.value))
 }
 
-string scalar PConstant::to_expr(string scalar variable) {
-    if (isreal(this.value)) {
-        return(sprintf("%s == %21x", variable, this.value))
+string scalar PConstant::to_expr(class Variable scalar variable) {
+    if (variable.type == "string") {
+        return(sprintf("%s == %s", variable.name, variable.levels[this.value]))
     }
     else {
-        return(sprintf("%s == %s", variable, this.value))
+        return(sprintf("%s == %21x", variable.name, this.value))
     }
 }
 
@@ -1138,10 +1126,10 @@ void PRange::print() {
     printf("%s\n", this.to_string())
 }
 
-string scalar PRange::to_expr(string scalar variable) {
+string scalar PRange::to_expr(class Variable scalar variable) {
     return(sprintf(
         "%s >= %21x & %s <= %21x",
-        variable, this.min, variable, this.max
+        variable.name, this.min, variable.name, this.max
     ))
 }
 
@@ -1842,13 +1830,13 @@ void Variable::print() {
 
 void Variable::init(string scalar variable, real scalar check) {
     this.name = variable
+    this.levels_len = 0
     this.min = .a
     this.max = .a
+    this.check = check
     
     this.init_type()
-    if (check) {
-        this.init_levels()
-    }
+    this.init_levels()
 }
 
 void Variable::init_type() {
@@ -1887,6 +1875,10 @@ local N_MATA_HASH 100000
 
 mata
 void Variable::init_levels() {
+    if (this.check == 0) {
+        return
+    }
+    
     if (this.type == "int") {
         this.init_levels_int()
     }
@@ -1903,6 +1895,8 @@ void Variable::init_levels() {
         )
         exit(_error(3256))
     }
+    
+    this.levels_len = length(this.levels)
 }
 
 void Variable::init_levels_int() {
@@ -2083,12 +2077,60 @@ void Variable::quote_levels() {
     }
 }
 
+real scalar Variable::get_level_index(transmorphic scalar level) {
+    real scalar index
+    
+    if (this.check == 1) {
+        index = binary_search(&this.levels, level)
+    }
+    else {
+        if (this.levels_len == 0) {
+            this.levels = J(1, 64, missingof(level))
+        }
+        
+        if (this.levels_len == length(this.levels)) {
+            this.levels = this.levels, J(1, length(this.levels), missingof(level))
+        }
+        
+        this.levels_len = this.levels_len + 1
+        this.levels[this.levels_len] = level
+        index = this.levels_len
+    }
+    
+    return(index)
+}
+
+real scalar function binary_search(pointer(transmorphic vector) vec, transmorphic scalar value) {
+    real scalar left, right, i
+    transmorphic scalar val
+    
+    left = 1
+    right = length(*vec)
+    
+    while (left <= right) {
+        i = floor((left + right) / 2)
+        val = (*vec)[i]
+        
+        if (value == val) {
+            return(i)
+        }
+        else if (value < val) {
+            right = i - 1
+        }
+        else {
+            left = i + 1
+        }
+    }
+    
+    return(0)
+}
+
 void Variable::set_minmax() {
     real vector x_num, minmax
     
     minmax = minmax(x_num)
     
-    if (length(this.levels) == 0) {
+    if (this.check == 0) {
         st_view(x_num = ., ., this.name)
         minmax = minmax(x_num)
     }
@@ -2208,7 +2250,7 @@ string scalar Tuple::to_expr(class Variable vector variables) {
         pattern = pattern.compress()
         if (classname(pattern) != "PWild" & classname(pattern) != "PEmpty") {
             k++
-            exprs[k] = pattern.to_expr(variables[i].name)
+            exprs[k] = pattern.to_expr(variables[i])
         }
     }
     
@@ -2578,7 +2620,7 @@ void function eval_arms(
         }
         
         if (length(variables) == 1) {
-            condition = pattern.to_expr(variables[1].name)
+            condition = pattern.to_expr(variables[1])
         }
         else {
             condition = pattern.to_expr(variables)
@@ -2631,7 +2673,12 @@ class Arm vector function parse_arms (
 
     while (tokenpeek(t) != "") {
         arm = parse_arm(t, ++i, variables)
-        arms = arms, arm
+        if (classname(*arm.lhs.pattern) == "PEmpty") {
+            errprintf("Arm %f is considered empty\n", i)
+        }
+        else {
+            arms = arms, arm
+        }
     }
 
     return(arms)
@@ -2678,7 +2725,14 @@ class Pattern scalar function parse_pattern(
             return(parse_wild(variable))
         }
         else if (isquoted(tok)) {
-            return(parse_constant(tok))
+            number = variable.get_level_index(tok)
+            if (number == 0) {
+                errprintf("Unknown level : %s\n", tok)
+                return(PEmpty())
+            }
+            else {
+                return(parse_constant(number))
+            }
         }
         else {
             errprintf(
@@ -2777,9 +2831,7 @@ class PEmpty scalar function parse_empty() {
 
 class PConstant scalar function parse_constant(transmorphic scalar value) {
     class PConstant scalar pconstant
-
     pconstant.define(value)
-
     return(pconstant)
 }
 

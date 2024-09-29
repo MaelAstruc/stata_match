@@ -51,7 +51,7 @@ void function eval_arms(
         }
         
         if (length(variables) == 1) {
-            condition = pattern.to_expr(variables[1].name)
+            condition = pattern.to_expr(variables[1])
         }
         else {
             condition = pattern.to_expr(variables)

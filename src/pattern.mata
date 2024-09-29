@@ -134,7 +134,7 @@ void PEmpty::print() {
     printf("%s\n", this.to_string())
 }
 
-string scalar PEmpty::to_expr(string scalar variable) {
+string scalar PEmpty::to_expr(class Variable scalar variable) {
     return("")
 }
 
@@ -208,7 +208,7 @@ void PWild::new() {}
 
 void PWild::define(class Variable scalar variable) { 
     class PConstant scalar pconstant
-    real scalar i
+    real scalar i, index
 
     if (length(variable.levels) == 0) {
         this.push(PEmpty())
@@ -218,7 +218,7 @@ void PWild::define(class Variable scalar variable) {
     if (variable.type == "string") {
         for (i = 1; i <= length(variable.levels); i++) {
             pconstant = PConstant()
-            pconstant.define(variable.levels[i])
+            pconstant.define(i)
             this.push(pconstant)
         }
     }
@@ -276,7 +276,7 @@ void PWild::print(| real scalar all) {
     printf("%s\n", this.to_string(all))
 }
 
-string scalar PWild::to_expr(string scalar variable) {
+string scalar PWild::to_expr(class Variable scalar variable) {
     return("1")
 }
 
@@ -360,35 +360,20 @@ difference :
 
 void PConstant::new() {}
 
-void PConstant::define(transmorphic scalar value) {
-    if (isreal(value) | isstring(value)) {
-        this.value = value
-    }
-    else {
-        errprintf("Constant pattern value should be real or string")
-        error(_error(3254))
-    }
+void PConstant::define(real scalar value) {
+    this.value = value
 }
 
 string scalar PConstant::to_string() {
-    if (isstring(this.value)) {
-        return(this.value)
-    }
-    else if (isreal(this.value)) {
-        return(strofreal(this.value))
-    }
-    else {
-        errprintf("Constant pattern value should be real or string")
-        error(_error(3254))
-    }
+    return(strofreal(this.value))
 }
 
-string scalar PConstant::to_expr(string scalar variable) {
-    if (isreal(this.value)) {
-        return(sprintf("%s == %21x", variable, this.value))
+string scalar PConstant::to_expr(class Variable scalar variable) {
+    if (variable.type == "string") {
+        return(sprintf("%s == %s", variable.name, variable.levels[this.value]))
     }
     else {
-        return(sprintf("%s == %s", variable, this.value))
+        return(sprintf("%s == %21x", variable.name, this.value))
     }
 }
 
@@ -601,10 +586,10 @@ void PRange::print() {
     printf("%s\n", this.to_string())
 }
 
-string scalar PRange::to_expr(string scalar variable) {
+string scalar PRange::to_expr(class Variable scalar variable) {
     return(sprintf(
         "%s >= %21x & %s <= %21x",
-        variable, this.min, variable, this.max
+        variable.name, this.min, variable.name, this.max
     ))
 }
 

@@ -54,13 +54,13 @@ void Variable::print() {
 
 void Variable::init(string scalar variable, real scalar check) {
     this.name = variable
+    this.levels_len = 0
     this.min = .a
     this.max = .a
+    this.check = check
     
     this.init_type()
-    if (check) {
-        this.init_levels()
-    }
+    this.init_levels()
 }
 
 void Variable::init_type() {
@@ -99,6 +99,10 @@ local N_MATA_HASH 100000
 
 mata
 void Variable::init_levels() {
+    if (this.check == 0) {
+        return
+    }
+    
     if (this.type == "int") {
         this.init_levels_int()
     }
@@ -115,6 +119,8 @@ void Variable::init_levels() {
         )
         exit(_error(3256))
     }
+    
+    this.levels_len = length(this.levels)
 }
 
 void Variable::init_levels_int() {
@@ -295,12 +301,60 @@ void Variable::quote_levels() {
     }
 }
 
+real scalar Variable::get_level_index(transmorphic scalar level) {
+    real scalar index
+    
+    if (this.check == 1) {
+        index = binary_search(&this.levels, level)
+    }
+    else {
+        if (this.levels_len == 0) {
+            this.levels = J(1, 64, missingof(level))
+        }
+        
+        if (this.levels_len == length(this.levels)) {
+            this.levels = this.levels, J(1, length(this.levels), missingof(level))
+        }
+        
+        this.levels_len = this.levels_len + 1
+        this.levels[this.levels_len] = level
+        index = this.levels_len
+    }
+    
+    return(index)
+}
+
+real scalar function binary_search(pointer(transmorphic vector) vec, transmorphic scalar value) {
+    real scalar left, right, i
+    transmorphic scalar val
+    
+    left = 1
+    right = length(*vec)
+    
+    while (left <= right) {
+        i = floor((left + right) / 2)
+        val = (*vec)[i]
+        
+        if (value == val) {
+            return(i)
+        }
+        else if (value < val) {
+            right = i - 1
+        }
+        else {
+            left = i + 1
+        }
+    }
+    
+    return(0)
+}
+
 void Variable::set_minmax() {
     real vector x_num, minmax
     
     minmax = minmax(x_num)
     
-    if (length(this.levels) == 0) {
+    if (this.check == 0) {
         st_view(x_num = ., ., this.name)
         minmax = minmax(x_num)
     }

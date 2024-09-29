@@ -24,7 +24,12 @@ class Arm vector function parse_arms (
 
     while (tokenpeek(t) != "") {
         arm = parse_arm(t, ++i, variables)
-        arms = arms, arm
+        if (classname(*arm.lhs.pattern) == "PEmpty") {
+            errprintf("Arm %f is considered empty\n", i)
+        }
+        else {
+            arms = arms, arm
+        }
     }
 
     return(arms)
@@ -71,7 +76,14 @@ class Pattern scalar function parse_pattern(
             return(parse_wild(variable))
         }
         else if (isquoted(tok)) {
-            return(parse_constant(tok))
+            number = variable.get_level_index(tok)
+            if (number == 0) {
+                errprintf("Unknown level : %s\n", tok)
+                return(PEmpty())
+            }
+            else {
+                return(parse_constant(number))
+            }
         }
         else {
             errprintf(
@@ -170,9 +182,7 @@ class PEmpty scalar function parse_empty() {
 
 class PConstant scalar function parse_constant(transmorphic scalar value) {
     class PConstant scalar pconstant
-
     pconstant.define(value)
-
     return(pconstant)
 }
 

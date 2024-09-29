@@ -59,7 +59,7 @@ class PWild extends Pattern {
 // Constant
 class PConstant extends Pattern {
     // Members
-    transmorphic scalar value                                                   // The value (real or string)
+    real scalar value                                                           // The value (real or string index)
 
     // Pattern methods
     void define()
@@ -199,8 +199,10 @@ class Variable {
     string scalar stata_type                                                    // Stata type of the variable
     string scalar type                                                          // Internal type of the variable
     transmorphic rowvector levels                                               // The corresponding sorted vector of levels
+    real scalar levels_len                                                      // Number of levels
     private real scalar min
     private real scalar max
+    real scalar check                                                           // Is the variable checked
 
     void new()
     string scalar to_string()
@@ -219,6 +221,7 @@ class Variable {
     void init_levels_hash()
     real scalar should_tab()
     void quote_levels()
+    real scalar get_level_index()                                               // Retrieve index of level
     void set_minmax()                                                           // Set min and max levels
     real scalar get_min()                                                       // Get minimum level
     real scalar get_max()                                                       // Get maximum level
