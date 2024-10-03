@@ -12,10 +12,15 @@ BENCH_NAMES = (
     "parse",
     "check",
     "- usefulness",
+    "  - is_useful() 1",
     "- combine",
     "- exhaustiveness",
+    "  - is_useful() 2",
     "- compress",
     "- print",
+    "+ Overlap()",
+    "+ Difference()",
+    "+ Compress()",
     "eval",
     "total"
 )

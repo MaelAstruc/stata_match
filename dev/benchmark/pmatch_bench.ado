@@ -3318,7 +3318,9 @@ function check_useful(class Arm vector arms) {
 
     // Check that each arm is useful compared to previous useful arms
     for (i = 1; i <= n_arms; i++) {
+        bench_on("  - is_useful() 1")
         usefulness = is_useful(arms[i], useful_arms)
+        bench_off("  - is_useful() 1")
         usefulness.arm_id = i
         usefulness.has_wildcard = arms[i].has_wildcard
 
@@ -3369,17 +3371,23 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
         ref_arm = useful_arms[i]
 
         overlaps[i].arm_id = ref_arm.id
+        bench_on("+ Overlap()")
         overlaps[i].pattern = &tuple_pattern.overlap(*ref_arm.lhs.pattern)
+        bench_off("+ Overlap()")
 
         if (classname(*overlaps[i].pattern) != "PEmpty") {
             differences_pattern = differences
+            bench_on("+ Difference()")
             differences = *differences_pattern.difference(*overlaps[i].pattern)
+            bench_off("+ Difference()")
         }
     }
 
     k = 0
     for (i = 1; i <= length(overlaps); i++) {
+        bench_on("+ Compress()")
         overlaps[i].pattern = get_and_compress(overlaps, i)
+        bench_off("+ Compress()")
         if (classname(*overlaps[i].pattern) != "PEmpty") {
             k++
             // Copy member by member
@@ -3458,7 +3466,9 @@ class Tuple vector function check_exhaustiveness( ///
         wild_arm.lhs.pattern = &tuple
     }
 
+    bench_on("  - is_useful() 2")
     usefulness = is_useful(wild_arm, arms)
+    bench_off("  - is_useful() 2")
 
     return(*usefulness.differences)
 }
