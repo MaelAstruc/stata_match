@@ -157,7 +157,7 @@ transmorphic scalar Tuple::overlap_tuple(class Tuple scalar tuple) {
         tuple_overlap.patterns[i] = &pattern_i.overlap(*tuple.patterns[i])
     }
 
-    return(tuple_overlap.compress())
+    return(tuple_overlap)
 }
 
 transmorphic scalar Tuple::overlap_por(class POr scalar por) {

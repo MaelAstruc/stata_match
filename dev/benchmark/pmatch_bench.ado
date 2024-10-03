@@ -1,4 +1,4 @@
-*! version 0.0.11  29 Sep 2024
+*! version 0.0.12  03 Oct 2024
 
 **#************************************************************ src/declare.mata
 
@@ -1225,22 +1225,8 @@ transmorphic scalar PRange::overlap_prange(class PRange scalar prange) {
     if (this.max < prange.min) return(PEmpty())
 
     inter_range.type_nb = this.type_nb
-
-    // Determine the minimum
-    if (this.min >= prange.min) {
-        inter_range.min = this.min
-    }
-    else {
-        inter_range.min = prange.min
-    }
-
-    // Determine the maximum
-    if (this.max <= prange.max) {
-        inter_range.max = this.max
-    }
-    else {
-        inter_range.max = prange.max
-    }
+    inter_range.min = max((this.min, prange.min))
+    inter_range.max = min((this.max, prange.max))
 
     // Return the compressed version
     return(inter_range.compress())
@@ -1454,15 +1440,32 @@ void POr::print() {
 
 transmorphic scalar POr::overlap(class Pattern scalar pattern) {
     class POr scalar por
-    class Pattern scalar pattern_i
+    class Pattern scalar pattern_i, overlap_i
     real scalar i
 
     for (i = 1; i <= this.len(); i++) {
         pattern_i = this.get_pat(i)
-        por.push(pattern_i.overlap(pattern))
+        overlap_i = pattern_i.overlap(pattern)
+        if (classname(overlap_i) == "PEmpty") {
+            continue
+        }
+        else if (classname(overlap_i) == "PWild") {
+            return(overlap_i)
+        }
+        else {
+            por.push(overlap_i)
+        }
     }
     
-    return(por.compress())
+    if (por.len() == 0) {
+        return(PEmpty())
+    }
+    if (por.len() == 1) {
+        return(por.get_pat(1))
+    }
+    else {
+        return(por)
+    }
 }
 
 real scalar POr::includes(transmorphic scalar pattern) {
@@ -2349,7 +2352,7 @@ transmorphic scalar Tuple::overlap_tuple(class Tuple scalar tuple) {
         tuple_overlap.patterns[i] = &pattern_i.overlap(*tuple.patterns[i])
     }
 
-    return(tuple_overlap.compress())
+    return(tuple_overlap)
 }
 
 transmorphic scalar Tuple::overlap_por(class POr scalar por) {
