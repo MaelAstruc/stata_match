@@ -532,7 +532,7 @@ pmatch y2, nocheck v(x1) b( ///
     _      = "d"   ///
 )
 
-test_variables, expected(y1) result(y2) test("End to end: without checks")
+test_variables, expected(y1) result(y2) test("End to end: without checks int")
 
 /////////////////////////////////////////////////////////// Without checks float
 
@@ -554,7 +554,7 @@ pmatch y2, nocheck v(x1) b( ///
     _      = "d"   ///
 )
 
-test_variables, expected(y1) result(y2) test("End to end: without checks")
+test_variables, expected(y1) result(y2) test("End to end: without checks float")
 
 ////////////////////////////////////////////////////////// Without checks string
 
@@ -572,11 +572,11 @@ replace y1 = "c" if x1 == "5" | x1 == "6"
 pmatch y2, nocheck v(x1) b( ///
     "1"        = "a",  ///
     "2" | "3"  = "b",  ///
-    "5" | "6"  = "c",  ///
+    "5" | "5" | "6"  = "c",  ///
     _          = "d"   ///
 )
 
-test_variables, expected(y1) result(y2) test("End to end: without checks")
+test_variables, expected(y1) result(y2) test("End to end: without checks string")
 
 //////////////////////////////////////////////////////////// Match labeled value
 

@@ -2,13 +2,21 @@ mata
 
 class Arm vector function parse_string(
         string scalar str,
-        class Variable vector variables
-    ) {
+        class Variable vector variables,
+        real scalar check
+) {
+    class Arm vector arms
     pointer scalar t
 
     t = tokenize(str)
 
-    return(parse_arms(t, variables))
+    arms = parse_arms(t, variables)
+    
+    if (check == 0) {
+        reorder_levels(arms, variables)
+    }
+    
+    return(arms)
 }
 
 class Arm vector function parse_arms (
@@ -465,4 +473,133 @@ real scalar function check_wildcard_tuple(class Tuple scalar tuple) {
     return(0)
 }
 
+void function reorder_levels(
+    class Arm vector arms,
+    class Variable vector variables
+) {
+    real scalar i
+    pointer(real colvector) vector tables
+    
+    tables = J(1, length(variables), NULL)
+    
+    // Get a list of vector to recast indices
+    for (i = 1; i <= length(variables); i++) {
+        if (variables[i].type == "string") {
+            tables[i] = &variables[i].reorder_levels()
+        }
+    }
+    
+    if (tables != J(1, length(variables), NULL)) {
+        reindex_levels_arms(arms, tables)
+    }
+}
+
+void function reindex_levels_arms(
+    class Arm vector arms,
+    pointer(real colvector) vector tables
+) {
+    real scalar i
+    
+    // Get a list of vector to recast indices
+    for (i = 1; i < length(arms); i++) {
+        reindex_levels_arm(arms[i], tables)
+    }
+}
+
+void function reindex_levels_arm(
+    class Arm scalar arm,
+    pointer(real colvector) vector tables
+) {
+    reindex_levels_pattern(*arm.lhs.pattern, tables)
+}
+
+void function reindex_levels_pattern(
+    transmorphic scalar pattern,
+    pointer(real colvector) vector tables
+) {
+    if (classname(pattern) == "PEmpty") {
+        // Nothing
+    }
+    else if (classname(pattern) == "PWild") {
+        reindex_levels_pwild(pattern, tables)
+    }
+    else if (classname(pattern) == "PConstant") {
+        reindex_levels_pconstant(pattern, tables)
+    }
+    else if (classname(pattern) == "PRange") {
+        reindex_levels_prange(pattern, tables)
+    }
+    else if (classname(pattern) == "POr") {
+        reindex_levels_por(pattern, tables)
+    }
+    else if (classname(pattern) == "Tuple") {
+        reindex_levels_tuple(pattern, tables)
+    }
+    else {
+        // TODO: improve error
+        exit(1)
+    }
+}
+
+void function reindex_levels_pwild(
+    class PWild scalar pwild,
+    pointer(real colvector) vector tables
+) {
+    reindex_levels_por(pwild.values, tables)
+}
+
+void function reindex_levels_pconstant(
+    class PConstant scalar pconstant,
+    pointer(real colvector) scalar tables
+) {
+    if (tables != NULL) {
+        pconstant.value = (*tables)[pconstant.value]
+    }
+}
+
+void function reindex_levels_prange(
+    class PRange scalar prange,
+    pointer(real colvector) scalar tables
+) {
+    if (tables != NULL) {
+        prange.min = (*tables)[prange.min]
+        prange.max = (*tables)[prange.max]
+    }
+}
+
+void function reindex_levels_patternlist(
+    class PatternList scalar patternlist,
+    pointer(real colvector) vector tables
+) {
+    transmorphic scalar pattern
+    real scalar i
+    
+    for (i = 1; i <= patternlist.length; i++) {
+        pattern = patternlist.get_pat(i)
+        reindex_levels_pattern(pattern, tables)
+        if (length(pattern) > 0) {
+            patternlist.replace(pattern, i)
+        }
+    }
+}
+
+void function reindex_levels_por(
+    class POr scalar por,
+    pointer(real colvector) vector tables
+) {
+    reindex_levels_patternlist(por.patterns, tables)
+}
+
+void function reindex_levels_tuple(
+    class Tuple scalar tuple,
+    pointer(real colvector) vector tables
+) {
+    real scalar i
+    
+    for (i = 1; i <= length(tuple.patterns); i++) {
+        if (tables[i] != NULL) {
+            reindex_levels_pattern(tuple.patterns[i], tables[i])
+        }
+    }
+}
 end

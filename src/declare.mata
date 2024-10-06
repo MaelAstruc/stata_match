@@ -198,11 +198,12 @@ class Variable {
     string scalar name                                                          // Name of the variable
     string scalar stata_type                                                    // Stata type of the variable
     string scalar type                                                          // Internal type of the variable
-    transmorphic rowvector levels                                               // The corresponding sorted vector of levels
+    transmorphic colvector levels                                               // The corresponding sorted vector of levels
     real scalar levels_len                                                      // Number of levels
     private real scalar min
     private real scalar max
     real scalar check                                                           // Is the variable checked
+    real scalar sorted                                                          // Are the levels sorted
 
     void new()
     string scalar to_string()
@@ -226,6 +227,7 @@ class Variable {
     real scalar get_min()                                                       // Get minimum level
     real scalar get_max()                                                       // Get maximum level
     real scalar get_type_nb()                                                   // Get type number
+    real colvector reorder_levels()
 }
 
 ///////////////////////////////////////////////////////////////////// Hash Table

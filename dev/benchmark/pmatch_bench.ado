@@ -1,4 +1,4 @@
-*! version 0.0.14  06 Oct 2024
+*! version 0.0.15  06 Oct 2024
 
 **#************************************************************ src/declare.mata
 
@@ -202,11 +202,12 @@ class Variable {
     string scalar name                                                          // Name of the variable
     string scalar stata_type                                                    // Stata type of the variable
     string scalar type                                                          // Internal type of the variable
-    transmorphic rowvector levels                                               // The corresponding sorted vector of levels
+    transmorphic colvector levels                                               // The corresponding sorted vector of levels
     real scalar levels_len                                                      // Number of levels
     private real scalar min
     private real scalar max
     real scalar check                                                           // Is the variable checked
+    real scalar sorted                                                          // Are the levels sorted
 
     void new()
     string scalar to_string()
@@ -230,6 +231,7 @@ class Variable {
     real scalar get_min()                                                       // Get minimum level
     real scalar get_max()                                                       // Get maximum level
     real scalar get_type_nb()                                                   // Get type number
+    real colvector reorder_levels()
 }
 
 ///////////////////////////////////////////////////////////////////// Hash Table
@@ -1826,15 +1828,13 @@ string scalar Variable::to_string() {
 
     levels_str = J(1, length(this.levels), "")
 
-    for (i = 1; i <= length(this.levels); i++) {
-        if (this.type == "int" | this.type == "float" | this.type == "double") {
-            levels_str[i] = strofreal(this.levels[i])
-        }
-        else {
-            levels_str[i] = this.levels[i]
-        }
+    if (this.type == "string") {
+        levels_str = this.levels'
     }
-
+    else {
+        levels_str = strofreal(this.levels)'
+    }
+    
     return(
         sprintf(
             "'%s' (%s): (%s)",
@@ -1854,7 +1854,8 @@ void Variable::init(string scalar variable, real scalar check) {
     this.levels_len = 0
     this.min = .a
     this.max = .a
-    this.check = check
+    this.check  = check
+    this.sorted = check
     
     this.init_type()
     this.init_levels()
@@ -1962,7 +1963,7 @@ void Variable::init_levels_string() {
 }
 
 void Variable::init_levels_int_base() {
-    real vector x
+    real colvector x
     
     st_view(x = ., ., this.name)
     
@@ -1970,7 +1971,7 @@ void Variable::init_levels_int_base() {
 }
 
 void Variable::init_levels_float_base() {
-    real vector x
+    real colvector x
     
     st_view(x = ., ., this.name)
     
@@ -1999,7 +2000,7 @@ void Variable::init_levels_strL() {
 }
 
 void Variable::init_levels_strN() {
-    string vector x
+    string colvector x
     
     st_sview(x = "", ., this.name)
 
@@ -2101,16 +2102,16 @@ void Variable::quote_levels() {
 real scalar Variable::get_level_index(transmorphic scalar level) {
     real scalar index
     
-    if (this.check == 1) {
-        index = binary_search(&this.levels, level)
+    if (this.sorted == 1) {
+        index = binary_search(&this.levels, this.levels_len, level)
     }
     else {
         if (this.levels_len == 0) {
-            this.levels = J(1, 64, missingof(level))
+            this.levels = J(64, 1, missingof(level))
         }
         
         if (this.levels_len == length(this.levels)) {
-            this.levels = this.levels, J(1, length(this.levels), missingof(level))
+            this.levels = this.levels \ J(length(this.levels), 1, missingof(level))
         }
         
         this.levels_len = this.levels_len + 1
@@ -2121,12 +2122,12 @@ real scalar Variable::get_level_index(transmorphic scalar level) {
     return(index)
 }
 
-real scalar function binary_search(pointer(transmorphic vector) vec, transmorphic scalar value) {
+real scalar function binary_search(pointer(transmorphic vector) vec, real scalar length, transmorphic scalar value) {
     real scalar left, right, i
     transmorphic scalar val
     
     left = 1
-    right = length(*vec)
+    right = length
     
     while (left <= right) {
         i = floor((left + right) / 2)
@@ -2196,6 +2197,51 @@ real scalar Variable::get_type_nb() {
         // TODO: improve error
         exit(1)
     }
+}
+
+// We use the level indices for string variables
+// If the checks are skipped, they are obtained during parsing
+// In this case they are not ordered and need to be sorted afterwards
+real colvector Variable::reorder_levels() {
+    real vector indices, new_indices
+    transmorphic matrix table
+    real scalar i, k
+    
+    if (this.type != "string" | this.check == 1) {
+        // TODO: improve error
+        exit(1)
+    }
+    
+    indices = (1..this.levels_len)'
+    
+    // Keep track of original order
+    table = (this.levels[1..this.levels_len], strofreal(indices))
+    
+    // Sort levels
+    table = sort(table, 1)
+    
+    // Handle duplicate levels
+    new_indices = J(this.levels_len, 1, 1)
+    k = 1
+    for (i = 2; i <= this.levels_len; i++) {
+        if (table[i, 1] != table[i - 1, 1]) {
+            k++
+        }
+        new_indices[i] = k
+    }
+    
+    // Update Variable
+    this.levels = uniqrowssort(table[., 1])
+    this.sorted = 1
+    
+    // Add new position of levels
+    table = (strtoreal(table[., 2]), new_indices)
+    
+    // Reorganize based on original order
+    table = sort(table, 1)
+    
+    // Return a vector of new indices
+    return(table[., 2])
 }
 end
 
@@ -2683,13 +2729,21 @@ mata
 
 class Arm vector function parse_string(
         string scalar str,
-        class Variable vector variables
-    ) {
+        class Variable vector variables,
+        real scalar check
+) {
+    class Arm vector arms
     pointer scalar t
 
     t = tokenize(str)
 
-    return(parse_arms(t, variables))
+    arms = parse_arms(t, variables)
+    
+    if (check == 0) {
+        reorder_levels(arms, variables)
+    }
+    
+    return(arms)
 }
 
 class Arm vector function parse_arms (
@@ -3146,6 +3200,135 @@ real scalar function check_wildcard_tuple(class Tuple scalar tuple) {
     return(0)
 }
 
+void function reorder_levels(
+    class Arm vector arms,
+    class Variable vector variables
+) {
+    real scalar i
+    pointer(real colvector) vector tables
+    
+    tables = J(1, length(variables), NULL)
+    
+    // Get a list of vector to recast indices
+    for (i = 1; i <= length(variables); i++) {
+        if (variables[i].type == "string") {
+            tables[i] = &variables[i].reorder_levels()
+        }
+    }
+    
+    if (tables != J(1, length(variables), NULL)) {
+        reindex_levels_arms(arms, tables)
+    }
+}
+
+void function reindex_levels_arms(
+    class Arm vector arms,
+    pointer(real colvector) vector tables
+) {
+    real scalar i
+    
+    // Get a list of vector to recast indices
+    for (i = 1; i < length(arms); i++) {
+        reindex_levels_arm(arms[i], tables)
+    }
+}
+
+void function reindex_levels_arm(
+    class Arm scalar arm,
+    pointer(real colvector) vector tables
+) {
+    reindex_levels_pattern(*arm.lhs.pattern, tables)
+}
+
+void function reindex_levels_pattern(
+    transmorphic scalar pattern,
+    pointer(real colvector) vector tables
+) {
+    if (classname(pattern) == "PEmpty") {
+        // Nothing
+    }
+    else if (classname(pattern) == "PWild") {
+        reindex_levels_pwild(pattern, tables)
+    }
+    else if (classname(pattern) == "PConstant") {
+        reindex_levels_pconstant(pattern, tables)
+    }
+    else if (classname(pattern) == "PRange") {
+        reindex_levels_prange(pattern, tables)
+    }
+    else if (classname(pattern) == "POr") {
+        reindex_levels_por(pattern, tables)
+    }
+    else if (classname(pattern) == "Tuple") {
+        reindex_levels_tuple(pattern, tables)
+    }
+    else {
+        // TODO: improve error
+        exit(1)
+    }
+}
+
+void function reindex_levels_pwild(
+    class PWild scalar pwild,
+    pointer(real colvector) vector tables
+) {
+    reindex_levels_por(pwild.values, tables)
+}
+
+void function reindex_levels_pconstant(
+    class PConstant scalar pconstant,
+    pointer(real colvector) scalar tables
+) {
+    if (tables != NULL) {
+        pconstant.value = (*tables)[pconstant.value]
+    }
+}
+
+void function reindex_levels_prange(
+    class PRange scalar prange,
+    pointer(real colvector) scalar tables
+) {
+    if (tables != NULL) {
+        prange.min = (*tables)[prange.min]
+        prange.max = (*tables)[prange.max]
+    }
+}
+
+void function reindex_levels_patternlist(
+    class PatternList scalar patternlist,
+    pointer(real colvector) vector tables
+) {
+    transmorphic scalar pattern
+    real scalar i
+    
+    for (i = 1; i <= patternlist.length; i++) {
+        pattern = patternlist.get_pat(i)
+        reindex_levels_pattern(pattern, tables)
+        if (length(pattern) > 0) {
+            patternlist.replace(pattern, i)
+        }
+    }
+}
+
+void function reindex_levels_por(
+    class POr scalar por,
+    pointer(real colvector) vector tables
+) {
+    reindex_levels_patternlist(por.patterns, tables)
+}
+
+void function reindex_levels_tuple(
+    class Tuple scalar tuple,
+    pointer(real colvector) vector tables
+) {
+    real scalar i
+    
+    for (i = 1; i <= length(tuple.patterns); i++) {
+        if (tables[i] != NULL) {
+            reindex_levels_pattern(tuple.patterns[i], tables[i])
+        }
+    }
+}
 end
 
 
@@ -3519,7 +3702,7 @@ function pmatch(
     bench_off("init")
     
     bench_on("parse")
-    arms = parse_string(body, variables)
+    arms = parse_string(body, variables, check)
     bench_off("parse")
     
     bench_on("check")

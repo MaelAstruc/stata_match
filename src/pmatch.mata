@@ -20,7 +20,7 @@ function pmatch(
     // bench_off("init")
     
     // bench_on("parse")
-    arms = parse_string(body, variables)
+    arms = parse_string(body, variables, check)
     // bench_off("parse")
     
     // bench_on("check")
