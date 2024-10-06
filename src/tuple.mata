@@ -98,8 +98,15 @@ pointer scalar function tuple_compress_i(pointer vector patterns, real scalar i)
     return(&pattern.compress())
 }
 
+// The outcome is compressed
 transmorphic scalar Tuple::overlap(transmorphic scalar pattern) {
-    if (classname(pattern) == "Tuple") {
+    if (classname(pattern) == "PEmpty") {
+        return(PEmpty())
+    }
+    else if (classname(pattern) == "PWild") {
+        return(this)
+    }
+    else if (classname(pattern) == "Tuple") {
         return(this.overlap_tuple(pattern))
     }
     else if (classname(pattern) == "POr") {
@@ -144,8 +151,8 @@ void function check_tuples_length( ///
     }
 }
 
+// The outcome is compressed
 transmorphic scalar Tuple::overlap_tuple(class Tuple scalar tuple) {
-    class Pattern scalar pattern_i
     class Tuple scalar tuple_overlap
     real scalar i
 
@@ -153,23 +160,27 @@ transmorphic scalar Tuple::overlap_tuple(class Tuple scalar tuple) {
 
     // We compute the overlap of each pattern in the tuple
     for (i = 1; i <= length(this.patterns); i++) {
-        pattern_i = *this.patterns[i]
-        tuple_overlap.patterns[i] = &pattern_i.overlap(*tuple.patterns[i])
+        tuple_overlap.patterns[i] = &overlap_tuple_tuple_i(this, tuple, i)
+        if (classname(*tuple_overlap.patterns[i]) == "PEmpty") {
+            return(PEmpty())
+        }
     }
-
     return(tuple_overlap)
 }
 
-transmorphic scalar Tuple::overlap_por(class POr scalar por) {
-    class POr scalar por_overlap
-    real scalar i
+// Once again pointer issues in loops
+transmorphic scalar overlap_tuple_tuple_i(class Tuple scalar tuple_1, class Tuple scalar tuple_2, real scalar i) {
+    class Pattern scalar pattern_1, pattern_2
     
-    // We compute the overlap for each tuple in the Or pattern
-    for (i = 1; i <= por.len(); i++) {
-        por_overlap.push(&this.overlap(por.get_pat(i)))
-    }
+    pattern_1 = *tuple_1.patterns[i]
+    pattern_2 = *tuple_2.patterns[i]
+    
+    return(pattern_1.overlap(pattern_2))
+}
 
-    return(por_overlap.compress())
+// The outcome is compressed
+transmorphic scalar Tuple::overlap_por(class POr scalar por) {
+    return(por.overlap(this))
 }
 
 /*

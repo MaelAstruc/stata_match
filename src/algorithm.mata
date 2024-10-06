@@ -124,11 +124,13 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
             // bench_off("+ Difference()")
         }
     }
-
+    
+    // TODO: Do it in previous loop
+    
     k = 0
     for (i = 1; i <= length(overlaps); i++) {
         // bench_on("+ Compress()")
-        overlaps[i].pattern = get_and_compress(overlaps, i)
+        // overlaps[i].pattern = get_and_compress(overlaps, i)
         // bench_off("+ Compress()")
         if (classname(*overlaps[i].pattern) != "PEmpty") {
             k++
@@ -174,6 +176,7 @@ function get_and_compress(struct LHS vector overlaps, i) {
     class Pattern scalar pattern_i
 
     pattern_i = *overlaps[i].pattern
+
     return(&pattern_i.compress())
 }
 

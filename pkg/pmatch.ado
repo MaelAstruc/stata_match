@@ -1,4 +1,4 @@
-*! version 0.0.12  03 Oct 2024
+*! version 0.0.13  06 Oct 2024
 
 **#************************************************************ src/declare.mata
 
@@ -682,6 +682,7 @@ transmorphic scalar PEmpty::compress() {
     return(this)
 }
 
+// The outcome is compressed
 transmorphic scalar PEmpty::overlap(class Pattern scalar pattern) {
     check_pattern(pattern)
 
@@ -824,6 +825,7 @@ transmorphic scalar PWild::compress() {
     return(this)
 }
 
+// The outcome is compressed
 transmorphic scalar PWild::overlap(class Pattern scalar pattern) {
     check_pattern(pattern)
 
@@ -926,6 +928,7 @@ transmorphic scalar PConstant::compress() {
     return(this)
 }
 
+// The outcome is compressed
 transmorphic scalar PConstant::overlap(class Pattern scalar pattern) {
     check_pattern(pattern)
 
@@ -1209,6 +1212,7 @@ pointer scalar PRange::difference(transmorphic scalar pattern) {
     }
 }
 
+// The outcome is compressed
 transmorphic scalar PRange::overlap_pconstant(class PConstant scalar pconstant) {
     if (this.includes(pconstant)) {
         return(pconstant)
@@ -1218,6 +1222,7 @@ transmorphic scalar PRange::overlap_pconstant(class PConstant scalar pconstant) 
     }
 }
 
+// The outcome is compressed
 transmorphic scalar PRange::overlap_prange(class PRange scalar prange) {
     class PRange scalar inter_range
     
@@ -1438,6 +1443,17 @@ void POr::print() {
     printf("%s\n", this.to_string())
 }
 
+// The outcome is compressed, but need to check if the pattern is included
+// If X = 1/3 and Y = 2/4, Z = 3 and T = 2/3
+// (1/3 | 2/4 | 3) & T => (2/3 | 2/3 | 3)
+// If (X | Y | Z) was compressed such that no element is included in another
+// (1/3 | 2/4 | 3) => (1/3 | 2/4)
+// X and Y are not included in one another
+// Compressing would require to merge the overlaping patterns
+// (1/3 | 2/4 | 3) => 1/4
+// In this case all the compressed elements are exclusive
+// The overlaps of a compressed POr and a pattern would always be compressed
+// This would work for tuples too
 transmorphic scalar POr::overlap(class Pattern scalar pattern) {
     class POr scalar por
     class Pattern scalar pattern_i, overlap_i
@@ -1453,7 +1469,9 @@ transmorphic scalar POr::overlap(class Pattern scalar pattern) {
             return(overlap_i)
         }
         else {
-            por.push(overlap_i)
+            if (!por.includes(overlap_i)) {
+                por.push(overlap_i)
+            }
         }
     }
     
@@ -2293,8 +2311,15 @@ pointer scalar function tuple_compress_i(pointer vector patterns, real scalar i)
     return(&pattern.compress())
 }
 
+// The outcome is compressed
 transmorphic scalar Tuple::overlap(transmorphic scalar pattern) {
-    if (classname(pattern) == "Tuple") {
+    if (classname(pattern) == "PEmpty") {
+        return(PEmpty())
+    }
+    else if (classname(pattern) == "PWild") {
+        return(this)
+    }
+    else if (classname(pattern) == "Tuple") {
         return(this.overlap_tuple(pattern))
     }
     else if (classname(pattern) == "POr") {
@@ -2339,8 +2364,8 @@ void function check_tuples_length( ///
     }
 }
 
+// The outcome is compressed
 transmorphic scalar Tuple::overlap_tuple(class Tuple scalar tuple) {
-    class Pattern scalar pattern_i
     class Tuple scalar tuple_overlap
     real scalar i
 
@@ -2348,23 +2373,27 @@ transmorphic scalar Tuple::overlap_tuple(class Tuple scalar tuple) {
 
     // We compute the overlap of each pattern in the tuple
     for (i = 1; i <= length(this.patterns); i++) {
-        pattern_i = *this.patterns[i]
-        tuple_overlap.patterns[i] = &pattern_i.overlap(*tuple.patterns[i])
+        tuple_overlap.patterns[i] = &overlap_tuple_tuple_i(this, tuple, i)
+        if (classname(*tuple_overlap.patterns[i]) == "PEmpty") {
+            return(PEmpty())
+        }
     }
-
     return(tuple_overlap)
 }
 
-transmorphic scalar Tuple::overlap_por(class POr scalar por) {
-    class POr scalar por_overlap
-    real scalar i
+// Once again pointer issues in loops
+transmorphic scalar overlap_tuple_tuple_i(class Tuple scalar tuple_1, class Tuple scalar tuple_2, real scalar i) {
+    class Pattern scalar pattern_1, pattern_2
     
-    // We compute the overlap for each tuple in the Or pattern
-    for (i = 1; i <= por.len(); i++) {
-        por_overlap.push(&this.overlap(por.get_pat(i)))
-    }
+    pattern_1 = *tuple_1.patterns[i]
+    pattern_2 = *tuple_2.patterns[i]
+    
+    return(pattern_1.overlap(pattern_2))
+}
 
-    return(por_overlap.compress())
+// The outcome is compressed
+transmorphic scalar Tuple::overlap_por(class POr scalar por) {
+    return(por.overlap(this))
 }
 
 /*
@@ -3382,11 +3411,13 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
             // bench_off("+ Difference()")
         }
     }
-
+    
+    // TODO: Do it in previous loop
+    
     k = 0
     for (i = 1; i <= length(overlaps); i++) {
         // bench_on("+ Compress()")
-        overlaps[i].pattern = get_and_compress(overlaps, i)
+        // overlaps[i].pattern = get_and_compress(overlaps, i)
         // bench_off("+ Compress()")
         if (classname(*overlaps[i].pattern) != "PEmpty") {
             k++
@@ -3432,6 +3463,7 @@ function get_and_compress(struct LHS vector overlaps, i) {
     class Pattern scalar pattern_i
 
     pattern_i = *overlaps[i].pattern
+
     return(&pattern_i.compress())
 }
 

@@ -142,6 +142,7 @@ transmorphic scalar PEmpty::compress() {
     return(this)
 }
 
+// The outcome is compressed
 transmorphic scalar PEmpty::overlap(class Pattern scalar pattern) {
     check_pattern(pattern)
 
@@ -284,6 +285,7 @@ transmorphic scalar PWild::compress() {
     return(this)
 }
 
+// The outcome is compressed
 transmorphic scalar PWild::overlap(class Pattern scalar pattern) {
     check_pattern(pattern)
 
@@ -386,6 +388,7 @@ transmorphic scalar PConstant::compress() {
     return(this)
 }
 
+// The outcome is compressed
 transmorphic scalar PConstant::overlap(class Pattern scalar pattern) {
     check_pattern(pattern)
 
@@ -669,6 +672,7 @@ pointer scalar PRange::difference(transmorphic scalar pattern) {
     }
 }
 
+// The outcome is compressed
 transmorphic scalar PRange::overlap_pconstant(class PConstant scalar pconstant) {
     if (this.includes(pconstant)) {
         return(pconstant)
@@ -678,6 +682,7 @@ transmorphic scalar PRange::overlap_pconstant(class PConstant scalar pconstant) 
     }
 }
 
+// The outcome is compressed
 transmorphic scalar PRange::overlap_prange(class PRange scalar prange) {
     class PRange scalar inter_range
     
@@ -898,6 +903,17 @@ void POr::print() {
     printf("%s\n", this.to_string())
 }
 
+// The outcome is compressed, but need to check if the pattern is included
+// If X = 1/3 and Y = 2/4, Z = 3 and T = 2/3
+// (1/3 | 2/4 | 3) & T => (2/3 | 2/3 | 3)
+// If (X | Y | Z) was compressed such that no element is included in another
+// (1/3 | 2/4 | 3) => (1/3 | 2/4)
+// X and Y are not included in one another
+// Compressing would require to merge the overlaping patterns
+// (1/3 | 2/4 | 3) => 1/4
+// In this case all the compressed elements are exclusive
+// The overlaps of a compressed POr and a pattern would always be compressed
+// This would work for tuples too
 transmorphic scalar POr::overlap(class Pattern scalar pattern) {
     class POr scalar por
     class Pattern scalar pattern_i, overlap_i
@@ -913,7 +929,9 @@ transmorphic scalar POr::overlap(class Pattern scalar pattern) {
             return(overlap_i)
         }
         else {
-            por.push(overlap_i)
+            if (!por.includes(overlap_i)) {
+                por.push(overlap_i)
+            }
         }
     }
     
