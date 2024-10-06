@@ -1,4 +1,4 @@
-*! version 0.0.13  06 Oct 2024
+*! version 0.0.14  06 Oct 2024
 
 **#************************************************************ src/declare.mata
 
@@ -3373,6 +3373,7 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
     transmorphic scalar differences
     class Usefulness scalar result
     class Arm scalar ref_arm
+    pointer scalar overlap_i
     real scalar i, k
 
     lhs_empty.pattern = &(PEmpty())
@@ -3394,41 +3395,27 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
         return(result)
     }
 
+    k = 0
     // We loop over all the patterns
     for (i = 1; i <= length(useful_arms); i++) {
         // TODO: Use difference
         ref_arm = useful_arms[i]
 
-        overlaps[i].arm_id = ref_arm.id
         bench_on("+ Overlap()")
-        overlaps[i].pattern = &tuple_pattern.overlap(*ref_arm.lhs.pattern)
+        overlap_i = &tuple_pattern.overlap(*ref_arm.lhs.pattern)
         bench_off("+ Overlap()")
-
-        if (classname(*overlaps[i].pattern) != "PEmpty") {
+        
+        if (classname(*overlap_i) != "PEmpty") {
+            k++
+            overlaps[k].pattern = overlap_i
+            overlaps[k].arm_id = ref_arm.id
             differences_pattern = differences
             bench_on("+ Difference()")
-            differences = *differences_pattern.difference(*overlaps[i].pattern)
+            differences = *differences_pattern.difference(*overlap_i)
             bench_off("+ Difference()")
         }
     }
     
-    // TODO: Do it in previous loop
-    
-    k = 0
-    for (i = 1; i <= length(overlaps); i++) {
-        bench_on("+ Compress()")
-        // overlaps[i].pattern = get_and_compress(overlaps, i)
-        bench_off("+ Compress()")
-        if (classname(*overlaps[i].pattern) != "PEmpty") {
-            k++
-            // Copy member by member
-            // Otherwise it's empty at the end of the loop
-            // And it crashes when trying to access it
-            overlaps[k].arm_id = overlaps[i].arm_id
-            overlaps[k].pattern = overlaps[i].pattern
-        }
-    }
-
     if (k == 0) {
         // No overlap, return tuple
         result.useful = 1
@@ -3463,7 +3450,7 @@ function get_and_compress(struct LHS vector overlaps, i) {
     class Pattern scalar pattern_i
 
     pattern_i = *overlaps[i].pattern
-
+    
     return(&pattern_i.compress())
 }
 

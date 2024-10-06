@@ -7,7 +7,7 @@ clear all
 
 **#********************************************************************** Locals
 
-local pkg_version    = "0.0.13"
+local pkg_version    = "0.0.14"
 local distrib_date   = "06 Oct 2024"
 local stata_version  = "`c(version)'"
 local date_fmt       = string(date("`distrib_date'", "DMY"), "%tdDD/NN/CCYY")
