@@ -353,6 +353,29 @@ pmatch y2, v(x1 x2) b( ///
 
 test_variables, expected(y1) result(y2) test("End to end: two variables")
 
+////////////////////////////////////////////////////////////////////// Or tuples
+
+drop _all
+
+set obs 100
+
+gen int x1 = floor(runiform(1, 4))
+gen str x2 = string(floor(runiform(1, 4)))
+
+gen y1 = "f"
+replace y1 = "a" if x1 == 1            & x2 == "1"
+replace y1 = "b" if (x1 == 1           & (x2 == "2" | x2 == "3")) | (x1 >= 2 & x1 <  3 & x2 == "2")
+replace y1 = "c" if (x1 >= 2 & x1 <= 3 & x2 == "1")               | (x1 >  2 & x1 <= 3  & x2 == "2")
+
+pmatch y2, v(x1 x2) b( ///
+    (1,     "1")                      = "a",  ///
+    (1,     "2" | "3") | (2/!3,  "2") = "b",  ///
+    (2/3,   "1")       | (2!/3,  "2") = "c",  ///
+    (_, _)                            = "f"   ///
+)
+
+test_variables, expected(y1) result(y2) test("End to end: or tuples")
+
 /////////////////////////////////////////////////////////// Integer min constant
 
 drop _all
