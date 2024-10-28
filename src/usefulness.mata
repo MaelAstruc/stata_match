@@ -13,7 +13,7 @@ void Usefulness::define(class Usefulness usefulness) {
 
 string vector Usefulness::to_string() {
     string vector str
-    class Pattern scalar overlap
+    pointer scalar overlap
     struct LHS scalar lhs
     real scalar i
     
@@ -31,11 +31,11 @@ string vector Usefulness::to_string() {
         
         for (i = 1; i <= length(*this.overlaps); i++) {
             lhs = (*this.overlaps)[i]
-            overlap = *lhs.pattern
+            overlap = lhs.pattern
             
-            if (classname(overlap) != "PEmpty") {
+            if (structname(*overlap) != "PEmpty") {
                 str = str,
-                    sprintf("    Arm %f: %s", lhs.arm_id, overlap.to_string())
+                    sprintf("    Arm %f: %s", lhs.arm_id, ::to_string(*overlap))
             }
         }
     }

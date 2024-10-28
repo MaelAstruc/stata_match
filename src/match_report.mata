@@ -14,38 +14,38 @@ string vector Match_report::to_string() {
         strings = strings, usefulness.to_string()
     }
 
-    if (length(this.missings) == 0) {
+    if (length(*this.missings) == 0) {
         return(strings)
     }
 
-    if (classname(this.missings) == "PEmpty") {
+    if (structname(*this.missings) == "PEmpty") {
         return(strings)
     }
 
     strings = strings, "Warning : Missing cases"
 
-    if (classname(this.missings) == "POr") {
-        strings = strings, this.to_string_por(this.missings)
+    if (structname(*this.missings) == "POr") {
+        strings = strings, to_string_por(*this.missings)
     }
     else {
-        strings = strings, this.to_string_pattern(this.missings)
+        strings = strings, to_string_pattern(*this.missings)
     }
 
     return(strings)
 }
 
-string scalar Match_report::to_string_pattern(class Pattern scalar pattern) {
-    return(sprintf("    %s", pattern.to_string()))
+string scalar Match_report::to_string_pattern(transmorphic scalar pattern) {
+    return(sprintf("    %s", ::to_string(pattern)))
 }
 
-string vector Match_report::to_string_por(class POr scalar por) {
+string vector Match_report::to_string_por(struct POr scalar por) {
     string vector strings
     real scalar i
 
-    strings = J(1, por.len(), "")
+    strings = J(1, por.length, "")
     
-    for (i = 1; i <= por.len(); i++) {
-        strings[i] = this.to_string_pattern(por.get_pat(i))
+    for (i = 1; i <= por.length; i++) {
+        strings[i] = this.to_string_pattern(*por.patterns[i])
     }
     
     return(strings)

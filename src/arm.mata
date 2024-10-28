@@ -3,13 +3,10 @@ mata
 void Arm::new() {}
 
 string scalar Arm::to_string() {
-    class Pattern scalar pattern
-
-    pattern = *this.lhs.pattern
     return(
         sprintf(
             "Arm %f: Tuple: %s / Value: %s",
-            this.id, pattern.to_string(), this.value
+            this.id, ::to_string(*this.lhs.pattern), this.value
         )
     )
 }
@@ -27,7 +24,7 @@ void function eval_arms(
     string scalar dtype
 ) {
     class Arm scalar arm
-    class Pattern scalar pattern
+    pointer scalar pattern
     string scalar command, condition, statement
     real scalar i, n, _rc
 
@@ -36,7 +33,7 @@ void function eval_arms(
     displayas("text")
     for (i = n; i >= 1; i--) {
         arm = arms[i]
-        pattern = *arm.lhs.pattern
+        pattern = arm.lhs.pattern
         
         if (i == n & gen_first) {
             if (dtype != "") {
@@ -51,10 +48,10 @@ void function eval_arms(
         }
         
         if (length(variables) == 1) {
-            condition = pattern.to_expr(variables[1])
+            condition = to_expr(*pattern, variables[1])
         }
         else {
-            condition = pattern.to_expr(variables)
+            condition = to_expr(*pattern, variables)
         }
         
         if (condition == "1") {

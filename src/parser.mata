@@ -32,7 +32,7 @@ class Arm vector function parse_arms (
 
     while (tokenpeek(t) != "") {
         arm = parse_arm(t, ++i, variables)
-        if (classname(*arm.lhs.pattern) == "PEmpty") {
+        if (structname(*arm.lhs.pattern) == "PEmpty") {
             errprintf("Arm %f is considered empty\n", i)
         }
         else {
@@ -43,7 +43,7 @@ class Arm vector function parse_arms (
     return(arms)
 }
 
-class Arm scalar function parse_arm (
+class Arm scalar function parse_arm(
         pointer t,
         real scalar arm_id,
         class Variable vector variables
@@ -69,7 +69,7 @@ class Arm scalar function parse_arm (
     return(arm)
 }
 
-class Pattern scalar function parse_pattern(
+transmorphic scalar function parse_pattern(
     pointer t,
     class Variable scalar variable,
     real scalar arm_id
@@ -157,7 +157,7 @@ class Pattern scalar function parse_pattern(
     }
 }
 
-class Pattern scalar function parse_number(
+transmorphic scalar function parse_number(
     pointer t,
     real scalar number,
     real scalar arm_id,
@@ -177,31 +177,30 @@ class Pattern scalar function parse_number(
 
 ///////////////////////////////////////////////////////////////// Parse patterns
 
-class PWild scalar function parse_wild(class Variable scalar variable) {
-    class PWild scalar pwild
-
-    pwild.define(variable)
+struct PWild scalar function parse_wild(class Variable scalar variable) {
+    struct PWild scalar pwild
+    define_pwild(pwild, variable)
     return(pwild)
 }
 
-class PEmpty scalar function parse_empty() {
+struct PEmpty scalar function parse_empty() {
     return(PEmpty())
 }
 
-class PConstant scalar function parse_constant(transmorphic scalar value) {
+struct PConstant scalar function parse_constant(transmorphic scalar value) {
     class PConstant scalar pconstant
-    pconstant.define(value)
+    define_pconstant(pconstant, value)
     return(pconstant)
 }
 
-class PRange scalar function parse_range(
+struct PRange scalar function parse_range(
     pointer scalar t,
     string scalar symbole,
     real scalar min,
     real scalar arm_id,
     class Variable scalar variable
 ) {
-    class PRange scalar prange
+    struct PRange scalar prange
     string scalar next
     real scalar max, epsilon
     
@@ -237,7 +236,7 @@ class PRange scalar function parse_range(
         "Unexpected symbole: " + symbole
     }
 
-    prange.define(min, max, variable.get_type_nb())
+    define_prange(prange, min, max, variable.get_type_nb())
 
     return(prange)
 }
@@ -263,7 +262,8 @@ real scalar get_epsilon(real scalar x, real scalar type_nb) {
     }
     else {
         // TODO: improve error
-        exit(1)
+        errprintf("Expected a variable type 1, 2 or 3, found %f", type_nb)
+        exit(_error(3250))
     }
     
     x_log2 = log(abs(x)) / log(2)
@@ -280,26 +280,28 @@ real scalar get_epsilon(real scalar x, real scalar type_nb) {
     }
 }
 
-class POr scalar function parse_or(
+struct POr scalar function parse_or(
     pointer t,
     class Variable scalar variable,
     real scalar arm_id
 ) {
-    class POr scalar por
+    struct POr scalar por
 
+    init_por(por)
+    
     do {
-        por.push(parse_pattern(t, variable, arm_id))
+        push_por(por, parse_pattern(t, variable, arm_id))
     } while (match_next(t, "|"))
 
-    return(por.compress())
+    return(compress_por(por))
 }
 
-class Tuple scalar function parse_tuple(
+struct Tuple scalar function parse_tuple(
     pointer t,
     class Variable vector variables,
     real scalar arm_id
 ) {
-    class Tuple scalar tuple
+    struct Tuple scalar tuple
     real scalar i
 
     tuple.patterns = J(1, length(variables), NULL)
@@ -334,18 +336,20 @@ class Tuple scalar function parse_tuple(
     return(tuple)
 }
 
-class POr scalar function parse_tuples(
+struct POr scalar function parse_tuples(
     pointer t,
     class Variable vector variables,
     real scalar arm_id
 ) {
-    class POr scalar por
+    struct POr scalar por
+    
+    init_por(por)
 
     do {
-        por.push(parse_tuple(t, variables, arm_id))
+        push_por(por, parse_tuple(t, variables, arm_id))
     } while (match_next(t, "|"))
     
-    return(por.compress())
+    return(compress_por(por))
 }
 
 //////////////////////////////////////////////////////////////////// Parse Value
@@ -429,31 +433,35 @@ real scalar function check_wildcard(transmorphic scalar pattern) {
     if (eltype(pattern) == "pointer") {
         return(check_wildcard(*pattern))
     }
-    else if (classname(pattern) == "PEmpty") {
+    else if (structname(pattern) == "PEmpty") {
         return(0)
     }
-    else if (classname(pattern) == "PWild") {
+    else if (structname(pattern) == "PWild") {
         return(1)
     }
-    else if (classname(pattern) == "PConstant") {
+    else if (structname(pattern) == "PConstant") {
         return(0)
     }
-    else if (classname(pattern) == "PRange") {
+    else if (structname(pattern) == "PRange") {
         return(0)
     }
-    else if (classname(pattern) == "POr") {
+    else if (structname(pattern) == "POr") {
         return(check_wildcard_por(pattern))
     }
-    else if (classname(pattern) == "Tuple") {
+    else if (structname(pattern) == "Tuple") {
         return(check_wildcard_tuple(pattern))
+    }
+    else {
+        // From pattern.mata
+        unknown_pattern(pattern)
     }
 }
 
-real scalar function check_wildcard_por(class POr scalar por) {
+real scalar function check_wildcard_por(struct POr scalar por) {
     real scalar i
     
-    for (i = 1; i <= por.len(); i++) {
-        if (check_wildcard(por.get_pat(i)) == 1) {
+    for (i = 1; i <= por.length; i++) {
+        if (check_wildcard(*por.patterns[i]) == 1) {
             return(1)
         }
     }
@@ -461,11 +469,11 @@ real scalar function check_wildcard_por(class POr scalar por) {
     return(0)
 }
 
-real scalar function check_wildcard_tuple(class Tuple scalar tuple) {
+real scalar function check_wildcard_tuple(struct Tuple scalar tuple) {
     real scalar i
     
     for (i = 1; i <= length(tuple.patterns); i++) {
-        if (check_wildcard(tuple.patterns[i]) == 1) {
+        if (check_wildcard(*tuple.patterns[i]) == 1) {
             return(1)
         }
     }
@@ -517,39 +525,39 @@ void function reindex_levels_pattern(
     transmorphic scalar pattern,
     pointer(real colvector) vector tables
 ) {
-    if (classname(pattern) == "PEmpty") {
+    if (structname(pattern) == "PEmpty") {
         // Nothing
     }
-    else if (classname(pattern) == "PWild") {
+    else if (structname(pattern) == "PWild") {
         reindex_levels_pwild(pattern, tables)
     }
-    else if (classname(pattern) == "PConstant") {
+    else if (structname(pattern) == "PConstant") {
         reindex_levels_pconstant(pattern, tables)
     }
-    else if (classname(pattern) == "PRange") {
+    else if (structname(pattern) == "PRange") {
         reindex_levels_prange(pattern, tables)
     }
-    else if (classname(pattern) == "POr") {
+    else if (structname(pattern) == "POr") {
         reindex_levels_por(pattern, tables)
     }
-    else if (classname(pattern) == "Tuple") {
+    else if (structname(pattern) == "Tuple") {
         reindex_levels_tuple(pattern, tables)
     }
     else {
         // TODO: improve error
-        exit(1)
+        unknown_pattern(pattern)
     }
 }
 
 void function reindex_levels_pwild(
-    class PWild scalar pwild,
+    struct PWild scalar pwild,
     pointer(real colvector) vector tables
 ) {
     reindex_levels_por(pwild.values, tables)
 }
 
 void function reindex_levels_pconstant(
-    class PConstant scalar pconstant,
+    struct PConstant scalar pconstant,
     pointer(real colvector) scalar tables
 ) {
     if (tables != NULL) {
@@ -558,7 +566,7 @@ void function reindex_levels_pconstant(
 }
 
 void function reindex_levels_prange(
-    class PRange scalar prange,
+    struct PRange scalar prange,
     pointer(real colvector) scalar tables
 ) {
     if (tables != NULL) {
@@ -567,31 +575,19 @@ void function reindex_levels_prange(
     }
 }
 
-void function reindex_levels_patternlist(
-    class PatternList scalar patternlist,
+void function reindex_levels_por(
+    struct POr scalar por,
     pointer(real colvector) vector tables
 ) {
-    transmorphic scalar pattern
     real scalar i
     
-    for (i = 1; i <= patternlist.length; i++) {
-        pattern = patternlist.get_pat(i)
-        reindex_levels_pattern(pattern, tables)
-        if (length(pattern) > 0) {
-            patternlist.replace(pattern, i)
-        }
+    for (i = 1; i <= por.length; i++) {
+        reindex_levels_pattern(*por.patterns[i], tables)
     }
 }
 
-void function reindex_levels_por(
-    class POr scalar por,
-    pointer(real colvector) vector tables
-) {
-    reindex_levels_patternlist(por.patterns, tables)
-}
-
 void function reindex_levels_tuple(
-    class Tuple scalar tuple,
+    struct Tuple scalar tuple,
     pointer(real colvector) vector tables
 ) {
     real scalar i

@@ -7,193 +7,38 @@ mata set matastrict on
 
 //////////////////////////////////////////////////////////////////////// Pattern
 
-// The parent class for all patterns
-class Pattern {
-    virtual void define()                                                       // Define the instance members
-    virtual string scalar to_string()                                           // Turns the class content in a string
-    virtual void print()                                                        // Print the class content
-    virtual string scalar to_expr()                                             // Turns the class content in an expression based on a variable
-    virtual transmorphic scalar compress()                                      // Simplifies the class content if possible
-    virtual transmorphic scalar overlap()                                       // Returns the set of common values with another pattern
-    virtual real scalar includes()                                              // Check if the pattern is included in another
-    virtual pointer scalar difference()                                         // Returns the set of values not included in another patterns 
-    
-    // Other methods
-    void new()
-}
-
 // Empty pattern
-class PEmpty extends Pattern {
-    // Members
-    
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-}
+struct PEmpty { }
 
 // Wild card '_'
-class PWild extends Pattern {
+struct PWild {
     // Members
-    class POr scalar values                                                     // The union of all possible levels
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-    void push()                                                                 // Add new value to the patterns
+    struct POr scalar values                                                     // The union of all possible levels                                                            // Add new value to the patterns
 }
 
 // Constant
-class PConstant extends Pattern {
-    // Members
+struct PConstant {
     real scalar value                                                           // The value (real or string index)
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-    real scalar includes_pwild()                                                // Includes PWild()
-    real scalar includes_pconstant()                                            // Includes PConstant()
-    real scalar includes_prange()                                               // Includes PRange()
-    real scalar includes_por()                                                  // Includes POr()
 }
 
 // Real or Float Range
-class PRange extends Pattern {
-    // Members
+struct PRange {
     real scalar min                                                             // Minimum value
     real scalar max                                                             // Maximum value
     real scalar type_nb                                                         // 1 int, 2 float, 3 double
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-    transmorphic scalar overlap_pconstant()                                     // Overlap with PConstant()
-    transmorphic scalar overlap_prange()                                        // Overlap with PRange()
-    transmorphic scalar overlap_por()                                           // Overlap with POr()
-    pointer scalar difference_pconstant()                                       // Difference with PConstant()
-    pointer scalar difference_prange()                                          // Difference with PRange()
-    pointer scalar difference_por()                                             // Difference with POr()
-    real scalar includes_pwild()                                                // Includes PWild()
-    real scalar includes_pconstant()                                            // Includes PConstant()
-    real scalar includes_prange()                                               // Includes PRange()
-    real scalar includes_por()                                                  // Includes POr()
-}
-
-class PatternList extends Pattern {
-    // Members
-    public pointer vector patterns                                              // An array of pointers to patterns
-    public real scalar capacity                                                 // Number of pre-allocated pointers
-    public real scalar length                                                   // Number of patterns initiated
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()                                                                  // Initiates the instance with a capacity
-    pointer scalar get()                                                        // Returns a pointer to the desired pattern
-    transmorphic scalar get_pat()                                               // Return the desired pattern
-    void resize()                                                               // Resize to the desired size
-    void push()                                                                 // Add a pointer to the end of the patterns
-    void append()                                                               // Add a vector of pointer to the end of the patterns
-    void replace()                                                              // Replace the desired pattern
-    void remove()                                                               // Remove the value at a given index and shift all the following ones
-    void swap_remove()                                                          // Swap the value with the last one and decrement the length
-    void clear()                                                                // Redefine the legnth as 0 and ignore all values
-    void check_integer()                                                        // Check if the value is an integer
-    void check_range()                                                          // Check if the index is in the range of the array
 }
 
 // Or pattern, which is a list of pointers to patterns
-class POr extends Pattern {
+struct POr {
     // Members
-    class PatternList scalar patterns                                           // A dynamic array of patterns
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-    real scalar includes_pconstant()                                            // Includes PConstant()
-    real scalar includes_default()                                              // Includes PWild(), PRange() or POr()
-    real scalar len()                                                           // Get the # of patterns
-    void push()                                                                 // Push a new pattern
-    void append_por()                                                           // Append a new por
-    pointer scalar get()                                                        // Returns a pointer to the desired pattern
-    transmorphic scalar get_pat()                                               // Return the desired pattern
-    void clear()                                                                // Remove all the patterns
+    pointer vector patterns                                           // A dynamic array of patterns
+    real scalar length
 }
 
-class Tuple extends Pattern {
+struct Tuple {
     // Members
     real scalar arm_id                                                          // The corresponding arm #
     pointer vector patterns                                                     // An array of patterns
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-    transmorphic scalar overlap_tuple()                                         // Overlap with Tuple()
-    transmorphic scalar overlap_por()                                           // Overlap with POr()
-    pointer scalar difference_tuple()                                        
-    pointer scalar difference_por()                                        
-    transmorphic scalar difference_vec()                                        // Computes the difference with an array of patterns
 }
 
 /////////////////////////////////////////////////////////////////////// Variable
@@ -208,7 +53,7 @@ class Variable {
     private real scalar max
     real scalar check                                                           // Is the variable checked
     real scalar sorted                                                          // Are the levels sorted
-
+    
     void new()
     string scalar to_string()
     void print()
@@ -282,7 +127,7 @@ class Usefulness {
 // The result of all the checks
 class Match_report {
     class Usefulness vector usefulness                                          // The usefulness of each arm
-    class Pattern scalar missings                                               // The missing patterns
+    pointer scalar missings                                                     // The missing patterns
 
     void new()
     string vector to_string()
@@ -293,497 +138,68 @@ class Match_report {
 end
 
 
-**#******************************************************* src/pattern_list.mata
-
-mata
-
-// Called with PatternList(), cannot be directly called
-void PatternList::new() {
-    // The default capacity when created is 8
-    this.patterns = J(1, 8, NULL)
-    this.capacity = 8
-    this.length = 0
-}
-
-void PatternList::print() {
-    printf("%s", this.to_string())
-}
-
-string scalar PatternList::to_string(string scalar sep) {
-    string vector strings
-    class Pattern scalar pattern
-    real scalar i
-
-    strings = J(1, this.length, "")
-
-    for (i = 1; i <= this.length; i++) {
-        pattern = *this.patterns[i]
-        strings[i] = pattern.to_string()
-    }
-
-    return(invtokens(strings, sep))
-}
-
-string scalar PatternList::to_expr(string scalar sep, string vector variable) {
-    string vector exprs
-    class Pattern scalar pattern
-    real scalar i
-    
-    if (this.length == 0) {
-        return("")
-    }
-
-    if (this.length == 1) {
-        pattern = *this.patterns[1]
-        return(pattern.to_expr(variable))
-    }
-
-    exprs = J(1, this.length, "")
-    
-    for (i = 1; i <= this.length; i++) {
-        pattern = *this.patterns[i]
-        exprs[i] = "(" + pattern.to_expr(variable) + ")"
-    }
-
-    return(invtokens(exprs, sep))
-}
-
-transmorphic scalar PatternList::compress() {
-    class PatternList scalar new_pat
-    real scalar i
-
-    new_pat = this
-
-    for (i = 1; i <= new_pat.length; i++) {
-        if (classname(new_pat.get_pat(i)) == "PEmpty") {
-            new_pat.swap_remove(i)
-        }
-    }
-
-    if (new_pat.length == 0) {
-        return(PEmpty())
-    }
-    else if (new_pat.length == 1) {
-        return(new_pat.get_pat(1))
-    }
-    else {
-        return(new_pat)
-    }
-}
-
-transmorphic scalar PatternList::overlap(class Pattern scalar pattern) {
-    class Pattern scalar pattern_i
-    class PatternList scalar overlap
-    real scalar i
-
-    for (i = 1; i <= this.length; i ++) {
-        pattern_i = this.get_pat(i)
-        overlap.push(pattern_i.overlap(pattern))
-    }
-
-    return(overlap.compress())
-}
-
-pointer scalar PatternList::difference(class Pattern scalar pattern) {
-    class Pattern scalar pattern_i
-    class PatternList scalar differences
-    real scalar i
-
-    for (i = 1; i <= this.length; i ++) {
-        pattern_i = this.get_pat(i)
-        differences.append(pattern_i.difference(pattern))
-    }
-
-    return(&differences.compress())
-}
-
-
-// Resize the dynamic array
-void PatternList::resize(real scalar new_capacity) {
-    check_integer(new_capacity, "Array new capacity")
-
-    if (new_capacity == 0) {
-        errprintf("Cannot resize to a capacity of 0\n")
-        exit(_error(3300))
-    }
-    else if (new_capacity > this.capacity) {
-        // This needs to changed if the type is not a pointer
-        this.patterns = this.patterns, J(1, new_capacity - this.capacity, NULL)
-        this.capacity = new_capacity
-    }
-    else {
-        this.patterns = this.patterns[1..new_capacity]
-        this.capacity = new_capacity
-        this.length = new_capacity
-    }
-}
-
-// Add a new element at the end of the values and resize if required
-void PatternList::push(pointer scalar value) {
-    // Double the capacity if the dynamic is filled
-    if (this.length == this.capacity) {
-        this.resize(this.capacity * 2)
-    }
-
-    this.length = this.length + 1
-    this.patterns[this.length] = value
-}
-
-// Add an array of new elements at the end and resize if required
-void PatternList::append(pointer rowvector new_values) {
-    real scalar new_capacity, new_length
-
-    new_length = this.length + cols(new_values)
-
-    // Increase to the right power of two if needed
-    if (new_length > this.capacity) {
-        new_capacity = 2^ceil(log(new_length) / log(2))
-        this.resize(new_capacity)
-    }
-
-    this.patterns[this.length+1..new_length] = new_values
-    this.length = new_length
-}
-
-// Replace a value at a given index
-void PatternList::replace(transmorphic scalar value, real scalar index) {
-    transmorphic scalar new_value
-    
-    check_range(index, "replace")
-
-    if (eltype(value) == "pointer") {
-        this.patterns[index] = value
-    }
-    else {
-        new_value = value // Copy value before reference
-        this.patterns[index] = &new_value
-    }
-    
-}
-
-// Get the pointer at a given index
-pointer scalar PatternList::get(real scalar index) {
-    check_range(index, "get")
-
-    return(this.patterns[index])
-}
-
-// Get the pattern at a given index
-transmorphic scalar PatternList::get_pat(real scalar index) {
-    return(*this.get(index))
-}
-
-// Removes the value at a given index
-void PatternList::remove(real scalar index) {
-    check_range(index, "remove")
-
-    this.patterns[index..length-1] = this.patterns[index+1..length]
-    this.length = this.length - 1
-}
-
-// Swap the value at a given index with the last value and decrease the length
-void PatternList::swap_remove(real scalar index) {
-    check_range(index, "swap and remove")
-
-    this.patterns[index] = this.patterns[length]
-    this.length = this.length - 1
-}
-
-// Remove all the values
-void PatternList::clear() {
-    if (this.length == 0) {
-        return
-    }
-
-    this.patterns[1..(this.length)] = J(1, this.length, NULL)
-
-    this.length = 0
-}
-
-// Util function to check for missing, negative or float values
-void PatternList::check_integer(real scalar value, string scalar message) {
-    if (value == .) {
-        errprintf("%s cannot be a missing value\n", message)
-        exit(_error(3351))
-    }
-
-    if (value < 0) {
-        errprintf("%s should be a positive integer, found %f\n", message, value)
-        exit(_error(3398))
-    }
-
-    if (trunc(value) != value) {
-        errprintf("%s should be an integer, found %f\n", message, value)
-        exit(_error(3398))
-    }
-}
-
-// Util check if the index is in range
-void PatternList::check_range(real scalar index, string scalar verb) {
-    check_integer(index, "Index")
-
-    if (index == 0) {
-        errprintf("Cannot %s a value at index 0\n", verb)
-        exit(_error(3300))
-    }
-    else if (index > this.length) {
-        errprintf(
-            "Cannot %s a value at index %f in an array of length %f\n",
-            verb, index, this.length
-        )
-        exit(_error(3300))
-    }
-}
-
-end
-
-
 **#************************************************************ src/pattern.mata
 
+local T         transmorphic     scalar
+local POINTER   pointer          scalar
+local POINTERS  pointer          vector
+local REAL      real             scalar
+local STRING    string           scalar
+
+local EMPTY     struct PEmpty    scalar
+local WILD      struct PWild     scalar
+local CONSTANT  struct PConstant scalar
+local RANGE     struct PRange    scalar
+local OR        struct POr       scalar
+local TUPLE     struct Tuple     scalar
+
+local VARIABLE  class Variable   scalar
+local VARIABLES class Variable   vector
+
 mata
 
-/*
-# Definition
+///////////////////////////////////////////////////////////////////// define_*()
 
-We have a dataset X containing N variables. We K variables V_1, ..., V_K, each
-defined with a universe of levels O(V_k) distributed over the observations. For
-a variable V containing L levels O(V) = {v_1, ..., v_L}, the levels are unique
-and ordered: in the following explanations, for all v_i, v_j, such that i < j,
-v_i < v_j.
-
-Given the set of levels O(V), we can define different patterns p_i, ..., p_j
-that represent combinations of levels and that can be understood as sets:
-
-Empty      {}                  empty set
-Wildcard   O(V)                set containing the universe of levels
-Constant   {v}                 set containing a unique level of V
-Range      {v_i, ..., v_j}     set containing all the values between v_i and v_j
-Or         p_i U ... U p_j     set containing the union of patterns
-
-These patterns and the underlying levels can correspond to different individuals
-in the dataset X. X(p) is the sample of X that have values of V included in the
-pattern p.
-
-Given multiple variables V_1, ..., V_k, we can consider the intersection of the
-patterns p(V_1), ..., p(V_k) as:
-
-Tuple      P(V_1) & ... & P(V_k)   set containing the intersection
-
-With t the a tuple defined over V_1, ..., V_k and t(X) is the sample of X that
-has values of V_1, ..., V_k included in the corresponding patterns
-p(V_1), ..., p(V_k).
-
-With these notations we can cover all possible combinations of levels across
-the variables of the dataset X.
-
-# Classes
-
-For the details about the classes, check the 'src/declare.mata' file.
-
-# Methods
-
-These classes have common methods
-
-define :
-    Used to define the instance's members
-    arguments : depends on the class
-    returns :   void
-to_string :
-    Used to transform the class content in a string
-    arguments : none
-    returns :   string scalar
-print :
-    Used to print the string content
-    arguments : none
-    returns :   void
-to_expr :
-    Used to transform the pattern in an expression
-    arguments : the corresponding variable (or variables for tuples)
-    returns :   string scalar
-compress :
-    Used to simplify the pattern
-    arguments : none
-    returns :   a pattern
-overlap :
-    Used to compute the set of levels in common with another pattern
-    arguments : a pattern
-    returns :   a pattern
-includes :
-    Used to check if the pattern includes another
-    arguments : a pattern
-    returns :   1 if the pattern is included, 0 other otherwise
-difference :
-    Used to compute the set of levels not included in another pattern
-    arguments : another pattern
-    returns :   a pointer to apattern
-*/
-
-void Pattern::new() {}
-
-///////////////////////////////////////////////////////////////////////// PEmpty
-
-/*
-Empty pattern
-
-An empty set of levels {}
-
-define :
-    Nothing, the set is empty
-    arguments : none
-    returns :   void
-to_string :
-    'Empty', to know it's there
-    arguments : none
-    returns :   string scalar 'Empty'
-print :
-    'Empty'
-    arguments : none
-    returns :   void
-to_expr :
-    Nothing "", it's empty
-    arguments : the corresponding variable
-    returns :   string scalar ""
-compress :
-    Nothing, it's already empty
-    arguments : none
-    returns :   PEmpty
-overlap :
-    Nothing, it contains nothing
-    arguments : a pattern
-    returns :   PEmpty
-includes :
-    The empty set includes itself
-    arguments : a pattern
-    returns :   1 if PEmpty, 0 other otherwise
-difference :
-    Nothing, it contains nothing
-    arguments : another pattern
-    returns :   &PEmpty()
-*/
-
-void PEmpty::new() {}
-
-void PEmpty::define() { 
-    // Does nothing, it's empty
+void define_pempty(`EMPTY' pempty) {
 }
 
-string scalar PEmpty::to_string() {
-    return("Empty")
-}
-
-void PEmpty::print() {
-    displayas("text")
-    printf("%s\n", this.to_string())
-}
-
-string scalar PEmpty::to_expr(class Variable scalar variable) {
-    return("")
-}
-
-transmorphic scalar PEmpty::compress() {
-    return(this)
-}
-
-// The outcome is compressed
-transmorphic scalar PEmpty::overlap(class Pattern scalar pattern) {
-    check_pattern(pattern)
-
-    return(this)
-}
-
-real scalar PEmpty::includes(transmorphic scalar pattern) {
-    check_pattern(pattern)
+void define_pwild(`WILD' pwild, `VARIABLE' variable) {
+    `CONSTANT' pconstant
+    `REAL' i
     
-    return(classname(pattern) == "PEmpty")
-}
-
-pointer scalar PEmpty::difference(transmorphic scalar pattern) {
-    check_pattern(pattern)
-
-    return(&this)
-}
-
-////////////////////////////////////////////////////////////////////////// PWild
-
-/*
-Wildcard pattern
-
-A set containing the universe of the levels O(V) for a variable V
-
-define :
-    Takes a variable and define a Pattern covering its universe
-        - for integers : a union of all the levels as Constant patterns
-        - for float : a range from the min to the max, plus missing value if any
-        - for strings : a union of all the levels as Constant patterns
-    arguments : a variable
-    returns :   void
-to_string :
-    Either '_' or the underlying patterns if argument all is provided
-    arguments : optional real scalar all
-    returns :   string scalar
-print :
-    prints the result of to_string()
-    arguments : optional real scalar all
-    returns :   void
-to_expr :
-    '1==1', it's always true
-    arguments : the corresponding variable
-    returns :   string scalar "1==1"
-compress :
-    Nothing, it's the universe of levels, that are all unique
-    arguments : none
-    returns :   itself
-overlap :
-    It overlaps with all the patterns, assuming that the user provides included patterns
-    arguments : a pattern
-    returns :   the provided pattern
-includes :
-    It includes everything
-    arguments : a pattern
-    returns :   1
-difference :
-    The difference between the underlying pattern and the provided pattern
-    arguments : another pattern
-    returns :   a pointer to a pattern
-*/
-
-void PWild::new() {}
-
-void PWild::define(class Variable scalar variable) { 
-    class PConstant scalar pconstant
-    real scalar i, index
-
+    init_por(pwild.values)
+    
     if (length(variable.levels) == 0) {
-        this.push(PEmpty())
+        push_por(pwild.values, PEmpty())
         return
     }
-
+    
     if (variable.type == "string") {
         for (i = 1; i <= length(variable.levels); i++) {
             pconstant = PConstant()
-            pconstant.define(i)
-            this.push(pconstant)
+            define_pconstant(pconstant, i)
+            push_por(pwild.values, pconstant)
         }
     }
     else if (variable.type == "int") {
         for (i = 1; i <= length(variable.levels); i++) {
             pconstant = PConstant()
-            pconstant.define(variable.levels[i])
-            this.push(pconstant)
+            define_pconstant(pconstant, variable.levels[i])
+            push_por(pwild.values, pconstant)
         }
     }
     else if (variable.type == "float") {
         for (i = 1; i <= length(variable.levels); i++) {
             pconstant = PConstant()
-            pconstant.define(variable.levels[i])
-            this.push(pconstant)
+            define_pconstant(pconstant, variable.levels[i])
+            push_por(pwild.values, pconstant)
         }
     }
     else if (variable.type == "double") {
         for (i = 1; i <= length(variable.levels); i++) {
             pconstant = PConstant()
-            pconstant.define(variable.levels[i])
-            this.push(pconstant)
+            define_pconstant(pconstant, variable.levels[i])
+            push_por(pwild.values, pconstant)
         }
     }
     else {
@@ -795,305 +211,13 @@ void PWild::define(class Variable scalar variable) {
     }
 }
 
-string scalar PWild::to_string(| real scalar all) {
-    if (args() == 0) {
-        return("_")
-    }
-    else if (all == 0) {
-        return("_")
-    }
-    else if (this.values.len() == 0) {
-        return("")
-    }
-    else {
-        return(this.values.to_string())
-    }
+void define_pconstant(`CONSTANT' pconstant, `REAL' value) {
+    pconstant.value = value
 }
 
-void PWild::print(| real scalar all) {
-    if (args() == 0) {
-        all = 0
-    }
-    
-    displayas("text")
-    printf("%s\n", this.to_string(all))
-}
-
-string scalar PWild::to_expr(class Variable scalar variable) {
-    return("1")
-}
-
-transmorphic scalar PWild::compress() {
-    return(this)
-}
-
-// The outcome is compressed
-transmorphic scalar PWild::overlap(class Pattern scalar pattern) {
-    check_pattern(pattern)
-
-    return(pattern)
-}
-
-real scalar PWild::includes(transmorphic scalar pattern) {
-    check_pattern(pattern)
-
-    return(1)
-}
-
-pointer scalar PWild::difference(transmorphic scalar pattern) {
-    check_pattern(pattern)
-
-    return(this.values.difference(pattern))
-}
-
-void PWild::push(transmorphic scalar pattern) {
-    this.values.push(pattern)
-}
-
-////////////////////////////////////////////////////////////////////// PConstant
-
-/*
-Constant pattern
-
-A set containing a unique level of variable V
-
-define :
-    Takes a value and assing it to its member
-    arguments : a value (real or string)
-    returns :   void
-to_string :
-    Transforms the value to string (%g format if its a real)
-    arguments : nothing
-    returns :   string scalar
-print :
-    Prints the result of to_string()
-    arguments : nothing
-    returns :   void
-to_expr :
-    A string of an expression checking if the variable is equal to the value. 
-    Uses %21x format for real to be sure that it uses the exact value.
-    arguments : the corresponding variable
-    returns :   string scalar "V == value"
-compress :
-    Nothing, it's a unique value
-    arguments : none
-    returns :   itself
-overlap :
-    Returns the set of values in common with other another pattern. It returns
-    itself if the other pattern includes it, an Empty pattern otherwise.
-    arguments : a pattern
-    returns :   itself or PEmpty()
-includes :
-    Different conditions depending on the pattern
-        - It always includes the Empty pattern
-        - It includes the Wildcard pattern if it includes its values
-        - It includes the Range pattern if it's equal to its min and max and
-          they are included in the range
-        - It includes the Or pattern if it includes all its patterns
-    arguments : a pattern
-    returns :   real scalar 0 or 1
-difference :
-    The difference of the Constant pattern with another pattern is the set of
-    levels in the Constant pattern that are not included in the other pattern.
-    Given that the constant pattern includes one level, it can be either itself
-    if the other pattern does not include this level or the Empty pattern
-    otherwise.
-    arguments : another pattern
-    returns :   a pointer to itself or PEmpty()
-*/
-
-void PConstant::new() {}
-
-void PConstant::define(real scalar value) {
-    this.value = value
-}
-
-string scalar PConstant::to_string() {
-    return(strofreal(this.value))
-}
-
-string scalar PConstant::to_expr(class Variable scalar variable) {
-    if (variable.type == "string") {
-        return(sprintf("%s == %s", variable.name, variable.levels[this.value]))
-    }
-    else {
-        return(sprintf("%s == %21x", variable.name, this.value))
-    }
-}
-
-void PConstant::print() {
-    displayas("text")
-    printf("%s\n", this.to_string())
-}
-
-transmorphic scalar PConstant::compress() {
-    return(this)
-}
-
-// The outcome is compressed
-transmorphic scalar PConstant::overlap(class Pattern scalar pattern) {
-    check_pattern(pattern)
-
-    if (pattern.includes(this)) {
-        return(this)
-    }
-    else {
-        return(PEmpty())
-    }
-}
-
-real scalar PConstant::includes(transmorphic scalar pattern) {
-    check_pattern(pattern)
-
-    if (classname(pattern) == "PEmpty") {
-        return(1)
-    }
-    else if (classname(pattern) == "PWild") {
-        return(this.includes_pwild(pattern))
-    }
-    else if (classname(pattern) == "PConstant") {
-        return(this.includes_pconstant(pattern))
-    }
-    else if (classname(pattern) == "PRange") {
-        return(this.includes_prange(pattern))
-    }
-    else if (classname(pattern) == "POr") {
-        return(this.includes_por(pattern))
-    }
-}
-
-real scalar PConstant::includes_pwild(class PWild scalar pwild) {
-    return(this.includes(pwild.values))
-}
-
-real scalar PConstant::includes_pconstant(class PConstant scalar pconstant) {
-    return(this.value == pconstant.value)
-}
-
-real scalar PConstant::includes_prange(class PRange scalar prange) {
-    return(
-        this.value == prange.min
-        & this.value == prange.max
-    )
-}
-
-real scalar PConstant::includes_por(class POr scalar por) {
-    real scalar i
-    
-    for (i = 1; i <= por.len(); i++) {
-        if (!this.includes(por.get_pat(i))) {
-            return(0)
-        }
-    }
-    return(1)
-}
-
-pointer scalar PConstant::difference(class Pattern scalar pattern) {
-    // For the constant there is one value
-    // Hence, we either return it or return nothing
-
-    if (pattern.includes(this)) {
-        return(&(PEmpty()))
-    }
-    else {
-        return(&this)
-    }
-}
-
-///////////////////////////////////////////////////////////////////////// PRange
-
-/*
-Range pattern
-
-A set containing all the levels of variable V between a minimum and a maximum
-
-define :
-    Takes a minimum, a maximum, a bool if the minimum is included, a bool if the
-    maximum is included and a bool if the variable is discrete
-    arguments : five real scalars
-    returns :   void
-to_string :
-    The min, the max and a symbol depending on their inclusion in the range.
-    The symbol can be:
-        - /   if min and max are included
-        - !/  if min is excluded and max included
-        - /!  if min is included and max excluded
-        - !!  if min and max are excluded
-    arguments : nothing
-    returns :   string scalar "'min''sym''max'" 
-print :
-    Prints the result of to_string()
-    arguments : nothing
-    returns :   void
-to_expr :
-    A string of an expression checking if the variable is above the minimum and
-    below the maximum. The inequality sign are defined depending on the
-    inclusion members. The minimum and maximum use the %21x format to be sure
-    that it uses the exact value.
-    arguments : the corresponding variable
-    returns :   string scalar "V >(=) min & V <(=) max"
-compress :
-    - If the variable is discrete and the min(max) is not included, we increase
-        (decrease) the min(max) and mark it included
-    - If the min is larger than the max the Range pattern is empty
-    - If the min is equal to the max and one of them is not included, it's empty
-    - If the min is equal to the max and both of them are included, it returns
-        a Constant pattern
-    - Otherwise it returns the itself with the modifications
-    arguments : none
-    returns :   itself, PEmpty() or PConstant()
-overlap :
-    Different conditions depending on the pattern
-        - Empty pattern : the empty pattern
-        - Wildcard pattern : itself
-        - Constant pattern : the pattern if it includes it, empty otherwise
-        - PRange pattern :
-            - if the min is above the other max, it's empty
-            - if the max is below the other min, it's empty
-            - min = max(min, other min)
-            - max = min(max, other max)
-            - inclusion is taken from the corresponding pattern
-            - the result can be either a Range, a Constant or an Empty pattern
-        - POr pattern : it's the union of the overlap with each pattern
-    arguments : a pattern
-    returns :   PEmpty(), PConstant(), PRange() or POr()
-includes :
-    Different conditions depending on the pattern
-        - It always includes the Empty pattern
-        - It includes the Wildcard pattern if it includes its values
-        - It includes the Range pattern if its min is smaller and its max is
-            larger than the other, given their respective inclusion
-        - It includes the Or pattern if it includes all its patterns
-    arguments : a pattern
-    returns :   real scalar 0 or 1
-difference :
-    Different conditions depending on the pattern
-        - Returns itself with the Empty pattern
-        - Returns an Empty pattern with a Wildcard patter
-        - With a constant pattern
-            - if it includes it, it's splitten in two ranges
-            - otherwise it returns itself
-        - With a range pattern it is either
-            - empty if the other range covers it
-            - a single range if the other range covers a side of it
-            - splitten in two if the other range covers the middle of it
-            - itself if the other range is below or above
-        - With a Or pattern
-            - it's the difference with each sub-pattern
-            - comparing the resulting difference with the following sub-patterns
-    arguments : another pattern
-    returns :   a pointer to a pattern
-*/
-
-void PRange::new() {}
-
-void PRange::define( ///
-        real scalar min, ///
-        real scalar max, ///
-        real scalar type_nb ///
-) {
+void define_prange(`RANGE' prange, `REAL' min, `REAL' max, `REAL' type_nb) {
     if (isint(type_nb) & type_nb >= 1 & type_nb <= 3) {
-        this.type_nb = type_nb
+        prange.type_nb = type_nb
     }
     else {
         errprintf("Range type number field should be 1, 2 or 3\n")
@@ -1105,344 +229,425 @@ void PRange::define( ///
         exit(_error(3253))
     }
     
-    // TODO: Decide where to check it in rest of code
-    // if (min > max) {
-    //     errprintf("Range minimum (%s) should be smaller than its maximum (%s)\n", min, max)
-    //     exit(_error(3498))
-    // }
+    /*if (min > max) {
+        errprintf("Range minimum (%s) should be smaller than its maximum (%s)\n", min, max)
+        exit(_error(3498))
+    }*/
     
-    if (this.type_nb == 1) {
+    if (prange.type_nb == 1) {
         if (!isint(min) | !isint(max)) {
             errprintf("Range is discrete but boundaries are not integers\n")
             exit(_error(3498))
         }
     }
     
-    this.min = min
-    this.max = max
+    prange.min = min
+    prange.max = max
 }
 
-string scalar PRange::to_string() {
-    return(sprintf("%f/%f", this.min, this.max))
+void define_por(`OR' por, `POINTERS' patterns) {
+    init_por(por)
+    append(por, patterns)
 }
 
-void PRange::print() {
-    displayas("text")
-    printf("%s\n", this.to_string())
+//////////////////////////////////////////////////////////////////// to_string()
+
+`STRING' to_string(`T' pattern) {
+    if (structname(pattern) == "PEmpty") {
+        return(to_string_pempty(pattern))
+    }
+    else if (structname(pattern) == "PWild") {
+        return(to_string_pwild(pattern))
+    }
+    else if (structname(pattern) == "PConstant") {
+        return(to_string_pconstant(pattern))
+    }
+    else if (structname(pattern) == "PRange") {
+        return(to_string_prange(pattern))
+    }
+    else if (structname(pattern) == "POr") {
+        return(to_string_por(pattern))
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(to_string_tuple(pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
 }
 
-string scalar PRange::to_expr(class Variable scalar variable) {
+`STRING' to_string_pempty(`EMPTY' pempty) {
+    return("Empty")
+}
+
+`STRING' to_string_pwild(`WILD' pwild, | `REAL' detailed) {
+    if (args() == 1) {
+        detailed = 0
+    }
+    
+    if (detailed == 0) {
+        return("_")
+    }
+    else {
+        return(to_string_por(pwild.values))
+    }
+}
+
+`STRING' to_string_pconstant(`CONSTANT' pconstant) {
+    return(strofreal(pconstant.value))
+}
+
+`STRING' to_string_prange(`RANGE' prange) {
+    return(strofreal(prange.min) + "/" + strofreal(prange.max))
+}
+
+`STRING' to_string_por(`OR' por) {
+    string vector strings
+    `REAL' i
+
+    strings = J(1, por.length, "")
+
+    for (i = 1; i <= por.length; i++) {
+        strings[i] = to_string(*por.patterns[i])
+    }
+
+    return(invtokens(strings, " | "))
+}
+
+`STRING' to_string_tuple(`TUPLE' tuple) {
+    string vector strings
+    `REAL' i, n_pat
+    
+    n_pat = length(tuple.patterns)
+
+    if (n_pat == 0) {
+        return("Empty Tuple: Error")
+    }
+    
+    strings = J(1, n_pat, "")
+    
+    for (i = 1; i <= n_pat; i++) {
+        strings[i] = to_string(*tuple.patterns[i])
+    }
+    
+    if (n_pat == 1) {
+        return(invtokens(strings, ", "))
+    }
+    else {
+        return("(" + invtokens(strings, ", ") + ")")
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////// print()
+
+void print(`T' pattern) {
+    to_string(pattern)
+}
+
+////////////////////////////////////////////////////////////////////// to_expr()
+
+`STRING' to_expr(`T' pattern, `VARIABLES' variable) {
+    if (structname(pattern) == "PEmpty") {
+        return(to_expr_pempty(pattern, variable))
+    }
+    else if (structname(pattern) == "PWild") {
+        return(to_expr_pwild(pattern, variable))
+    }
+    else if (structname(pattern) == "PConstant") {
+        return(to_expr_pconstant(pattern, variable))
+    }
+    else if (structname(pattern) == "PRange") {
+        return(to_expr_prange(pattern, variable))
+    }
+    else if (structname(pattern) == "POr") {
+        return(to_expr_por(pattern, variable))
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(to_expr_tuple(pattern, variable))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+`STRING' to_expr_pempty(`EMPTY' pempty, `VARIABLE' variable) {
+    return("")
+}
+
+`STRING' to_expr_pwild(`WILD' pwild, `VARIABLE' variable) {
+    return("1")
+}
+
+`STRING' to_expr_pconstant(`CONSTANT' pconstant, `VARIABLE' variable) {
+    if (variable.type == "string") {
+        return(sprintf("%s == %s", variable.name, variable.levels[pconstant.value]))
+    }
+    else {
+        return(sprintf("%s == %21x", variable.name, pconstant.value))
+    }
+}
+
+`STRING' to_expr_prange(`RANGE' prange, `VARIABLE' variable) {
     return(sprintf(
         "%s >= %21x & %s <= %21x",
-        variable.name, this.min, variable.name, this.max
+        variable.name, prange.min, variable.name, prange.max
     ))
 }
 
-transmorphic scalar PRange::compress() {
-    class PConstant scalar pconstant
-
-    // The range can also be empty or a constant
-    if (this.min > this.max) {
-        return(PEmpty())
-    }
-    else if (this.min == this.max) {
-        pconstant.define(this.min)
-        return(pconstant)
-    }
-    else {
-        return(this)
-    }
-}
-
-transmorphic scalar PRange::overlap(class Pattern scalar pattern) {
-    check_pattern(pattern)
-
-    if (classname(pattern) == "PEmpty") {
-        return(PEmpty())
-    }
-    else if (classname(pattern) == "PWild") {
-        return(this)
-    }
-    else if (classname(pattern) == "PConstant") {
-        return(this.overlap_pconstant(pattern))
-    }
-    else if (classname(pattern) == "PRange") {
-        return(this.overlap_prange(pattern))
-    }
-    else if (classname(pattern) == "POr") {
-        return(this.overlap_por(pattern))
-    }
-}
-
-real scalar PRange::includes(transmorphic scalar pattern) {
-    check_pattern(pattern)
-
-    if (classname(pattern) == "PEmpty") {
-        return(1)
-    }
-    else if (classname(pattern) == "PWild") {
-        return(this.includes_pwild(pattern))
-    }
-    else if (classname(pattern) == "PConstant") {
-        return(this.includes_pconstant(pattern))
-    }
-    else if (classname(pattern) == "PRange") {
-        return(this.includes_prange(pattern))
-    }
-    else if (classname(pattern) == "POr") {
-        return(this.includes_por(pattern))
-    }
-}
-
-pointer scalar PRange::difference(transmorphic scalar pattern) {
-    check_pattern(pattern)
-
-    if (classname(pattern) == "PEmpty") {
-        return(&this)
-    }
-    else if (classname(pattern) == "PWild") {
-        return(&(PEmpty()))
-    }
-    else if (classname(pattern) == "PConstant") {
-        return(this.difference_pconstant(pattern))
-    }
-    else if (classname(pattern) == "PRange") {
-        return(this.difference_prange(pattern))
-    }
-    else if (classname(pattern) == "POr") {
-        return(this.difference_por(pattern))
-    }
-}
-
-// The outcome is compressed
-transmorphic scalar PRange::overlap_pconstant(class PConstant scalar pconstant) {
-    if (this.includes(pconstant)) {
-        return(pconstant)
-    }
-    else {
-        return(PEmpty())
-    }
-}
-
-// The outcome is compressed
-transmorphic scalar PRange::overlap_prange(class PRange scalar prange) {
-    class PRange scalar inter_range
+`STRING' to_expr_por(`OR' por, `VARIABLES' variable) {
+    string vector exprs
+    `REAL' i
     
-    if (this.min > prange.max) return(PEmpty())
-    if (this.max < prange.min) return(PEmpty())
-
-    inter_range.type_nb = this.type_nb
-    inter_range.min = max((this.min, prange.min))
-    inter_range.max = min((this.max, prange.max))
-
-    // Return the compressed version
-    return(inter_range.compress())
-}
-
-transmorphic scalar PRange::overlap_por(class POr scalar por) {
-    return(por.overlap(this))
-}
-
-real scalar PRange::includes_pwild(class PWild scalar pwild) {
-    return(this.includes(pwild.values))
-}
-
-real scalar PRange::includes_pconstant(class PConstant scalar pconstant) {
-    return(pconstant.value >= this.min & pconstant.value <= this.max)
-}
-
-real scalar PRange::includes_prange(class PRange scalar prange) {
-    return(prange.min >= this.min & prange.max <= this.max)
-}
-
-real scalar PRange::includes_por(class POr scalar por) {
-    real scalar i
+    assert(!missing(por.length))
     
-    for (i = 1; i <= por.len(); i++) {
-        if (!this.includes(por.get_pat(i))) {
-            return(0)
+    if (por.length == 0) {
+        return("")
+    }
+    
+    if (por.length == 1) {
+        return(to_expr(*por.patterns[1], variable))
+    }
+
+    exprs = J(1, por.length, "")
+    
+    for (i = 1; i <= por.length; i++) {
+        exprs[i] = "(" + to_expr(*por.patterns[i], variable) + ")"
+    }
+
+    return(invtokens(exprs, " | "))
+}
+
+`STRING' to_expr_tuple(`TUPLE' tuple, `VARIABLES' variables) {
+    `POINTER' pattern
+    string vector exprs
+    `REAL' i, k, n_pat
+
+    n_pat = length(tuple.patterns)
+    
+    if (n_pat != length(variables)) {
+        errprintf(
+            "The tuples and variables have different sizes %f and %f",
+            n_pat, length(variables)
+        )
+        exit(_error(3300))
+    }
+    
+    exprs = J(1, n_pat, "")
+
+    k = 0
+    for (i = 1; i <= n_pat; i++) {
+        pattern = &compress(*tuple.patterns[i])
+        if (structname(*pattern) != "PWild" & structname(*pattern) != "PEmpty") {
+            k++
+            exprs[k] = to_expr(*pattern, variables[i])
         }
     }
-    return(1)
+    
+    if (k == 0) {
+        return("1")
+    }
+    
+    // Add parentheses if there is more than 1 condition
+    if (k > 1) {
+        for (i = 1; i <= k; i++) {
+            exprs[i] = "(" + exprs[i] + ")"
+        }
+    }
+    
+    return(invtokens(exprs[1..k], " & "))
 }
 
-pointer scalar PRange::difference_pconstant(class PConstant scalar pconstant) {
-    class PRange scalar prange_1, prange_2
-    class POr scalar pranges
-    real scalar new_min, new_max
-    
-    if (pconstant.value < this.min | pconstant.value > this.max) {
-        return(&this)
-    }
-    
-    if (pconstant.value != this.min) {
-        new_max = pconstant.value - get_epsilon(pconstant.value, this.type_nb)
-        prange_1.define(this.min, new_max, this.type_nb)
-        pranges.push(&prange_1)
-    }
-    
-    if (pconstant.value != this.max) {
-        new_min = pconstant.value + get_epsilon(pconstant.value, this.type_nb)
-        prange_2.define(new_min, this.max, this.type_nb)
-        pranges.push(&prange_2)
-    }
-    
-    return(&pranges.compress())
-}
+///////////////////////////////////////////////////////////////////// compress()
 
-pointer scalar PRange::difference_prange(class PRange scalar prange) {
-    class PRange scalar prange_1, prange_2
-    class POr scalar result
-    real scalar new_min, new_max
-    
-    if (prange.max < this.min | prange.min > this.max) {
-        return(&this)
+`T' compress(`T' pattern) {
+    if (structname(pattern) == "PEmpty") {
+        return(compress_pempty(pattern))
     }
-    
-    // First half
-    if (prange.min <= this.min) {
-        // Nothing there is no first half
+    else if (structname(pattern) == "PWild") {
+        return(compress_pwild(pattern))
+    }
+    else if (structname(pattern) == "PConstant") {
+        return(compress_pconstant(pattern))
+    }
+    else if (structname(pattern) == "PRange") {
+        return(compress_prange(pattern))
+    }
+    else if (structname(pattern) == "POr") {
+        return(compress_por(pattern))
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(compress_tuple(pattern))
     }
     else {
-        new_max = prange.min - get_epsilon(prange.min, this.type_nb)
-        prange_1.define(this.min, new_max, this.type_nb)
-        result.push(&prange_1)
+        unknown_pattern(pattern)
     }
+}
+
+`T' compress_pempty(`EMPTY' pempty) {
+    return(pempty)
+}
+
+`T' compress_pwild(`WILD' pwild) {
+    return(pwild)
+}
+
+`T' compress_pconstant(`CONSTANT' pconstant) {
+    return(pconstant)
+}
+
+`T' compress_prange(`RANGE' prange) {
+    `CONSTANT' pconstant
     
-    // Second half
-    if (prange.max >= this.max) {
-        // Nothing there is no second half
+    if (prange.min > prange.max) {
+        return(PEmpty())
+    }
+    else if (prange.min == prange.max) {
+        pconstant.value = prange.min
+        return(pconstant)
     }
     else {
-        new_min = prange.max + get_epsilon(prange.max, this.type_nb)
-        prange_2.define(new_min, this.max, this.type_nb)
-        result.push(&prange_2)
-    }
-    
-    return(&result.compress())
-}
-
-pointer scalar PRange::difference_por(class POr scalar por) {
-    class POr scalar result
-    
-    result.define(difference_list(this, por.patterns))
-    
-    return(&result)
-}
-
-//////////////////////////////////////////////////////////////////////////// POr
-
-/*
-POr pattern
-
-A set containing the union of multiple patterns
-
-define :
-    Takes a vector of pointers and push it to its dynamic array
-    arguments : a vector of pointers to patterns
-    returns :   void
-to_string :
-    The string version of its patterns separated by " | "
-    arguments : nothing
-    returns :   string scalar "p_i | ... | p_j" 
-print :
-    Prints the result of to_string()
-    arguments : nothing
-    returns :   void
-to_expr :
-    The union of the expressions of its patterns
-    arguments : the corresponding variable
-    returns :   string scalar "p_i | ... | p_j"
-compress :
-    - Compress all its patterns
-    - Add them to a new Or pattern if they are not empty
-    - Return an Empty pattern if the Or pattern has no pattern
-    - Return a unique pattern if the Or pattern has only one pattern
-    - Return the Or pattern otherwise
-    arguments : none
-    returns :   PEmpty(), PConstant(), PRange() or POr()
-overlap :
-    The overlap of a Or pattern with another pattern is the union of its
-    patterns' overlap with the other pattern
-    arguments : a pattern
-    returns :   PEmpty(), PConstant(), PRange() or POr()
-includes :
-    A Or pattern includes another pattern if, taken together, its pattern
-    include the other pattern. For this we can compute the difference between
-    each of its patterns with the remaining the previous differences and check
-    if the final pattern is empty. If it is, it means that all the levels of the
-    pattern have been found in the Or pattern and it includes it. Otherwise, it
-    means that some levels are not included in the Or pattern and it does not.
-    arguments : a pattern
-    returns :   real scalar 0 or 1
-difference :
-    The difference between a Or pattern and another pattern is the union of the
-    difference between each of its patterns and the other pattern?
-    arguments : another pattern
-    returns :   a pointer to a pattern
-*/
-
-void POr::new() {}
-
-void POr::define(pointer vector patterns) {
-    real scalar i
-
-    this.clear()
-
-    for (i = 1; i <= length(patterns); i++) {
-        this.push(patterns[i])
+        return(prange)
     }
 }
 
-transmorphic scalar POr::compress() {
-    class POr scalar por
-    class Pattern scalar pattern
-    real scalar i
-
-    // TODO: Replace in place
+`T' compress_por(`OR' por) {
+    `OR' por_compressed
+    `POINTER' pattern_compressed
+    `REAL' i
     
-    for (i = 1; i <= this.len(); i++) {
-        pattern = this.get_pat(i)
-        pattern = pattern.compress()
-        if (classname(pattern) == "PEmpty") {
+    init_por(por_compressed)
+    
+    for (i = 1; i <= por.length; i++) {
+        pattern_compressed = &compress(*por.patterns[i])
+        if (structname(*pattern_compressed) == "PEmpty") {
             continue
         }
-        else if (classname(pattern) == "PWild") {
-            return(pattern)
+        else if (structname(*pattern_compressed) == "PWild") {
+            return(*pattern_compressed)
         }
         else {
-            if (!por.includes(pattern)) {
-                por.push(pattern) 
+            if (!includes_por(por_compressed, *pattern_compressed)) {
+                push_por(por_compressed, *pattern_compressed) 
             }
         }
     }
     
-    if (por.len() == 0) {
+    if (por_compressed.length == 0) {
         return(PEmpty())
     }
-    if (por.len() == 1) {
-        return(por.get_pat(1))
+    if (por_compressed.length == 1) {
+        return(*por_compressed.patterns[1])
     }
     else {
-        return(por)
+        return(por_compressed)
     }
 }
 
-string scalar POr::to_string() {
-    return(this.patterns.to_string(" | "))
-}
+`T' compress_tuple(`TUPLE' tuple) {
+    `TUPLE' tuple_compressed
+    `REAL' i
 
-string scalar POr::to_expr(string vector variable) {
-    class Pattern scalar pattern
-    string vector exprs
-    real scalar i
+    tuple_compressed.arm_id = tuple.arm_id
+    tuple_compressed.patterns = J(length(tuple.patterns), 1, NULL)
     
-    return(this.patterns.to_expr(" | ", variable))
+    for (i = 1; i <= length(tuple.patterns); i++) {
+        tuple_compressed.patterns[i] = &compress(*tuple.patterns[i])
+        if (structname(*tuple_compressed.patterns[i]) == "PEmpty") {
+            return(PEmpty())
+        }
+    }
+
+    return(tuple_compressed)
 }
 
-void POr::print() {
-    displayas("text")
-    printf("%s\n", this.to_string())
+////////////////////////////////////////////////////////////////////// overlap()
+
+`T' overlap(`T' pattern_1, `T' pattern_2) {
+    if (structname(pattern_1) == "PEmpty") {
+        return(overlap_pempty(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "PWild") {
+        return(overlap_pwild(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "PConstant") {
+        return(overlap_pconstant(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "PRange") {
+        return(overlap_prange(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "POr") {
+        return(overlap_por(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "Tuple") {
+        return(overlap_tuple(pattern_1, pattern_2))
+    }
+    else {
+        unknown_pattern(pattern_1)
+    }
+}
+
+`T' overlap_pempty(`EMPTY' pempty, `T' pattern) {
+    return(pempty)
+}
+
+`T' overlap_pwild(`WILD' pwild, `T' pattern) {
+    return(pattern)
+}
+
+`T' overlap_pconstant(`CONSTANT' pconstant, `T' pattern) {
+    if (includes(pattern, pconstant)) {
+        return(pconstant)
+    }
+    else {
+        return(PEmpty())
+    }
+}
+
+`T' overlap_prange(`RANGE' prange, `T' pattern) {
+    if (structname(pattern) == "PEmpty") {
+        return(PEmpty())
+    }
+    else if (structname(pattern) == "PWild") {
+        return(prange)
+    }
+    else if (structname(pattern) == "PConstant") {
+        return(overlap_prange_pconstant(prange, pattern))
+    }
+    else if (structname(pattern) == "PRange") {
+        return(overlap_prange_prange(prange, pattern))
+    }
+    else if (structname(pattern) == "POr") {
+        return(overlap_por(pattern, prange))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+`T' overlap_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
+    if (includes_prange_pconstant(prange, pconstant)) {
+        return(pconstant)
+    }
+    else {
+        return(PEmpty())
+    }
+}
+
+`T' overlap_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
+    `RANGE' inter_range
+    
+    if (prange_1.min > prange_2.max) return(PEmpty())
+    if (prange_1.max < prange_2.min) return(PEmpty())
+
+    inter_range.type_nb = prange_2.type_nb
+
+    // Determine the minimum
+    inter_range.min = max((prange_1.min, prange_2.min))
+    inter_range.max = min((prange_1.max, prange_2.max))
+
+    // Return the compressed version
+    return(compress_prange(inter_range))
 }
 
 // The outcome is compressed, but need to check if the pattern is included
@@ -1455,79 +660,236 @@ void POr::print() {
 // (1/3 | 2/4 | 3) => 1/4
 // In this case all the compressed elements are exclusive
 // The overlaps of a compressed POr and a pattern would always be compressed
-// This would work for tuples too
-transmorphic scalar POr::overlap(class Pattern scalar pattern) {
-    class POr scalar por
-    class Pattern scalar pattern_i, overlap_i
-    real scalar i
+// This would work for tuples to
+`T' overlap_por(`OR' por, `T' pattern) {
+    `OR' por_overlap
+    `POINTER' overlap
+    `REAL' i
+    
+    init_por(por_overlap)
 
-    for (i = 1; i <= this.len(); i++) {
-        pattern_i = this.get_pat(i)
-        overlap_i = pattern_i.overlap(pattern)
-        if (classname(overlap_i) == "PEmpty") {
+    for (i = 1; i <= por.length; i++) {
+        overlap = &overlap(*por.patterns[i], pattern)
+        if (structname(*overlap) == "PEmpty") {
             continue
         }
-        else if (classname(overlap_i) == "PWild") {
-            return(overlap_i)
+        else if (structname(*overlap) == "PWild") {
+            return(*overlap)
         }
         else {
-            if (!por.includes(overlap_i)) {
-                por.push(overlap_i)
+            if (!includes_por(por_overlap, *overlap)) {
+                push_por(por_overlap, *overlap)
             }
         }
     }
     
-    if (por.len() == 0) {
+    if (por_overlap.length == 0) {
         return(PEmpty())
     }
-    if (por.len() == 1) {
-        return(por.get_pat(1))
+    if (por_overlap.length == 1) {
+        return(*por_overlap.patterns[1])
     }
     else {
-        return(por)
+        return(por_overlap)
     }
 }
 
-real scalar POr::includes(transmorphic scalar pattern) {
-    check_pattern(pattern)
+`T' overlap_tuple(`TUPLE' tuple, `T' pattern) {
+    if (structname(pattern) == "PEmpty") {
+        return(PEmpty())
+    }
+    else if (structname(pattern) == "PWild") {
+        return(tuple)
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(overlap_tuple_tuple(tuple, pattern))
+    }
+    else if (structname(pattern) == "POr") {
+        return(overlap_tuple_por(tuple, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
 
-    if (classname(pattern) == "PEmpty") {
+`T' overlap_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
+    `TUPLE' tuple_overlap
+    `REAL' i
+    
+    check_tuples(tuple_1, tuple_2)
+    
+    tuple_overlap.patterns = J(1, length(tuple_1.patterns), NULL)
+
+    // We compute the overlap of each pattern in the tuple
+    for (i = 1; i <= length(tuple_1.patterns); i++) {
+        tuple_overlap.patterns[i] = &overlap(
+            *tuple_1.patterns[i],
+            *tuple_2.patterns[i]
+        )
+        if (structname(*tuple_overlap.patterns[i]) == "PEmpty") {
+            return(PEmpty())
+        }
+    }
+
+    return(tuple_overlap)
+}
+
+`T' overlap_tuple_por(`TUPLE' tuple, `OR' por) {
+    `OR' por_overlap
+    `REAL' i
+    
+    init_por(por_overlap)
+    
+    por_overlap.patterns = J(1, length(por.patterns), NULL)
+    
+    for (i = 1; i <= por.length; i++) {
+        push_por(por_overlap, overlap_tuple_tuple(tuple, *por.patterns[i]))
+    }
+    
+    return(compress(por_overlap))
+}
+
+///////////////////////////////////////////////////////////////////// includes()
+
+`REAL' includes(`T' pattern_1, `T' pattern_2) {
+    if (structname(pattern_1) == "PEmpty") {
+        return(includes_pempty(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "PWild") {
+        return(includes_pwild(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "PConstant") {
+        return(includes_pconstant(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "PRange") {
+        return(includes_prange(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "POr") {
+        return(includes_por(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "Tuple") {
+        return(includes_tuple(pattern_1, pattern_2))
+    }
+    else {
+        unknown_pattern(pattern_1)
+    }
+}
+
+`REAL' includes_pempty(`EMPTY' pempty, `T' pattern) {
+    return(structname(pattern) == "PEmpty")
+}
+
+`REAL' includes_pwild(`WILD' pwild, `T' pattern) {
+    return(1)
+}
+
+`REAL' includes_pconstant(`CONSTANT' pconstant, `T' pattern) {
+    if (structname(pattern) == "PEmpty") {
         return(1)
     }
-    if (classname(pattern) == "PConstant") {
-        return(this.includes_pconstant(pattern))
+    else if (structname(pattern) == "PWild") {
+        return(includes_pconstant_pwild(pconstant, pattern))
+    }
+    else if (structname(pattern) == "PConstant") {
+        return(includes_pconstant_pconstant(pconstant, pattern))
+    }
+    else if (structname(pattern) == "PRange") {
+        return(includes_pconstant_prange(pconstant, pattern))
+    }
+    else if (structname(pattern) == "POr") {
+        return(includes_pconstant_por(pconstant, pattern))
     }
     else {
-        return(this.includes_default(pattern))
+        unknown_pattern(pattern)
     }
 }
 
-pointer scalar POr::difference(transmorphic scalar pattern) {
-    class POr scalar differences
-    class Pattern scalar pattern_i
-    real scalar i
+`REAL' includes_pconstant_pwild(`CONSTANT' pconstant, `WILD' pwild) {
+    return(includes_pconstant_por(pconstant, pwild.values))
+}
 
-    // Loop over all patterns in Or and compute the difference
-    for (i = 1; i <= this.len(); i++) {
-        pattern_i = this.get_pat(i)
-        differences.push(*pattern_i.difference(pattern))
+`REAL' includes_pconstant_pconstant(`CONSTANT' pconstant_1, `CONSTANT' pconstant_2) {
+    return(pconstant_1.value == pconstant_2.value)
+}
+
+`REAL' includes_pconstant_prange(`CONSTANT' pconstant, `RANGE' prange) {
+    return(pconstant.value == prange.min & pconstant.value == prange.max)
+}
+
+`REAL' includes_pconstant_por(`CONSTANT' pconstant, `OR' por) {
+    `REAL' i
+    
+    for (i = 1; i <= por.length; i++) {
+        if (!includes_pconstant(pconstant, *por.patterns[i])) {
+            return(0)
+        }
     }
     
-    if (differences.len() == 0) {
-        return(&(PEmpty()))
+    return(1)
+}
+
+`REAL' includes_prange(`RANGE' prange, `T' pattern) {
+    if (structname(pattern) == "PEmpty") {
+        return(1)
+    }
+    else if (structname(pattern) == "PWild") {
+        return(includes_prange_pwild(prange, pattern))
+    }
+    else if (structname(pattern) == "PConstant") {
+        return(includes_prange_pconstant(prange, pattern))
+    }
+    else if (structname(pattern) == "PRange") {
+        return(includes_prange_prange(prange, pattern))
+    }
+    else if (structname(pattern) == "POr") {
+        return(includes_prange_por(prange, pattern))
     }
     else {
-        return(&differences)
+        unknown_pattern(pattern)
     }
 }
 
-real scalar POr::includes_pconstant(class PConstant scalar pconstant) {
-    class Pattern scalar pattern_i
-    real scalar i
+`REAL' includes_prange_pwild(`RANGE' prange, `WILD' pwild) {
+    return(includes_prange_por(prange, pwild.values))
+}
+
+`REAL' includes_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
+    return(pconstant.value >= prange.min & pconstant.value <= prange.max)
+}
+
+`REAL' includes_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
+    return(prange_2.min >= prange_1.min & prange_2.max <= prange_1.max)
+}
+
+`REAL' includes_prange_por(`RANGE' prange, `OR' por) {
+    `REAL' i
     
-    for (i = 1; i <= this.len(); i++) {
-        pattern_i = this.get_pat(i)
-        if (pattern_i.includes(pconstant)) {
+    for (i = 1; i <= por.length; i++) {
+        if (!includes_prange(prange, *por.patterns[i])) {
+            return(0)
+        }
+    }
+    
+    return(1)
+}
+
+`REAL' includes_por(`OR' por, `T' pattern) {
+    if (structname(pattern) == "PEmpty") {
+        return(1)
+    }
+    else if (structname(pattern) == "PConstant") {
+        return(includes_por_pconstant(por, pattern))
+    }
+    else {
+        return(includes_por_default(por, pattern))
+    }
+}
+
+`REAL' includes_por_pconstant(`OR' por, `CONSTANT' pconstant) {
+    `REAL' i
+    
+    for (i = 1; i <= por.length; i++) {
+        if (includes(*por.patterns[i], pconstant)) {
             return(1)
         }
     }
@@ -1535,153 +897,404 @@ real scalar POr::includes_pconstant(class PConstant scalar pconstant) {
     return(0)
 }
 
-real scalar POr::includes_default(transmorphic scalar pattern) {
-    pointer vector difference
+`REAL' includes_por_default(`OR' por, `T' pattern) {
+    `POINTERS' difference
+    `REAL' i, n_pat
     
-    difference = difference_list(pattern, this.patterns)
-
-    if (length(difference) > 1) {
-        return(0)
+    difference = difference_list(pattern, por)
+    
+    n_pat = 0
+    
+    for (i = 1; i <= length(difference); i++) {
+        if (difference[i] == NULL) break
+        n_pat++
     }
-    else if (classname(*difference[1]) == "PEmpty") {
+    
+    if (n_pat == 0) {
         return(1)
     }
     else {
+        // difference_list() removes all the empty patterns
+        // So if there is anything, there are patterns of pattern not in por
         return(0)
     }
 }
 
-real scalar POr::len() {
-    return(this.patterns.length)
-}
-
-void POr::push(transmorphic scalar pattern) {
-    transmorphic scalar pattern_copy
-    pointer scalar pattern_ref
-    
-    pattern_copy = pattern // To avoid bad references
-
-    if (eltype(pattern) != "pointer") {
-        pattern_ref = &pattern_copy
+`REAL' includes_tuple(`TUPLE' tuple, `T' pattern) {
+    if (structname(pattern) == "PEmpty") {
+        return(1)
+    }
+    if (structname(pattern) == "PWild") {
+        // TODO: loop over all wildcards
+        return(0)
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(includes_tuple_tuple(tuple, pattern))
+    }
+    else if (structname(pattern) == "POr") {
+        return(includes_tuple_por(tuple, pattern))
     }
     else {
-        pattern_ref = pattern_copy
+        unknown_pattern(pattern)
     }
+}
+
+`REAL' includes_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
+    `REAL' i
     
-    check_pattern(*pattern_ref)
-
-    if (classname(*pattern_ref) == "PEmpty") {
-        // Ignore
-    }
-    else if (classname(*pattern_ref) == "POr") {
-        // Flatten the Or pattern
-        this.append_por(*pattern_ref)
-    }
-    else {
-        this.patterns.push(pattern_ref)
-    }
-}
-
-void POr::append_por(class POr scalar por) {
-    real scalar i
+    check_tuples(tuple_1, tuple_2)
     
-    for (i = 1; i <= por.len(); i++) {
-        this.push(por.get(i))
-    }
-}
-
-pointer scalar POr::get(real scalar index) {
-    return(this.patterns.get(index))
-}
-
-transmorphic scalar POr::get_pat(real scalar index) {
-    return(this.patterns.get_pat(index))
-}
-
-void POr::clear() {
-    this.patterns.clear()
-}
-
-////////////////////////////////////////////////////////////////////////// Utils
-
-real scalar function isbool(real scalar x) {
-    return(x == 0 | x == 1)
-}
-
-real scalar function isint(real scalar x) {
-    return(x == trunc(x))
-}
-
-real scalar function ispattern(transmorphic x) {
-    return(
-        classname(x) == "Pattern" ||
-            classname(x) == "PEmpty" ||
-            classname(x) == "PWild" ||
-            classname(x) == "PConstant" ||
-            classname(x) == "PRange" ||
-            classname(x) == "POr" ||
-            classname(x) == "Tuple"
-    )
-}
-
-void function check_pattern(transmorphic scalar pattern) {
-    if (eltype(pattern) != "class") {
-        exit(error(3260))
-    }
-
-    if (!ispattern(pattern)) {
-        errprintf("Unknown pattern of class '%s'", classname(pattern))
-        exit(_error(3260))
-    }
-}
-
-pointer vector function drop_empty_pattern(pointer vector patterns) {
-    pointer vector patterns_clean
-    real scalar i, j
-
-    if (length(patterns) == 1) {
-        return(patterns)
-    }
-
-    // TODO: do in place
-    patterns_clean = J(1, length(patterns), NULL)
-
-    j = 0
-
-    for (i = 1; i <= length(patterns); i++) {
-        if (patterns[i] != NULL) {
-            if (classname(*patterns[i]) != "PEmpty") {
-                j++
-                patterns_clean[j] = patterns[i]
-            }
+    for (i = 1; i <= length(tuple_1.patterns); i++) {
+        if (!includes(*tuple_1.patterns[i], *tuple_2.patterns[i])) {
+            return(0)
         }
     }
 
-    if (j == 0) {
-        return(&(PEmpty()))
+    return(1)
+}
+
+`REAL' includes_tuple_por(`TUPLE' tuple, `OR' por) {
+    `REAL' i
+    
+    for (i = 1; i <= por.length; i++) {
+        if (!includes_tuple(tuple, *por.patterns[i])) {
+            return(0)
+        }
+    }
+
+    return(1)
+}
+
+/////////////////////////////////////////////////////////////////// difference()
+
+`POINTER' difference(`T' pattern_1, `T' pattern_2) {
+    if (structname(pattern_1) == "PEmpty") {
+        return(difference_pempty(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "PWild") {
+        return(difference_pwild(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "PConstant") {
+        return(difference_pconstant(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "PRange") {
+        return(difference_prange(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "POr") {
+        return(difference_por(pattern_1, pattern_2))
+    }
+    else if (structname(pattern_1) == "Tuple") {
+        return(difference_tuple(pattern_1, pattern_2))
     }
     else {
-        return(patterns_clean[1..j])
+        unknown_pattern(pattern_1)
     }
 }
 
-// Compute the difference between a pattern and a list of patterns
-pointer vector difference_list(class Pattern scalar pattern, class PatternList scalar pat_list) {
-    class PatternList scalar differences, new_differences
-    class Pattern scalar pattern_i, difference_j
-    real scalar i, j
+// The result is compressed
+`POINTER' difference_pempty(`EMPTY' pempty, `T' pattern) {
+    return(&pempty)
+}
+
+`POINTER' difference_pwild(`WILD' pwild, `T' pattern) {
+    return(difference_por(pwild.values, pattern))
+}
+
+// The result is compressed
+`POINTER' difference_pconstant(`CONSTANT' pconstant, `T' pattern) {
+    if (includes(pattern, pconstant)) {
+        return(&(PEmpty()))
+    }
+    else {
+        return(&pconstant)
+    }
+}
+
+`POINTER' difference_prange(`RANGE' prange, `T' pattern) {
+    if (structname(pattern) == "PEmpty") {
+        return(&prange)
+    }
+    else if (structname(pattern) == "PWild") {
+        return(&(PEmpty()))
+    }
+    else if (structname(pattern) == "PConstant") {
+        return(difference_prange_pconstant(prange, pattern))
+    }
+    else if (structname(pattern) == "PRange") {
+        return(difference_prange_prange(prange, pattern))
+    }
+    else if (structname(pattern) == "POr") {
+        return(difference_prange_por(prange, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+// The result is compressed
+`POINTER' difference_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
+    `RANGE' prange_low, prange_high
+    `OR' pranges
     
-    differences.push(&pattern)
+    init_por(pranges)
+    
+    if (pconstant.value < prange.min | pconstant.value > prange.max) {
+        return(&prange)
+    }
+    
+    if (pconstant.value != prange.min) {
+        prange_low.min = prange.min
+        prange_low.max = pconstant.value - get_epsilon(pconstant.value, prange.type_nb)
+        prange_low.type_nb = prange.type_nb
+        push_por(pranges, prange_low)
+    }
+    
+    if (pconstant.value != prange.max) {
+        prange_high.min = pconstant.value + get_epsilon(pconstant.value, prange.type_nb)
+        prange_high.max = prange.max
+        prange_high.type_nb = prange.type_nb
+        push_por(pranges, prange_high)
+    }
+    
+    return(&compress(pranges))
+}
+
+// The result is compressed
+`POINTER' difference_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
+    `RANGE' prange_low, prange_high
+    `OR' pranges
+    
+    init_por(pranges)
+    
+    if (prange_2.max < prange_1.min | prange_2.min > prange_1.max) {
+        return(&prange_1)
+    }
+    
+    // First half
+    if (prange_2.min <= prange_1.min) {
+        // Nothing there is no first half
+    }
+    else {
+        prange_low.min = prange_1.min
+        prange_low.max = prange_2.min - get_epsilon(prange_2.min, prange_1.type_nb)
+        prange_low.type_nb = prange_1.type_nb
+        push_por(pranges, prange_low)
+    }
+    
+    // Second half
+    if (prange_2.max >= prange_1.max) {
+        // Nothing there is no second half
+    }
+    else {
+        prange_high.min = prange_2.max + get_epsilon(prange_2.max, prange_1.type_nb)
+        prange_high.max = prange_1.max
+        prange_high.type_nb = prange_1.type_nb
+        push_por(pranges, prange_high)
+    }
+    
+    return(&compress(pranges))
+}
+
+`POINTER' difference_prange_por(`RANGE' prange, `OR' por) {
+    `OR' por_differences
+    
+    init_por(por_differences)
+
+    append(por_differences, difference_list(prange, por))
+    
+    return(&por_differences)
+}
+
+// The result is NOT compressed
+`POINTER' difference_por(`OR' por, `T' pattern) {
+    `OR' por_differences
+    `REAL' i
+    
+    init_por(por_differences)
+
+    // Loop over all patterns in Or and compute the difference
+    for (i = 1; i <= por.length; i++) {
+        push_por(por_differences, *difference(*por.patterns[i], pattern))
+    }
+    
+    if (por_differences.length == 0) {
+        return(&(PEmpty()))
+    }
+    else {
+        return(&por_differences)
+    }
+}
+
+`POINTER' difference_tuple(`TUPLE' tuple, `T' pattern) {
+    if (structname(pattern) == "PEmpty") {
+        return(&tuple)
+    }
+    if (structname(pattern) == "PWild") {
+        return(&(PEmpty()))
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(difference_tuple_tuple(tuple, pattern))
+    }
+    else if (structname(pattern) == "POr") {
+        return(difference_tuple_por(tuple, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+    
+}
+
+/*
+For two patterns of size n: (p_1, ...p_n) and (q_1, ..., q_n), we compute the
+difference recursively. For the first patterns p_1 and q_1 we compute the
+intersection inter_1, a pattern and the difference diff_1, a vectors of
+patterns.
+
+If n = 1, the difference is equal to diff_1.
+
+If n == 2, the difference is composed of two parts:
+    1. (diff_1, p_2), the combinaision of all the patterns in diff_n-1 with the pattern_n.
+    2. (inter_1, diff_2), the combinaison of inter_n-1 with all the patterns in diff_n if diff_n is non-empty.
+
+We recursively compute the difference between two tuples:
+    1. We compute the interesection and the difference between two fields
+    2. If they are the last fields, we return the difference
+    3. Else we enter the recursive parts
+        3.1 If
+
+We then compute the difference between the remaining fields
+(p_2, ..., p_n) and (q_2, ..., q_n).
+
+For the a field n, the difference is equal to diff_n. For a field (n-1),
+
+We recursively build the difference of all the fields up to the first one.
+*/
+`POINTER' difference_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
+    `OR' res_inter, res_diff, result, por
+    `POINTER' new_diff, main_pattern, other_pattern, field_inter
+    `POINTERS' field_diff
+    `TUPLE' new_main, new_other, new_diff_i
+    `REAL' i
+    
+    check_tuples(tuple_1, tuple_2)
+    
+    init_por(res_inter)
+    init_por(res_diff)
+    init_por(result)
+    init_por(por)
+    
+    // Compute the field difference
+    main_pattern = tuple_1.patterns[1]
+    other_pattern = tuple_2.patterns[1]
+
+    field_inter = &overlap(*main_pattern, *other_pattern)
+    field_diff = difference(*main_pattern, *other_pattern)
+
+    // If there are no other fields
+    if (length(tuple_1.patterns) == 1) {
+        if (structname(*field_diff) != "PEmpty") {
+            push_por(
+                res_diff,
+                tuple_from_patterns(field_diff)
+            )
+        }
+    }
+    else {
+        // If the fields difference is empty there is no difference part
+        if (structname(*field_diff) != "PEmpty") {
+            push_por(
+                res_diff,
+                tuple_from_patterns((
+                    field_diff,
+                    tuple_1.patterns[2..length(tuple_1.patterns)]
+                ))
+            )
+        }
+
+        // If the fields intersection is empty there is intersection part
+        if (structname(*field_inter) != "PEmpty") {
+            // Build two tuples with the reaining patterns
+            new_main.patterns = tuple_1.patterns[2..length(tuple_1.patterns)]
+            new_other.patterns = tuple_2.patterns[2..length(tuple_2.patterns)]
+
+            // Compute the difference
+            new_diff = difference(new_main, new_other)
+
+            // If non empty, we fill the tuples
+            if (eltype(*new_diff) != "struct") {
+                exit(420)
+            }
+            if (structname(*new_diff) == "Tuple") {
+                new_diff_i = *new_diff
+                push_por(
+                    res_inter,
+                    tuple_from_patterns((
+                        field_inter, 
+                        new_diff_i.patterns
+                    ))
+                )
+            }
+            else if (structname(*new_diff) == "POr") {
+                por = *new_diff
+                for (i = 1; i <= por.length; i++) {
+                    new_diff_i = *por.patterns[i]
+                    push_por(
+                        res_inter,
+                        tuple_from_patterns((
+                            field_inter,
+                            new_diff_i.patterns
+                        ))
+                    )
+                }
+            }
+            else if (structname(*new_diff) != "PEmpty") {
+                unknown_pattern(*new_diff)
+            }
+        }
+    }
+    
+    push_por(result, res_inter)
+    push_por(result, res_diff)
+
+    return(&compress(result))
+}
+
+`TUPLE' tuple_from_patterns(`POINTERS' patterns) {
+    `TUPLE' tuple
+
+    tuple.patterns = patterns
+    
+    return(tuple)
+}
+
+`POINTER' difference_tuple_por(`TUPLE' tuple, `OR' por) {
+    `OR' por_result
+    
+    init_por(por_result)
+    
+    append(por_result, difference_list(tuple, por))
+
+    return(&compress(por_result))
+}
+
+`POINTERS' difference_list(`T' pattern, `OR' por) {
+    `OR' differences, new_differences
+    `REAL' i, j
+    
+    init_por(differences)
+    
+    push_por(differences, pattern)
 
     // Loop over all pattern in Or
-    for (i = 1; i <= pat_list.length; i++) {
-        new_differences.clear()
-        pattern_i = pat_list.get_pat(i)
+    for (i = 1; i <= por.length; i++) {
+        init_por(new_differences)
 
         // Compute the difference
-        for (j = 1; j <= length(differences); j++) {
-            difference_j = differences.get_pat(j)
-            new_differences.append(difference_j.difference(pattern_i))
+        for (j = 1; j <= differences.length; j++) {
+            append(
+                new_differences,
+                difference(*differences.patterns[j], *por.patterns[i])
+            )
         }
 
         if (new_differences.length == 0) {
@@ -1690,9 +1303,226 @@ pointer vector difference_list(class Pattern scalar pattern, class PatternList s
         
         // if we don't precise ".patterns" it creates a new instance
         differences.patterns = new_differences.patterns
+        differences.length = new_differences.length
     }
 
-    return(drop_empty_pattern(differences.patterns))
+    drop_empty_patterns(differences)
+    
+    return(differences.patterns)
+}
+
+void drop_empty_patterns(`OR' por) {
+    `REAL' i
+    
+    for (i = 1; i <= por.length; i++) {
+        if (structname(*por.patterns[i]) == "PEmpty") {
+            por.patterns[i] = por.patterns[por.length]
+            por.patterns[por.length] = NULL
+            por.length = por.length - 1
+            i--
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////// Utils
+
+`REAL' function isbool(`REAL' x) {
+    return(x == 0 | x == 1)
+}
+
+`REAL' function isint(`REAL' x) {
+    return(x == trunc(x))
+}
+
+`STRING' type_details(object) {
+    `STRING' eltype, orgtype
+    
+    eltype = eltype(object)
+    orgtype = orgtype(object)
+    
+    if (eltype == "pointer" & orgtype == "scalar") {
+        eltype = eltype + "(" + type_details(*object) + ")"
+    }
+    else if (eltype == "struct") {
+        eltype = eltype + " " + structname(object)
+    }
+    else if (eltype == "classname") {
+        eltype = eltype + " " + classname(object)
+    }
+    
+    return(eltype + " " + orgtype)
+}
+
+void unknown_pattern(`T' pattern) {
+    errprintf(
+        "Unknown pattern of type: %s\n",
+        type_details(pattern)
+    )
+    exit(_error(3250))
+}
+
+void check_tuples(`TUPLE' tuple_1, `TUPLE' tuple_2) {
+    if (length(tuple_1.patterns) != length(tuple_2.patterns)) {
+        errprintf(
+            "Different number of patter in tuples: %f != %f\n",
+            length(tuple_1.patterns), length(tuple_2.patterns)
+        )
+        exit(_error(3200))
+    }
+}
+
+void init_por(`OR' por) {
+    por.length = 0
+    por.patterns = J(1, 8, NULL)
+}
+
+void push_por(`OR' por, `T' pattern) {
+    // New fun :
+    // - with ref we create a ref to pattern
+    // - in a loop creates pattern takes the last value of the loop
+    // - we end up with all values equal to the last
+    // - we need to copy the value before creating the ref
+    // - for this we create a new variable to force the hard copy
+    // - we don't know the type of pattern/struct
+    // - we cannot use transmorphic because it drops the structname
+    // - we need to create one variable per pattern type
+    // - to avoid creating all object every time, this is done within functions
+    
+    // Ideally we should drop this but there might be bugs latter
+    if (por.length == .) {
+        init_por(por)
+    }
+    
+    if (structname(pattern) == "PEmpty") {
+        // Ignore
+        return
+    }
+    else if (structname(pattern) == "PWild") {
+        return(push_por_copy_pwild(por, pattern))
+    }
+    else if (structname(pattern) == "PConstant") {
+        return(push_por_copy_pconstant(por, pattern))
+    }
+    else if (structname(pattern) == "PRange") {
+        return(push_por_copy_prange(por, pattern))
+    }
+    else if (structname(pattern) == "POr") {
+        append_por(por, pattern)
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(push_por_copy_tuple(por, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+void push_por_copy_pwild(`OR' por, `WILD' pwild) {
+    `WILD' wild_copy
+    
+    wild_copy = pwild
+    
+    por.patterns = &wild_copy, J(1, 7, NULL)
+    por.length = 1
+}
+
+void push_por_copy_pconstant(`OR' por, `CONSTANT' pconstant) {
+    `CONSTANT' pconstant_copy
+    
+    if (por.length == 1) {
+        if (structname(*por.patterns[1]) == "PWild") {
+            return
+        }
+    }
+    
+    if (por.length == length(por.patterns)) {
+        por.patterns = por.patterns, J(1, length(por.patterns), NULL)
+    }
+    
+    pconstant_copy = pconstant
+    
+    por.length = por.length + 1
+    por.patterns[por.length] = &pconstant_copy
+}
+
+void push_por_copy_prange(`OR' por, `RANGE' prange) {
+    `RANGE' prange_copy
+    
+    if (por.length == 1) {
+        if (structname(*por.patterns[1]) == "PWild") {
+            return
+        }
+    }
+    
+    if (por.length == length(por.patterns)) {
+        por.patterns = por.patterns, J(1, length(por.patterns), NULL)
+    }
+    
+    prange_copy = prange
+    
+    por.length = por.length + 1
+    por.patterns[por.length] = &prange_copy
+}
+
+void push_por_copy_tuple(`OR' por, `TUPLE' tuple) {
+    `TUPLE' tuple_copy
+    
+    if (por.length == 1) {
+        if (structname(*por.patterns[1]) == "PWild") {
+            return
+        }
+    }
+    
+    if (por.length == length(por.patterns)) {
+        por.patterns = por.patterns, J(1, length(por.patterns), NULL)
+    }
+    
+    tuple_copy = tuple
+    
+    por.length = por.length + 1
+    por.patterns[por.length] = &tuple_copy
+}
+
+void append(`OR' por, `POINTERS' patterns) {
+    `REAL' i, n_pat, n_pat_new
+    
+    if (por.length == .) {
+        init_por(por)
+    }
+    
+    n_pat = 0
+    
+    for (i = 1; i <= length(patterns); i++) {
+        if (patterns[i] == NULL) {
+            break
+        }
+        n_pat++
+    }
+    
+    if (n_pat == 0) {
+        return
+    }
+    
+    if (por.length + n_pat >= length(por.patterns)) {
+        // Get the next power of 2 number of patterns
+        n_pat_new = por.length + n_pat
+        n_pat_new = log(n_pat_new) / log(2)
+        n_pat_new = ceil(n_pat_new)
+        n_pat_new = exp(n_pat_new * log(2))
+        por.patterns = por.patterns, J(1, n_pat_new, NULL)
+    }
+    
+    por.patterns[(por.length + 1)..(por.length + n_pat)] = patterns[1..n_pat]
+    por.length = por.length + n_pat
+}
+
+void append_por(`OR' por_1, `OR' por_2) {
+    if (por_2.length == 0) {
+        return
+    }
+    else {
+        append(por_1, por_2.patterns[1..por_2.length])
+    }
 }
 
 end
@@ -2255,394 +2085,6 @@ real scalar multiplicity(real scalar s, real scalar n) {
 end
 
 
-**#************************************************************** src/tuple.mata
-
-mata
-
-void Tuple::new() {}
-
-string scalar Tuple::to_string() {
-    class Pattern scalar pattern
-    string vector strings
-    string scalar str
-    real scalar i, n_pat
-    
-    n_pat = length(this.patterns)
-
-    if (n_pat == 0) {
-        return("Empty Tuple: Error")
-    }
-    
-    strings = J(1, n_pat, "")
-    
-    for (i = 1; i <= n_pat; i++) {
-        pattern = *patterns[i]
-        strings[i] = pattern.to_string()
-    }
-    
-    str = invtokens(strings, ", ")
-
-    if (n_pat > 1) {
-        str = "(" + str + ")"
-    }
-    
-    return(str)
-}
-
-void Tuple::print() {
-    displayas("text")
-    printf("%s\n", this.to_string())
-}
-
-string scalar Tuple::to_expr(class Variable vector variables) {
-    class Pattern scalar pattern
-    string vector exprs
-    real scalar i, k, n_pat
-
-    n_pat = length(this.patterns)
-    
-    if (n_pat != length(variables)) {
-        errprintf(
-            "The tuples and variables have different sizes %f and %f",
-            length(this.patterns), length(variables)
-        )
-        exit(_error(3300))
-    }
-    
-    exprs = J(1, n_pat, "")
-
-    k = 0
-    for (i = 1; i <= n_pat; i++) {
-        pattern = *this.patterns[i]
-        pattern = pattern.compress()
-        if (classname(pattern) != "PWild" & classname(pattern) != "PEmpty") {
-            k++
-            exprs[k] = pattern.to_expr(variables[i])
-        }
-    }
-    
-    if (k == 0) {
-        return("1")
-    }
-    
-    if (k > 1) {
-        for (i = 1; i <= k; i++) {
-            exprs[i] = "(" + exprs[i] + ")"
-        }
-    }
-    
-    return(invtokens(exprs[1..k], " & "))
-}
-
-transmorphic scalar Tuple::compress() {
-    real scalar i
-
-    for (i = 1; i <= length(this.patterns); i++) {
-        this.patterns[i] = tuple_compress_i(this.patterns, i)
-    }
-
-    for (i = 1; i <= length(this.patterns); i++) {
-        if (classname(*this.patterns[i]) == "PEmpty") {
-            return(PEmpty())
-        }
-    }
-
-    return(this)
-}
-
-pointer scalar function tuple_compress_i(pointer vector patterns, real scalar i) {
-    class Pattern scalar pattern
-
-    pattern = *patterns[i]
-    return(&pattern.compress())
-}
-
-// The outcome is compressed
-transmorphic scalar Tuple::overlap(transmorphic scalar pattern) {
-    if (classname(pattern) == "PEmpty") {
-        return(PEmpty())
-    }
-    else if (classname(pattern) == "PWild") {
-        return(this)
-    }
-    else if (classname(pattern) == "Tuple") {
-        return(this.overlap_tuple(pattern))
-    }
-    else if (classname(pattern) == "POr") {
-        return(this.overlap_por(pattern))
-    }
-    else {
-        errprintf("Unexpected pattern class: %s", classname(pattern))
-        exit(_error(3260))
-    }
-}
-
-real scalar Tuple::includes(class Tuple scalar tuple) {
-    class Pattern scalar pattern_i
-    real scalar included
-    real scalar i
-
-    check_tuples_length(this, tuple)
-
-    included = 1
-
-    for (i = 1; i <= length(this.patterns); i++) {
-        pattern_i = *this.patterns[i]
-        if (!pattern_i.includes(*tuple.patterns[i])) {
-            included = 0
-            break
-        }
-    }
-
-    return(included)
-}
-
-void function check_tuples_length( ///
-    class Tuple scalar tuple_1, ///
-    class Tuple scalar tuple_2    ///
-) {
-    if (length(tuple_1.patterns) != length(tuple_2.patterns)) {
-        errprintf(
-            "The tuples different sizes %f and %f",
-            length(tuple_1.patterns), length(tuple_2.patterns)
-        )
-        exit(_error(3300))
-    }
-}
-
-// The outcome is compressed
-transmorphic scalar Tuple::overlap_tuple(class Tuple scalar tuple) {
-    class Tuple scalar tuple_overlap
-    real scalar i
-
-    tuple_overlap.patterns = J(1, length(this.patterns), NULL)
-
-    // We compute the overlap of each pattern in the tuple
-    for (i = 1; i <= length(this.patterns); i++) {
-        tuple_overlap.patterns[i] = &overlap_tuple_tuple_i(this, tuple, i)
-        if (classname(*tuple_overlap.patterns[i]) == "PEmpty") {
-            return(PEmpty())
-        }
-    }
-    return(tuple_overlap)
-}
-
-// Once again pointer issues in loops
-transmorphic scalar overlap_tuple_tuple_i(class Tuple scalar tuple_1, class Tuple scalar tuple_2, real scalar i) {
-    class Pattern scalar pattern_1, pattern_2
-    
-    pattern_1 = *tuple_1.patterns[i]
-    pattern_2 = *tuple_2.patterns[i]
-    
-    return(pattern_1.overlap(pattern_2))
-}
-
-// The outcome is compressed
-transmorphic scalar Tuple::overlap_por(class POr scalar por) {
-    return(por.overlap(this))
-}
-
-/*
-For two patterns of size n: (p_1, ...p_n) and (q_1, ..., q_n), we compute the
-difference recursively. For the first patterns p_1 and q_1 we compute the
-intersection inter_1, a pattern and the difference diff_1, a vectors of
-patterns.
-
-If n = 1, the difference is equal to diff_1.
-
-If n == 2, the difference is composed of two parts:
-    1. (diff_1, p_2), the combinaision of all the patterns in diff_n-1 with the pattern_n.
-    2. (inter_1, diff_2), the combinaison of inter_n-1 with all the patterns in diff_n if diff_n is non-empty.
-
-We recursively compute the difference between two tuples:
-    1. We compute the interesection and the difference between two fields
-    2. If they are the last fields, we return the difference
-    3. Else we enter the recursive parts
-        3.1 If
-
-We then compute the difference between the remaining fields
-(p_2, ..., p_n) and (q_2, ..., q_n).
-
-For the a field n, the difference is equal to diff_n. For a field (n-1),
-
-We recursively build the difference of all the fields up to the first one.
-*/
-pointer scalar Tuple::difference(transmorphic scalar pattern) {
-    if (classname(pattern) == "PEmpty") {
-        return(&this)
-    }
-    else if (classname(pattern) == "POr") {
-        return(this.difference_por(pattern))
-    }
-    else if (classname(pattern) != "Tuple") {
-        errprintf("Unexpected pattern class %s", classname(pattern))
-        exit(_error(101))
-    }
-
-    return(this.difference_tuple(pattern))
-}
-
-pointer scalar Tuple::difference_por(class POr scalar por) {
-    class POr scalar por_result
-    
-    por_result.define(difference_list(this, por.patterns))
-
-    return(&por_result.compress())
-}
-
-pointer scalar Tuple::difference_tuple(class Tuple scalar tuple) {
-    class POr scalar res_inter, res_diff, result
-    transmorphic scalar new_diff
-    class Pattern scalar main_pattern, other_pattern, field_inter
-    pointer vector field_diff
-    class Tuple scalar new_main, new_other, new_diff_i
-    class PatternList scalar pat_list
-    real scalar i
-    
-    // Compute the field difference
-    main_pattern = *this.patterns[1]
-    other_pattern = *tuple.patterns[1]
-
-    field_inter = main_pattern.overlap(other_pattern)
-    field_diff = main_pattern.difference(other_pattern)
-
-    // If there are no other fields
-    if (length(this.patterns) == 1) {
-        if (classname(*field_diff) != "PEmpty") {
-            res_diff.push(tuple_from_patterns(field_diff))
-        }
-    }
-    else {
-        // If the fields difference is empty there is no difference part
-        if (classname(*field_diff) != "PEmpty") {
-            res_diff.push(tuple_from_patterns((field_diff, this.patterns[2..length(this.patterns)])))
-        }
-
-        // If the fields intersection is empty there is intersection part
-        if (classname(field_inter) != "PEmpty") {
-            // Build two tuples with the reaining patterns
-            new_main.patterns = this.patterns[2..length(this.patterns)]
-
-            new_other.patterns = tuple.patterns[2..length(this.patterns)]
-
-            // Compute the difference
-            new_diff = *new_main.difference(new_other)
-
-            // If non empty, we fill the tuples
-            if (classname(new_diff) == "Tuple") {
-                new_diff_i = new_diff
-                res_inter.push(tuple_from_patterns((&field_inter, new_diff_i.patterns)))
-            }
-            else if (classname(new_diff) == "PatternList") {
-                pat_list = new_diff
-                for (i = 1; i <= pat_list.length; i++) {
-                    new_diff_i = pat_list.get_pat(i)
-                    res_inter.push(tuple_from_patterns((&field_inter, new_diff_i.patterns)))
-                }
-            }
-            else if (classname(new_diff) != "PEmpty") {
-                errprintf("Unexpected pattern of class '%s'", classname(*new_diff))
-                exit(_error(3260))
-            }
-        }
-    }
-
-    result.push(&res_diff)
-    result.push(&res_inter)
-
-    return(&result.compress())
-}
-
-pointer scalar function tuple_from_patterns(pointer vector patterns) {
-    class Tuple scalar tuple
-
-    tuple.patterns = patterns
-    return(&tuple)
-}
-
-// To compute the difference between a tuple and a list of tuple
-// We have an issue:
-// 1. Compute the difference between our tuple and the first one
-// 2. We obtain zero, one or more tuple corresponding to the difference
-// 3. Compute the difference between each of these tuples and the second one
-// 4. We obtain a new vector of differences
-// 5. We repeat until we have checked all the tuples in the list
-// We can stop earlier if at some point we have no difference remaining
-transmorphic scalar function difference_vec( ///
-    class Pattern scalar pattern,
-    class Tuple vector tuples ///
-) {
-    class PatternList scalar differences
-    transmorphic scalar new_differences
-    real scalar i
-
-    differences.push(&pattern)
-
-    for (i = 1; i <= length(tuples); i++) {
-
-        new_differences = *differences.difference(tuples[i])
-
-        if (classname(new_differences) == "PEmpty") {
-            return(new_differences)
-        }
-        else {
-            differences = new_differences
-        }
-    }
-
-    return(differences)
-}
-
-
-real scalar function is_empty_ctor(class Tuple vector tuples) {
-    if (length(tuples) == 0) {
-        return(1)
-    }
-    else if (length(tuples) == 1) {
-        return(length(tuples[1].patterns) == 0)
-    }
-    else {
-        return(0)
-    }
-}
-
-
-                // x = (1 | 2, 1 | 2, 1 | 2)
-                // y = (1, 1 | 2, 1)
-                // diff_tuple(x, y)
-                // 1. diff((1 | 2, 1 | 2, 1 | 2), (1, 1 | 2, 1))
-                //        - overlap(1 | 2, 1)
-                //        => overlap_pattern = 1
-                //        - 1 | 2 - 1
-                //        => diff_field = 2
-                //        => not_overlap = (2, 1 | 2, 1 | 2)
-                // 2. diff((1 | 2, 1 | 2), (1 | 2, 1))
-                //        - overlap(1 | 2, 1 | 2)
-                //        => overlap_pattern = 1 | 2
-                //        - 1 | 2 - 1 | 2
-                //        => diff_field = 0
-                //        => not_overlap = 0
-                // 3. diff((1 | 2), (1))
-                //        - overlap(1 | 2, 1)
-                //        => overlap_pattern = 1
-                //        - 1 | 2 - 1
-                //        => diff_field = 2
-                //        => not_overlap = 2
-                //        => remaining = 0
-                //      return((2))
-                // 2.
-                //        => remaining_other_fields = (2)
-                //        => remaining = (1 | 2, 2)
-                //        return((1 | 2, 2))
-                // 1.
-                //        => remaining_other_fields = (1 | 2, 2)
-                //        => remaining = (1, 1 | 2, 2)
-                //        return((2, 1 | 2, 1 | 2), (1, 1 | 2, 2))
-
-
-end
-
-
 **#**************************************************************** src/arm.mata
 
 mata
@@ -2650,13 +2092,10 @@ mata
 void Arm::new() {}
 
 string scalar Arm::to_string() {
-    class Pattern scalar pattern
-
-    pattern = *this.lhs.pattern
     return(
         sprintf(
             "Arm %f: Tuple: %s / Value: %s",
-            this.id, pattern.to_string(), this.value
+            this.id, ::to_string(*this.lhs.pattern), this.value
         )
     )
 }
@@ -2674,7 +2113,7 @@ void function eval_arms(
     string scalar dtype
 ) {
     class Arm scalar arm
-    class Pattern scalar pattern
+    pointer scalar pattern
     string scalar command, condition, statement
     real scalar i, n, _rc
 
@@ -2683,7 +2122,7 @@ void function eval_arms(
     displayas("text")
     for (i = n; i >= 1; i--) {
         arm = arms[i]
-        pattern = *arm.lhs.pattern
+        pattern = arm.lhs.pattern
         
         if (i == n & gen_first) {
             if (dtype != "") {
@@ -2698,10 +2137,10 @@ void function eval_arms(
         }
         
         if (length(variables) == 1) {
-            condition = pattern.to_expr(variables[1])
+            condition = to_expr(*pattern, variables[1])
         }
         else {
-            condition = pattern.to_expr(variables)
+            condition = to_expr(*pattern, variables)
         }
         
         if (condition == "1") {
@@ -2759,7 +2198,7 @@ class Arm vector function parse_arms (
 
     while (tokenpeek(t) != "") {
         arm = parse_arm(t, ++i, variables)
-        if (classname(*arm.lhs.pattern) == "PEmpty") {
+        if (structname(*arm.lhs.pattern) == "PEmpty") {
             errprintf("Arm %f is considered empty\n", i)
         }
         else {
@@ -2770,7 +2209,7 @@ class Arm vector function parse_arms (
     return(arms)
 }
 
-class Arm scalar function parse_arm (
+class Arm scalar function parse_arm(
         pointer t,
         real scalar arm_id,
         class Variable vector variables
@@ -2796,7 +2235,7 @@ class Arm scalar function parse_arm (
     return(arm)
 }
 
-class Pattern scalar function parse_pattern(
+transmorphic scalar function parse_pattern(
     pointer t,
     class Variable scalar variable,
     real scalar arm_id
@@ -2884,7 +2323,7 @@ class Pattern scalar function parse_pattern(
     }
 }
 
-class Pattern scalar function parse_number(
+transmorphic scalar function parse_number(
     pointer t,
     real scalar number,
     real scalar arm_id,
@@ -2904,31 +2343,30 @@ class Pattern scalar function parse_number(
 
 ///////////////////////////////////////////////////////////////// Parse patterns
 
-class PWild scalar function parse_wild(class Variable scalar variable) {
-    class PWild scalar pwild
-
-    pwild.define(variable)
+struct PWild scalar function parse_wild(class Variable scalar variable) {
+    struct PWild scalar pwild
+    define_pwild(pwild, variable)
     return(pwild)
 }
 
-class PEmpty scalar function parse_empty() {
+struct PEmpty scalar function parse_empty() {
     return(PEmpty())
 }
 
-class PConstant scalar function parse_constant(transmorphic scalar value) {
+struct PConstant scalar function parse_constant(transmorphic scalar value) {
     class PConstant scalar pconstant
-    pconstant.define(value)
+    define_pconstant(pconstant, value)
     return(pconstant)
 }
 
-class PRange scalar function parse_range(
+struct PRange scalar function parse_range(
     pointer scalar t,
     string scalar symbole,
     real scalar min,
     real scalar arm_id,
     class Variable scalar variable
 ) {
-    class PRange scalar prange
+    struct PRange scalar prange
     string scalar next
     real scalar max, epsilon
     
@@ -2964,7 +2402,7 @@ class PRange scalar function parse_range(
         "Unexpected symbole: " + symbole
     }
 
-    prange.define(min, max, variable.get_type_nb())
+    define_prange(prange, min, max, variable.get_type_nb())
 
     return(prange)
 }
@@ -2990,7 +2428,8 @@ real scalar get_epsilon(real scalar x, real scalar type_nb) {
     }
     else {
         // TODO: improve error
-        exit(1)
+        errprintf("Expected a variable type 1, 2 or 3, found %f", type_nb)
+        exit(_error(3250))
     }
     
     x_log2 = log(abs(x)) / log(2)
@@ -3007,26 +2446,28 @@ real scalar get_epsilon(real scalar x, real scalar type_nb) {
     }
 }
 
-class POr scalar function parse_or(
+struct POr scalar function parse_or(
     pointer t,
     class Variable scalar variable,
     real scalar arm_id
 ) {
-    class POr scalar por
+    struct POr scalar por
 
+    init_por(por)
+    
     do {
-        por.push(parse_pattern(t, variable, arm_id))
+        push_por(por, parse_pattern(t, variable, arm_id))
     } while (match_next(t, "|"))
 
-    return(por.compress())
+    return(compress_por(por))
 }
 
-class Tuple scalar function parse_tuple(
+struct Tuple scalar function parse_tuple(
     pointer t,
     class Variable vector variables,
     real scalar arm_id
 ) {
-    class Tuple scalar tuple
+    struct Tuple scalar tuple
     real scalar i
 
     tuple.patterns = J(1, length(variables), NULL)
@@ -3061,18 +2502,20 @@ class Tuple scalar function parse_tuple(
     return(tuple)
 }
 
-class POr scalar function parse_tuples(
+struct POr scalar function parse_tuples(
     pointer t,
     class Variable vector variables,
     real scalar arm_id
 ) {
-    class POr scalar por
+    struct POr scalar por
+    
+    init_por(por)
 
     do {
-        por.push(parse_tuple(t, variables, arm_id))
+        push_por(por, parse_tuple(t, variables, arm_id))
     } while (match_next(t, "|"))
     
-    return(por.compress())
+    return(compress_por(por))
 }
 
 //////////////////////////////////////////////////////////////////// Parse Value
@@ -3156,31 +2599,35 @@ real scalar function check_wildcard(transmorphic scalar pattern) {
     if (eltype(pattern) == "pointer") {
         return(check_wildcard(*pattern))
     }
-    else if (classname(pattern) == "PEmpty") {
+    else if (structname(pattern) == "PEmpty") {
         return(0)
     }
-    else if (classname(pattern) == "PWild") {
+    else if (structname(pattern) == "PWild") {
         return(1)
     }
-    else if (classname(pattern) == "PConstant") {
+    else if (structname(pattern) == "PConstant") {
         return(0)
     }
-    else if (classname(pattern) == "PRange") {
+    else if (structname(pattern) == "PRange") {
         return(0)
     }
-    else if (classname(pattern) == "POr") {
+    else if (structname(pattern) == "POr") {
         return(check_wildcard_por(pattern))
     }
-    else if (classname(pattern) == "Tuple") {
+    else if (structname(pattern) == "Tuple") {
         return(check_wildcard_tuple(pattern))
+    }
+    else {
+        // From pattern.mata
+        unknown_pattern(pattern)
     }
 }
 
-real scalar function check_wildcard_por(class POr scalar por) {
+real scalar function check_wildcard_por(struct POr scalar por) {
     real scalar i
     
-    for (i = 1; i <= por.len(); i++) {
-        if (check_wildcard(por.get_pat(i)) == 1) {
+    for (i = 1; i <= por.length; i++) {
+        if (check_wildcard(*por.patterns[i]) == 1) {
             return(1)
         }
     }
@@ -3188,11 +2635,11 @@ real scalar function check_wildcard_por(class POr scalar por) {
     return(0)
 }
 
-real scalar function check_wildcard_tuple(class Tuple scalar tuple) {
+real scalar function check_wildcard_tuple(struct Tuple scalar tuple) {
     real scalar i
     
     for (i = 1; i <= length(tuple.patterns); i++) {
-        if (check_wildcard(tuple.patterns[i]) == 1) {
+        if (check_wildcard(*tuple.patterns[i]) == 1) {
             return(1)
         }
     }
@@ -3244,39 +2691,39 @@ void function reindex_levels_pattern(
     transmorphic scalar pattern,
     pointer(real colvector) vector tables
 ) {
-    if (classname(pattern) == "PEmpty") {
+    if (structname(pattern) == "PEmpty") {
         // Nothing
     }
-    else if (classname(pattern) == "PWild") {
+    else if (structname(pattern) == "PWild") {
         reindex_levels_pwild(pattern, tables)
     }
-    else if (classname(pattern) == "PConstant") {
+    else if (structname(pattern) == "PConstant") {
         reindex_levels_pconstant(pattern, tables)
     }
-    else if (classname(pattern) == "PRange") {
+    else if (structname(pattern) == "PRange") {
         reindex_levels_prange(pattern, tables)
     }
-    else if (classname(pattern) == "POr") {
+    else if (structname(pattern) == "POr") {
         reindex_levels_por(pattern, tables)
     }
-    else if (classname(pattern) == "Tuple") {
+    else if (structname(pattern) == "Tuple") {
         reindex_levels_tuple(pattern, tables)
     }
     else {
         // TODO: improve error
-        exit(1)
+        unknown_pattern(pattern)
     }
 }
 
 void function reindex_levels_pwild(
-    class PWild scalar pwild,
+    struct PWild scalar pwild,
     pointer(real colvector) vector tables
 ) {
     reindex_levels_por(pwild.values, tables)
 }
 
 void function reindex_levels_pconstant(
-    class PConstant scalar pconstant,
+    struct PConstant scalar pconstant,
     pointer(real colvector) scalar tables
 ) {
     if (tables != NULL) {
@@ -3285,7 +2732,7 @@ void function reindex_levels_pconstant(
 }
 
 void function reindex_levels_prange(
-    class PRange scalar prange,
+    struct PRange scalar prange,
     pointer(real colvector) scalar tables
 ) {
     if (tables != NULL) {
@@ -3294,31 +2741,19 @@ void function reindex_levels_prange(
     }
 }
 
-void function reindex_levels_patternlist(
-    class PatternList scalar patternlist,
+void function reindex_levels_por(
+    struct POr scalar por,
     pointer(real colvector) vector tables
 ) {
-    transmorphic scalar pattern
     real scalar i
     
-    for (i = 1; i <= patternlist.length; i++) {
-        pattern = patternlist.get_pat(i)
-        reindex_levels_pattern(pattern, tables)
-        if (length(pattern) > 0) {
-            patternlist.replace(pattern, i)
-        }
+    for (i = 1; i <= por.length; i++) {
+        reindex_levels_pattern(*por.patterns[i], tables)
     }
 }
 
-void function reindex_levels_por(
-    class POr scalar por,
-    pointer(real colvector) vector tables
-) {
-    reindex_levels_patternlist(por.patterns, tables)
-}
-
 void function reindex_levels_tuple(
-    class Tuple scalar tuple,
+    struct Tuple scalar tuple,
     pointer(real colvector) vector tables
 ) {
     real scalar i
@@ -3349,7 +2784,7 @@ void Usefulness::define(class Usefulness usefulness) {
 
 string vector Usefulness::to_string() {
     string vector str
-    class Pattern scalar overlap
+    pointer scalar overlap
     struct LHS scalar lhs
     real scalar i
     
@@ -3367,11 +2802,11 @@ string vector Usefulness::to_string() {
         
         for (i = 1; i <= length(*this.overlaps); i++) {
             lhs = (*this.overlaps)[i]
-            overlap = *lhs.pattern
+            overlap = lhs.pattern
             
-            if (classname(overlap) != "PEmpty") {
+            if (structname(*overlap) != "PEmpty") {
                 str = str,
-                    sprintf("    Arm %f: %s", lhs.arm_id, overlap.to_string())
+                    sprintf("    Arm %f: %s", lhs.arm_id, ::to_string(*overlap))
             }
         }
     }
@@ -3414,38 +2849,38 @@ string vector Match_report::to_string() {
         strings = strings, usefulness.to_string()
     }
 
-    if (length(this.missings) == 0) {
+    if (length(*this.missings) == 0) {
         return(strings)
     }
 
-    if (classname(this.missings) == "PEmpty") {
+    if (structname(*this.missings) == "PEmpty") {
         return(strings)
     }
 
     strings = strings, "Warning : Missing cases"
 
-    if (classname(this.missings) == "POr") {
-        strings = strings, this.to_string_por(this.missings)
+    if (structname(*this.missings) == "POr") {
+        strings = strings, to_string_por(*this.missings)
     }
     else {
-        strings = strings, this.to_string_pattern(this.missings)
+        strings = strings, to_string_pattern(*this.missings)
     }
 
     return(strings)
 }
 
-string scalar Match_report::to_string_pattern(class Pattern scalar pattern) {
-    return(sprintf("    %s", pattern.to_string()))
+string scalar Match_report::to_string_pattern(transmorphic scalar pattern) {
+    return(sprintf("    %s", ::to_string(pattern)))
 }
 
-string vector Match_report::to_string_por(class POr scalar por) {
+string vector Match_report::to_string_por(struct POr scalar por) {
     string vector strings
     real scalar i
 
-    strings = J(1, por.len(), "")
+    strings = J(1, por.length, "")
     
-    for (i = 1; i <= por.len(); i++) {
-        strings[i] = this.to_string_pattern(por.get_pat(i))
+    for (i = 1; i <= por.length; i++) {
+        strings[i] = this.to_string_pattern(*por.patterns[i])
     }
     
     return(strings)
@@ -3478,7 +2913,7 @@ void function check_match( ///
     ) {
     class Match_report scalar report
     class Usefulness scalar usefulness
-    class Pattern scalar missings
+    pointer scalar missings
     class Arm scalar arm
     class Arm vector useful_arms
     real scalar i
@@ -3501,11 +2936,11 @@ void function check_match( ///
     // bench_off("- combine")
 
     // bench_on("- exhaustiveness")
-    missings = check_exhaustiveness(useful_arms, variables)
+    missings = &check_exhaustiveness(useful_arms, variables)
     // bench_off("- exhaustiveness")
     
     // bench_on("- compress")
-    report.missings = missings.compress()
+    report.missings = &compress(*missings)
     // bench_off("- compress")
 
     // bench_on("- print")
@@ -3549,11 +2984,9 @@ function check_useful(class Arm vector arms) {
 }
 
 class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
-    transmorphic scalar tuple
-    class Pattern scalar tuple_pattern, differences_pattern
+    pointer scalar tuple, differences
     struct LHS vector overlaps
     struct LHS scalar lhs_empty
-    transmorphic scalar differences
     class Usefulness scalar result
     class Arm scalar ref_arm
     pointer scalar overlap_i
@@ -3562,9 +2995,8 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
     lhs_empty.pattern = &(PEmpty())
 
     overlaps = LHS(length(useful_arms))
-
-    tuple = *arm.lhs.pattern
-    tuple_pattern = tuple
+    
+    tuple = arm.lhs.pattern
 
     differences = tuple
 
@@ -3573,28 +3005,28 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
         result.useful = 1
         result.any_overlap = 0
         result.overlaps = &lhs_empty
-        result.differences = &differences
+        result.differences = differences
 
         return(result)
     }
 
     k = 0
+    
     // We loop over all the patterns
     for (i = 1; i <= length(useful_arms); i++) {
         // TODO: Use difference
         ref_arm = useful_arms[i]
 
         // bench_on("+ Overlap()")
-        overlap_i = &tuple_pattern.overlap(*ref_arm.lhs.pattern)
+        overlap_i = &overlap(*tuple, *ref_arm.lhs.pattern)
         // bench_off("+ Overlap()")
         
-        if (classname(*overlap_i) != "PEmpty") {
+        if (structname(*overlap_i) != "PEmpty") {
             k++
             overlaps[k].pattern = overlap_i
             overlaps[k].arm_id = ref_arm.id
-            differences_pattern = differences
             // bench_on("+ Difference()")
-            differences = *differences_pattern.difference(*overlap_i)
+            differences = difference(*differences, *overlap_i)
             // bench_off("+ Difference()")
         }
     }
@@ -3604,25 +3036,28 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
         result.useful = 1
         result.any_overlap = 0
         result.overlaps = &lhs_empty
-        result.differences = &tuple
+        result.differences = tuple
     }
     else {
         // Compute the remaining patterns
-        //differences = difference_vec(tuple_pattern, overlaps[1..k])
-
-        if (classname(differences) == "PEmpty") {
+        //differences = difference_vec(*tuple, overlaps[1..k])
+        
+        // Ensure that differences are compressed to remove this
+        differences = &compress(*differences)
+        
+        if (structname(*differences) == "PEmpty") {
             // If no pattern remains, the pattern is not useful
             result.useful = 0
             result.any_overlap = 1
             result.overlaps = &overlaps[1..k]
-            result.differences = &differences
+            result.differences = differences
         }
         else {
             // Else return the tuple, the overlaps and the differences
             result.useful = 1
             result.any_overlap = 1
             result.overlaps = &overlaps[1..k]
-            result.differences = &differences
+            result.differences = differences
         }
     }
 
@@ -3630,11 +3065,7 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
 }
 
 function get_and_compress(struct LHS vector overlaps, i) {
-    class Pattern scalar pattern_i
-
-    pattern_i = *overlaps[i].pattern
-    
-    return(&pattern_i.compress())
+    return(&compress(*overlaps[i].pattern))
 }
 
 ///////////////////////////////////////////////////////////// Check completeness
@@ -3644,15 +3075,15 @@ class Tuple vector function check_exhaustiveness( ///
         class Variable vector variables ///
     ) {
     class Arm scalar wild_arm
-    class PWild vector pwilds
-    class Tuple scalar tuple
+    struct PWild vector pwilds
+    struct Tuple scalar tuple
     class Usefulness scalar usefulness
     real scalar i
 
     pwilds = PWild(length(variables))
 
     for (i = 1; i <= length(variables); i++) {
-        pwilds[i].define(variables[i])
+        define_pwild(pwilds[i], variables[i])
     }
 
     if (length(variables) == 1) {

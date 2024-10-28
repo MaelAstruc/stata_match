@@ -16,11 +16,9 @@ local pwd            = ustrregexra("`c(pwd)'", "\\", "/") + "/"
 mata
     files = (
         "src/declare.mata",
-        "src/pattern_list.mata",
         "src/pattern.mata",
         "src/htable.mata",
         "src/variable.mata",
-        "src/tuple.mata",
         "src/arm.mata",
         "src/parser.mata",
         "src/usefulness.mata",

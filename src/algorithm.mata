@@ -8,7 +8,7 @@ void function check_match( ///
     ) {
     class Match_report scalar report
     class Usefulness scalar usefulness
-    class Pattern scalar missings
+    pointer scalar missings
     class Arm scalar arm
     class Arm vector useful_arms
     real scalar i
@@ -31,11 +31,11 @@ void function check_match( ///
     // bench_off("- combine")
 
     // bench_on("- exhaustiveness")
-    missings = check_exhaustiveness(useful_arms, variables)
+    missings = &check_exhaustiveness(useful_arms, variables)
     // bench_off("- exhaustiveness")
     
     // bench_on("- compress")
-    report.missings = missings.compress()
+    report.missings = &compress(*missings)
     // bench_off("- compress")
 
     // bench_on("- print")
@@ -79,11 +79,9 @@ function check_useful(class Arm vector arms) {
 }
 
 class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
-    transmorphic scalar tuple
-    class Pattern scalar tuple_pattern, differences_pattern
+    pointer scalar tuple, differences
     struct LHS vector overlaps
     struct LHS scalar lhs_empty
-    transmorphic scalar differences
     class Usefulness scalar result
     class Arm scalar ref_arm
     pointer scalar overlap_i
@@ -92,9 +90,8 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
     lhs_empty.pattern = &(PEmpty())
 
     overlaps = LHS(length(useful_arms))
-
-    tuple = *arm.lhs.pattern
-    tuple_pattern = tuple
+    
+    tuple = arm.lhs.pattern
 
     differences = tuple
 
@@ -103,28 +100,28 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
         result.useful = 1
         result.any_overlap = 0
         result.overlaps = &lhs_empty
-        result.differences = &differences
+        result.differences = differences
 
         return(result)
     }
 
     k = 0
+    
     // We loop over all the patterns
     for (i = 1; i <= length(useful_arms); i++) {
         // TODO: Use difference
         ref_arm = useful_arms[i]
 
         // bench_on("+ Overlap()")
-        overlap_i = &tuple_pattern.overlap(*ref_arm.lhs.pattern)
+        overlap_i = &overlap(*tuple, *ref_arm.lhs.pattern)
         // bench_off("+ Overlap()")
         
-        if (classname(*overlap_i) != "PEmpty") {
+        if (structname(*overlap_i) != "PEmpty") {
             k++
             overlaps[k].pattern = overlap_i
             overlaps[k].arm_id = ref_arm.id
-            differences_pattern = differences
             // bench_on("+ Difference()")
-            differences = *differences_pattern.difference(*overlap_i)
+            differences = difference(*differences, *overlap_i)
             // bench_off("+ Difference()")
         }
     }
@@ -134,25 +131,28 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
         result.useful = 1
         result.any_overlap = 0
         result.overlaps = &lhs_empty
-        result.differences = &tuple
+        result.differences = tuple
     }
     else {
         // Compute the remaining patterns
-        //differences = difference_vec(tuple_pattern, overlaps[1..k])
-
-        if (classname(differences) == "PEmpty") {
+        //differences = difference_vec(*tuple, overlaps[1..k])
+        
+        // Ensure that differences are compressed to remove this
+        differences = &compress(*differences)
+        
+        if (structname(*differences) == "PEmpty") {
             // If no pattern remains, the pattern is not useful
             result.useful = 0
             result.any_overlap = 1
             result.overlaps = &overlaps[1..k]
-            result.differences = &differences
+            result.differences = differences
         }
         else {
             // Else return the tuple, the overlaps and the differences
             result.useful = 1
             result.any_overlap = 1
             result.overlaps = &overlaps[1..k]
-            result.differences = &differences
+            result.differences = differences
         }
     }
 
@@ -160,11 +160,7 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
 }
 
 function get_and_compress(struct LHS vector overlaps, i) {
-    class Pattern scalar pattern_i
-
-    pattern_i = *overlaps[i].pattern
-    
-    return(&pattern_i.compress())
+    return(&compress(*overlaps[i].pattern))
 }
 
 ///////////////////////////////////////////////////////////// Check completeness
@@ -174,15 +170,15 @@ class Tuple vector function check_exhaustiveness( ///
         class Variable vector variables ///
     ) {
     class Arm scalar wild_arm
-    class PWild vector pwilds
-    class Tuple scalar tuple
+    struct PWild vector pwilds
+    struct Tuple scalar tuple
     class Usefulness scalar usefulness
     real scalar i
 
     pwilds = PWild(length(variables))
 
     for (i = 1; i <= length(variables); i++) {
-        pwilds[i].define(variables[i])
+        define_pwild(pwilds[i], variables[i])
     }
 
     if (length(variables) == 1) {

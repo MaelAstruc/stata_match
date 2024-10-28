@@ -6,94 +6,94 @@ local N_init = 64
 
 mata
 struct BT {
-	real colvector values
+    real colvector values
     real colvector status
     real scalar N
     real scalar height
 }
 
 void init_bt(`BT' bt) {
-	bt.values = J(`N_init', 1, .)
-	bt.status = J(`N_init', 1, 0)
+    bt.values = J(`N_init', 1, .)
+    bt.status = J(`N_init', 1, 0)
     bt.N      = 0
 }
 
 void append(`BT' bt, real vector values) {
-	real scalar i
+    real scalar i
     
     for (i = 1; i <= length(values); i++) {
-    	push(bt, values[i])
+        push(bt, values[i])
     }
 }
 
 void push(`BT' bt, real scalar value) {
-	push_recursive(bt, value, 1)
+    push_recursive(bt, value, 1)
 }
 
 void push_recursive(`BT' bt, real scalar value, real scalar node) {
-	if (node > length(bt.values)) {
+    if (node > length(bt.values)) {
         bt.values = bt.values \ J(length(bt.values), 1, .)
         bt.status = bt.status \ J(length(bt.status), 1, 0)
     }
     
     if (bt.status[node] == 0) {
-    	bt.values[node] = value
-    	bt.status[node] = 1
+        bt.values[node] = value
+        bt.status[node] = 1
         bt.N = bt.N + 1
         return
     }
     
     if (value == bt.values[node]) {
-    	return
+        return
     }
     
     if (value < bt.values[node]) {
-    	push_recursive(bt, value, 2 * node)
+        push_recursive(bt, value, 2 * node)
     }
     else {
-    	push_recursive(bt, value, 2 * node + 1)
+        push_recursive(bt, value, 2 * node + 1)
     }
 }
 
 void append_sorted(`BT' bt, real colvector A) {
-	append_sorted_recursive(bt, A, 1, length(A))
+    append_sorted_recursive(bt, A, 1, length(A))
 }
 
 void append_sorted_recursive(`BT' bt, real colvector A, real scalar min, real scalar max) {
     if (min > max) {
-    	return
+        return
     }
     
     if (min == max) {
-    	push(bt, A[min])
+        push(bt, A[min])
     }
     else {
-    	mid = ceil((min + max) / 2)
-    	push(bt, A[mid])
+        mid = ceil((min + max) / 2)
+        push(bt, A[mid])
         append_sorted_recursive(bt, A, min, mid - 1)
         append_sorted_recursive(bt, A, mid + 1, max)
     }
 }
 
 real colvector BT_to_array(`BT' bt) {
-	real colvector A
+    real colvector A
     
     A = J(bt.N, 1, .)
-	(void) BT_to_array_recursive(bt, A, 1, 1)
+    (void) BT_to_array_recursive(bt, A, 1, 1)
     
     return(A)
 }
 
 real scalar BT_to_array_recursive(`BT' bt, real colvector A, real scalar index, real scalar node) {
-	if (node > length(bt.values)) {
-    	return(index)
+    if (node > length(bt.values)) {
+        return(index)
     }
     
     if (bt.status[node] == 0) {
-    	return(index)
+        return(index)
     }
     
-	index = BT_to_array_recursive(bt, A, index, 2 * node)
+    index = BT_to_array_recursive(bt, A, index, 2 * node)
     A[index] = bt.values[node]
     index = BT_to_array_recursive(bt, A, index + 1, 2 * node + 1)
     
@@ -101,11 +101,11 @@ real scalar BT_to_array_recursive(`BT' bt, real colvector A, real scalar index, 
 }
 
 void balance(`BT' bt) {
-	real colvector A
+    real colvector A
     
     A = BT_to_array(bt)
     
-	init_bt(bt)
+    init_bt(bt)
     append_sorted(bt, A)
 }
 end
@@ -124,9 +124,9 @@ bt_3 = BT()
 timer_clear()
 
 for (t = 1; t <= T; t++) {
-	t
+    t
     _jumble(y)
-	
+    
     init_bt(bt_1)
     init_bt(bt_2)
     init_bt(bt_3)

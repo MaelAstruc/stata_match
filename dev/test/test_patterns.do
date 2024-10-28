@@ -18,44 +18,44 @@ mata
 // PEmpty
 
 function test_pempty_to_string() {
-    class PEmpty scalar pempty
+    struct PEmpty scalar pempty
 
     pempty = PEmpty()
 
-    test_result("Test PEmpty::to_string()", pempty.to_string(), "Empty")
+    test_result("Test PEmpty::to_string()", to_string(pempty), "Empty")
 }
 
 // PWild
 
 function test_pwild_to_string() {
-    class PWild scalar pwild
+    struct PWild scalar pwild
 
     pwild = PWild()
 
-    test_result("Test PWild::to_string()", pwild.to_string(), "_")
+    test_result("Test PWild::to_string()", to_string(pwild), "_")
 }
 
 // PConstant
 
 function test_pconstant_to_string() {
-    class PConstant scalar pconstant
+    struct PConstant scalar pconstant
 
     pconstant = PConstant()
     
     pconstant.value = 1
-    test_result("Test PConstant::to_string(): integer", pconstant.to_string(), "1")
+    test_result("Test PConstant::to_string(): integer", to_string(pconstant), "1")
     
     pconstant.value = 1.1
-    test_result("Test PConstant::to_string(): float", pconstant.to_string(), "1.1")
+    test_result("Test PConstant::to_string(): float", to_string(pconstant), "1.1")
     
     pconstant.value = .
-    test_result("Test PConstant::to_string(): missing real", pconstant.to_string(), ".")
+    test_result("Test PConstant::to_string(): missing real", to_string(pconstant), ".")
 }
 
 // PRange
 
 function test_prange_to_string() {
-    class PRange scalar prange
+    struct PRange scalar prange
 
     prange = PRange()
     
@@ -63,39 +63,41 @@ function test_prange_to_string() {
     prange.max = 3
     prange.type_nb = 1
     
-    test_result("Test PRange::to_string(): integer", prange.to_string(), "1/3")
+    test_result("Test PRange::to_string(): integer", to_string(prange), "1/3")
     
     prange.min = 1.1
     prange.max = 3.1
     prange.type_nb = 2
     
-    test_result("Test PRange::to_string(): float", prange.to_string(), "1.1/3.1")
+    test_result("Test PRange::to_string(): float", to_string(prange), "1.1/3.1")
     
     prange.min = 1.1
     prange.max = 3.1
     prange.type_nb = 3
     
-    test_result("Test PRange::to_string(): double", prange.to_string(), "1.1/3.1")
+    test_result("Test PRange::to_string(): double", to_string(prange), "1.1/3.1")
 }
 
 // POr
 
 function test_por_to_string() {
-    class POr scalar por
-    class PConstant scalar pconstant
-    class PRange scalar prange
+    struct POr scalar por
+    struct PConstant scalar pconstant
+    struct PRange scalar prange
     
     por = POr()
     
-    test_result("Test POr::to_string(): empty", por.to_string(), "")
+    init_por(por)
+    
+    test_result("Test POr::to_string(): empty", to_string(por), "")
     
     pconstant = PConstant()
     pconstant.value = 1
     
-    por.patterns.patterns[1] = &pconstant
-    por.patterns.length = 1
+    por.patterns[1] = &pconstant
+    por.length = 1
     
-    test_result("Test POr::to_string(): one element", por.to_string(), "1")
+    test_result("Test POr::to_string(): one element", to_string(por), "1")
     
     prange = PRange()
     
@@ -103,30 +105,30 @@ function test_por_to_string() {
     prange.max = 3
     prange.type_nb = 1
     
-    por.patterns.patterns[2] = &prange
-    por.patterns.length = 2
+    por.patterns[2] = &prange
+    por.length = 2
     
-    test_result("Test POr::to_string(): two elements", por.to_string(), "1 | 1/3")
+    test_result("Test POr::to_string(): two elements", to_string(por), "1 | 1/3")
 }
 
 // Tuple
 
 function test_ptuple_to_string() {
-    class Tuple scalar tuple
-    class PConstant scalar pconstant
-    class PRange scalar prange
+    struct Tuple scalar tuple
+    struct PConstant scalar pconstant
+    struct PRange scalar prange
     
     tuple = Tuple()
     
-    test_result("Test Tuple::to_string(): empty", tuple.to_string(), "Empty Tuple: Error")
+    test_result("Test Tuple::to_string(): empty", to_string(tuple), "Empty Tuple: Error")
     
     pconstant = PConstant()
-    pconstant.define(1)
+    define_pconstant(pconstant, 1)
     
     tuple.patterns = J(1, 1, NULL)
     tuple.patterns[1] = &pconstant
     
-    test_result("Test Tuple::to_string(): one element", tuple.to_string(), "1")
+    test_result("Test Tuple::to_string(): one element", to_string(tuple), "1")
     
     prange = PRange()
     prange.min = 1
@@ -136,7 +138,7 @@ function test_ptuple_to_string() {
     tuple.patterns = J(2, 1, NULL)
     tuple.patterns[1] = &pconstant
     tuple.patterns[2] = &prange
-    test_result("Test Tuple::to_string(): two elements", tuple.to_string(), "(1, 1/3)")
+    test_result("Test Tuple::to_string(): two elements", to_string(tuple), "(1, 1/3)")
 }
 
 /////////////////////////////////////////////////////////////////////// define()
@@ -144,20 +146,20 @@ function test_ptuple_to_string() {
 // PEmpty
 
 function test_pempty_define() {
-    class PEmpty scalar pempty
+    struct PEmpty scalar pempty
 
     pempty = PEmpty()
-    pempty.define()
+    define_pempty(pempty)
 
-    test_result("Test PEmpty::define()", pempty.to_string(), "Empty")
+    test_result("Test PEmpty::define()", to_string(pempty), "Empty")
 }
 
 // PWild
 
 function test_pwild_define() {
-    class PWild scalar pwild
+    struct PWild scalar pwild
     class Variable scalar variable
-    class PConstant scalar pconstant_1, pconstant_2
+    struct PConstant scalar pconstant_1, pconstant_2
     
     variable = Variable()
     variable.name = "test_var"
@@ -165,43 +167,43 @@ function test_pwild_define() {
     variable.levels = 1, 2
     
     pwild = PWild()
-    pwild.define(variable)
+    define_pwild(pwild, variable)
 
-    test_result("Test PWild::define()", pwild.to_string(1), "1 | 2")
+    test_result("Test PWild::define()", to_string_pwild(pwild, 1), "1 | 2")
 }
 
 // PConstant
 
 function test_pconstant_define() {
-    class PConstant scalar pconstant
+    struct PConstant scalar pconstant
     
     pconstant = PConstant()
     
-    pconstant.define(1)
-    test_result("Test PConstant::define(): real", pconstant.to_string(), "1")
+    define_pconstant(pconstant, 1)
+    test_result("Test PConstant::define(): real", to_string(pconstant), "1")
     
-    pconstant.define(.)
-    test_result("Test PConstant::define(): missing real", pconstant.to_string(), ".")
+    define_pconstant(pconstant, .)
+    test_result("Test PConstant::define(): missing real", to_string(pconstant), ".")
     
-    pconstant.define(.a)
-    test_result("Test PConstant::define(): missing real .a", pconstant.to_string(), ".a")
+    define_pconstant(pconstant, .a)
+    test_result("Test PConstant::define(): missing real .a", to_string(pconstant), ".a")
 }
 
 // PRange
 
 function test_prange_define() {
-    class PRange scalar prange
+    struct PRange scalar prange
     
     prange = PRange()
     
-    prange.define(1, 3, 1)
-    test_result("Test PRange::define(): integer", prange.to_string(), "1/3")
+    define_prange(prange, 1, 3, 1)
+    test_result("Test PRange::define(): integer", to_string(prange), "1/3")
     
-    prange.define(1.1, 3.1, 2)
-    test_result("Test PRange::define(): float", prange.to_string(), "1.1/3.1")
+    define_prange(prange, 1.1, 3.1, 2)
+    test_result("Test PRange::define(): float", to_string(prange), "1.1/3.1")
     
-    prange.define(1.1, 3.1, 3)
-    test_result("Test PRange::define(): double", prange.to_string(), "1.1/3.1")
+    define_prange(prange, 1.1, 3.1, 3)
+    test_result("Test PRange::define(): double", to_string(prange), "1.1/3.1")
     
     /*
     TODO: test errors
@@ -215,22 +217,22 @@ function test_prange_define() {
 // POr
 
 function test_por_define() {
-    class POr scalar por
-    class PConstant scalar pconstant_1, pconstant_2, pconstant_3
+    struct POr scalar por
+    struct PConstant scalar pconstant_1, pconstant_2, pconstant_3
     
     pconstant_1 = PConstant()
-    pconstant_1.define(1)
+    define_pconstant(pconstant_1, 1)
     
     pconstant_2 = PConstant()
-    pconstant_2.define(2)
+    define_pconstant(pconstant_2, 2)
     
     pconstant_3 = PConstant()
-    pconstant_3.define(2)
+    define_pconstant(pconstant_3, 2)
     
     por = POr()
-    por.define((&pconstant_1, &pconstant_2, &pconstant_3))
+    define_por(por, (&pconstant_1, &pconstant_2, &pconstant_3))
     
-    test_result("Test POr::define(): base", por.to_string(), "1 | 2 | 2")
+    test_result("Test POr::define(): base", to_string(por), "1 | 2 | 2")
 }
 
 // Tuple
@@ -244,172 +246,172 @@ function test_por_define() {
 // PEmpty
 
 function test_pempty_compress() {
-    class PEmpty scalar pempty
-    class Pattern scalar compressed
+    struct PEmpty scalar pempty
+    pointer scalar compressed
 
     pempty = PEmpty()
     
-    compressed = pempty.compress()
+    compressed = &compress(pempty)
 
-    test_result("Test PEmpty::compress()", compressed.to_string(), "Empty")
+    test_result("Test PEmpty::compress()", to_string(*compressed), "Empty")
 }
 
 // PWild
 
 function test_pwild_compress() {
-    class PWild scalar pwild
-    class Pattern scalar compressed
+    struct PWild scalar pwild
+    pointer scalar compressed
 
     pwild = PWild()
     
-    compressed = pwild.compress()
+    compressed = &compress(pwild)
 
-    test_result("Test PWild::compress()", compressed.to_string(), "_")
+    test_result("Test PWild::compress()", to_string(*compressed), "_")
 }
 
 // PConstant
 
 function test_pconstant_compress() {
-    class PConstant scalar pconstant
-    class Pattern scalar compressed
+    struct PConstant scalar pconstant
+    pointer scalar compressed
 
     pconstant = PConstant()
-    pconstant.define(1)
+    define_pconstant(pconstant, 1)
     
-    compressed = pconstant.compress()
+    compressed = &compress(pconstant)
 
-    test_result("Test PConstant::compress()", compressed.to_string(), "1")
+    test_result("Test PConstant::compress()", to_string(*compressed), "1")
 }
 
 // PRange
 
 function test_prange_compress() {
-    class PRange scalar prange
-    class Pattern scalar compressed
+    struct PRange scalar prange
+    pointer scalar compressed
 
     prange = PRange()
     
-    prange.define(1, 3, 1)
-    compressed = prange.compress()
-    test_result("Test PRange::compress(): int range", compressed.to_string(), "1/3")
+    define_prange(prange, 1, 3, 1)
+    compressed = &compress(prange)
+    test_result("Test PRange::compress(): int range", to_string(*compressed), "1/3")
     
-    prange.define(1.1, 3.1, 2)
-    compressed = prange.compress()
-    test_result("Test PRange::compress(): float range", compressed.to_string(), "1.1/3.1")
+    define_prange(prange, 1.1, 3.1, 2)
+    compressed = &compress(prange)
+    test_result("Test PRange::compress(): float range", to_string(*compressed), "1.1/3.1")
     
-    prange.define(1.1, 3.1, 3)
-    compressed = prange.compress()
-    test_result("Test PRange::compress(): double range", compressed.to_string(), "1.1/3.1")
+    define_prange(prange, 1.1, 3.1, 3)
+    compressed = &compress(prange)
+    test_result("Test PRange::compress(): double range", to_string(*compressed), "1.1/3.1")
     
-    prange.define(1, 1, 1)
-    compressed = prange.compress()
-    test_result("Test PRange::compress(): int constant", compressed.to_string(), "1")
+    define_prange(prange, 1, 1, 1)
+    compressed = &compress(prange)
+    test_result("Test PRange::compress(): int constant", to_string(*compressed), "1")
     
-    prange.define(1.1, 1.1, 2)
-    compressed = prange.compress()
-    test_result("Test PRange::compress(): float constant", compressed.to_string(), "1.1")
+    define_prange(prange, 1.1, 1.1, 2)
+    compressed = &compress(prange)
+    test_result("Test PRange::compress(): float constant", to_string(*compressed), "1.1")
     
-    prange.define(1.1, 1.1, 3)
-    compressed = prange.compress()
-    test_result("Test PRange::compress(): double constant", compressed.to_string(), "1.1")
+    define_prange(prange, 1.1, 1.1, 3)
+    compressed = &compress(prange)
+    test_result("Test PRange::compress(): double constant", to_string(*compressed), "1.1")
     
-    prange.define(3, 1, 1)
-    compressed = prange.compress()
-    test_result("Test PRange::compress(): int empty", compressed.to_string(), "Empty")
+    define_prange(prange, 3, 1, 1)
+    compressed = &compress(prange)
+    test_result("Test PRange::compress(): int empty", to_string(*compressed), "Empty")
     
-    prange.define(3.1, 1.1, 2)
-    compressed = prange.compress()
-    test_result("Test PRange::compress(): float empty", compressed.to_string(), "Empty")
+    define_prange(prange, 3.1, 1.1, 2)
+    compressed = &compress(prange)
+    test_result("Test PRange::compress(): float empty", to_string(*compressed), "Empty")
     
-    prange.define(3.1, 1.1, 3)
-    compressed = prange.compress()
-    test_result("Test PRange::compress(): double empty", compressed.to_string(), "Empty")
+    define_prange(prange, 3.1, 1.1, 3)
+    compressed = &compress(prange)
+    test_result("Test PRange::compress(): double empty", to_string(*compressed), "Empty")
     
 }
 
 // POr
 
 function test_por_compress() {
-    class POr scalar por
-    class PConstant scalar pconstant_1, pconstant_2, pconstant_3
-    class PRange scalar prange_1, prange_2
-    class Pattern scalar compressed
+    struct POr scalar por
+    struct PConstant scalar pconstant_1, pconstant_2, pconstant_3
+    struct PRange scalar prange_1, prange_2
+    pointer scalar compressed
     
     pconstant_1 = PConstant()
-    pconstant_1.define(1)
+    define_pconstant(pconstant_1, 1)
     
     pconstant_2 = PConstant()
-    pconstant_2.define(2)
+    define_pconstant(pconstant_2, 2)
     
     pconstant_3 = PConstant()
-    pconstant_3.define(2)
+    define_pconstant(pconstant_3, 2)
     
     prange_1 = PRange()
-    prange_1.define(1, 3, 1)
+    define_prange(prange_1, 1, 3, 1)
     
     prange_2 = PRange()
-    prange_2.define(2, 2, 1)
+    define_prange(prange_2, 2, 2, 1)
     
     por = POr()
-    por.define((&pconstant_1, &pconstant_2))
-    compressed = por.compress()
-    test_result("Test POr::compress(): base", compressed.to_string(), "1 | 2")
+    define_por(por, (&pconstant_1, &pconstant_2))
+    compressed = &compress(por)
+    test_result("Test POr::compress(): base", to_string(*compressed), "1 | 2")
     
     por = POr()
-    por.define((&pconstant_1, &pconstant_2, &pconstant_3))
-    compressed = por.compress()
-    test_result("Test POr::compress(): shrink", compressed.to_string(), "1 | 2")
+    define_por(por, (&pconstant_1, &pconstant_2, &pconstant_3))
+    compressed = &compress(por)
+    test_result("Test POr::compress(): shrink", to_string(*compressed), "1 | 2")
     
     por = POr()
-    por.define((&pconstant_2, &pconstant_3))
-    compressed = por.compress()
-    test_result("Test POr::compress(): to constant", compressed.to_string(), "2")
+    define_por(por, (&pconstant_2, &pconstant_3))
+    compressed = &compress(por)
+    test_result("Test POr::compress(): to constant", to_string(*compressed), "2")
     
     por = POr()
-    por.define((&pconstant_1, &prange_2))
-    compressed = por.compress()
-    test_result("Test POr::compress(): compress each", compressed.to_string(), "1 | 2")
+    define_por(por, (&pconstant_1, &prange_2))
+    compressed = &compress(por)
+    test_result("Test POr::compress(): compress each", to_string(*compressed), "1 | 2")
     
     por = POr()
-    por.define((&prange_2, &prange_2))
-    compressed = por.compress()
-    test_result("Test POr::compress(): empty", compressed.to_string(), "2")
+    define_por(por, (&prange_2, &prange_2))
+    compressed = &compress(por)
+    test_result("Test POr::compress(): empty", to_string(*compressed), "2")
 }
 
 // Tuple
 
 function test_ptuple_compress() {
-    class Tuple scalar tuple
-    class POr scalar por
-    class PConstant scalar pconstant
-    class PRange scalar prange_1, prange_2
-    class Pattern scalar compressed
+    struct Tuple scalar tuple
+    struct POr scalar por
+    struct PConstant scalar pconstant
+    struct PRange scalar prange_1, prange_2
+    pointer scalar compressed
     
     pconstant = PConstant()
-    pconstant.define(1)
+    define_pconstant(pconstant, 1)
     
     por = POr()
-    por.define((&pconstant, &pconstant))
+    define_por(por, (&pconstant, &pconstant))
     
     prange_1 = PRange()
-    prange_1.define(2, 2, 1)
+    define_prange(prange_1, 2, 2, 1)
     
     prange_2 = PRange()
-    prange_2.define(3, 1, 1)
+    define_prange(prange_2, 3, 1, 1)
     
     tuple = Tuple()
     
     tuple.patterns = (&pconstant, &pconstant)
-    compressed = tuple.compress()
-    test_result("Test Tuple::compress(): base", compressed.to_string(), "(1, 1)")
+    compressed = &compress(tuple)
+    test_result("Test Tuple::compress(): base", to_string(*compressed), "(1, 1)")
     
     tuple.patterns = (&por, &prange_1)
-    compressed = tuple.compress()
-    test_result("Test Tuple::compress(): compress each", compressed.to_string(), "(1, 2)")
+    compressed = &compress(tuple)
+    test_result("Test Tuple::compress(): compress each", to_string(*compressed), "(1, 2)")
     
     tuple.patterns = (&por, &prange_2)
-    compressed = tuple.compress()
-    test_result("Test Tuple::compress(): empty", compressed.to_string(), "Empty")
+    compressed = &compress(tuple)
+    test_result("Test Tuple::compress(): empty", to_string(*compressed), "Empty")
 }
 
 
@@ -418,106 +420,106 @@ function test_ptuple_compress() {
 // PEmpty
 
 function test_pempty_overlap() {
-    class PEmpty scalar pempty
-    class PConstant scalar pconstant
-    class Pattern scalar overlap
+    struct PEmpty scalar pempty
+    struct PConstant scalar pconstant
+    pointer scalar overlap
     
     pempty = PEmpty()
     
     pconstant = PConstant()
-    pconstant.define(1)
+    define_pconstant(pconstant, 1)
     
-    overlap = pempty.overlap(pconstant)
+    overlap = &overlap(pempty, pconstant)
 
-    test_result("Test PEmpty::overlap()", overlap.to_string(), "Empty")
+    test_result("Test PEmpty::overlap()", to_string(*overlap), "Empty")
 }
 
 // PWild
 
 function test_pwild_overlap() {
-    class PWild scalar pwild
-    class PConstant scalar pconstant
-    class PRange scalar prange
-    class POr scalar por
-    class Pattern scalar overlap
+    struct PWild scalar pwild
+    struct PConstant scalar pconstant
+    struct PRange scalar prange
+    struct POr scalar por
+    pointer scalar overlap
     
     pwild = PWild()
     
     // PEmpty is covered in previous test
     
     pconstant = PConstant()
-    pconstant.define(1)
-    overlap = pwild.overlap(pconstant)
-    test_result("Test PWild::overlap() constant", overlap.to_string(), pconstant.to_string())
+    define_pconstant(pconstant, 1)
+    overlap = &overlap(pwild, pconstant)
+    test_result("Test PWild::overlap() constant", to_string(*overlap), to_string(pconstant))
     
     prange = PRange()
-    prange.define(0, 2, 1)
-    overlap = pwild.overlap(prange)
-    test_result("Test PWild::overlap() range", overlap.to_string(), prange.to_string())
+    define_prange(prange, 0, 2, 1)
+    overlap = &overlap(pwild, prange)
+    test_result("Test PWild::overlap() range", to_string(*overlap), to_string(prange))
     
     por = POr()
-    por.push(pconstant)
-    por.push(prange)
-    overlap = pwild.overlap(por)
-    test_result("Test PWild::overlap() or", overlap.to_string(), por.to_string())
+    push_por(por, pconstant)
+    push_por(por, prange)
+    overlap = &overlap(pwild, por)
+    test_result("Test PWild::overlap() or", to_string(*overlap), to_string(por))
 }
 
 // PConstant
 
 function test_pconstant_overlap() {
-    class PConstant scalar pconstant, pconstant_1, pconstant_2
-    class PRange scalar prange_1, prange_2
-    class POr scalar por
-    class Pattern scalar overlap
+    struct PConstant scalar pconstant, pconstant_1, pconstant_2
+    struct PRange scalar prange_1, prange_2
+    struct POr scalar por
+    pointer scalar overlap
     
     pconstant = PConstant()
-    pconstant.define(1)
+    define_pconstant(pconstant, 1)
     
     // PEmpty is covered in previous test
     
     // Pwild is covered in previous test
     
     pconstant_1 = PConstant()
-    pconstant_1.define(1)
-    overlap = pconstant.overlap(pconstant_1)
-    test_result("Test PConstant::overlap() same constant", overlap.to_string(), "1")
+    define_pconstant(pconstant_1, 1)
+    overlap = &overlap(pconstant, pconstant_1)
+    test_result("Test PConstant::overlap() same constant", to_string(*overlap), "1")
     
     pconstant_2 = PConstant()
-    pconstant_2.define(2)
-    overlap = pconstant.overlap(pconstant_2)
-    test_result("Test PConstant::overlap() other constant", overlap.to_string(), "Empty")
+    define_pconstant(pconstant_2, 2)
+    overlap = &overlap(pconstant, pconstant_2)
+    test_result("Test PConstant::overlap() other constant", to_string(*overlap), "Empty")
     
     prange_1 = PRange()
-    prange_1.define(0, 2, 1)
-    overlap = pconstant.overlap(prange_1)
-    test_result("Test PConstant::overlap() range in", overlap.to_string(), "1")
+    define_prange(prange_1, 0, 2, 1)
+    overlap = &overlap(pconstant, prange_1)
+    test_result("Test PConstant::overlap() range in", to_string(*overlap), "1")
     
     prange_2 = PRange()
-    prange_2.define(2, 3, 1)
-    overlap = pconstant.overlap(prange_2)
-    test_result("Test PConstant::overlap() range out", overlap.to_string(), "Empty")
+    define_prange(prange_2, 2, 3, 1)
+    overlap = &overlap(pconstant, prange_2)
+    test_result("Test PConstant::overlap() range out", to_string(*overlap), "Empty")
     
     por = POr()
-    por.push(pconstant_2)
-    por.push(prange_2)
-    overlap = pconstant.overlap(por)
-    test_result("Test PConstant::overlap() or out", overlap.to_string(), "Empty")
+    push_por(por, pconstant_2)
+    push_por(por, prange_2)
+    overlap = &overlap(pconstant, por)
+    test_result("Test PConstant::overlap() or out", to_string(*overlap), "Empty")
     
-    por.push(pconstant_1)
-    overlap = pconstant.overlap(por)
-    test_result("Test PConstant::overlap() or in", overlap.to_string(), "1")
+    push_por(por, pconstant_1)
+    overlap = &overlap(pconstant, por)
+    test_result("Test PConstant::overlap() or in", to_string(*overlap), "1")
 }
 
 // PRange
 
 function test_prange_overlap() {
-    class PRange scalar prange, prange_1, prange_2, prange_3, prange_4, prange_5, prange_6
-    class PConstant scalar pconstant_1, pconstant_2
-    class POr scalar por
-    class Pattern scalar overlap
+    struct PRange scalar prange, prange_1, prange_2, prange_3, prange_4, prange_5, prange_6
+    struct PConstant scalar pconstant_1, pconstant_2
+    struct POr scalar por
+    pointer scalar overlap
     
     prange = PRange()
-    prange.define(0, 3, 1)
+    define_prange(prange, 0, 3, 1)
     
     // PEmpty is covered in previous test
     
@@ -526,88 +528,88 @@ function test_prange_overlap() {
     // PConstant is covered in previous test
     
     prange_1 = PRange()
-    prange_1.define(0, 3, 1)
-    overlap = prange.overlap(prange_1)
-    test_result("Test PRange::overlap() same range", overlap.to_string(), "0/3")
+    define_prange(prange_1, 0, 3, 1)
+    overlap = &overlap(prange, prange_1)
+    test_result("Test PRange::overlap() same range", to_string(*overlap), "0/3")
     
     prange_2 = PRange()
-    prange_2.define(1, 2, 1)
-    overlap = prange.overlap(prange_2)
-    test_result("Test PRange::overlap() range in", overlap.to_string(), "1/2")
+    define_prange(prange_2, 1, 2, 1)
+    overlap = &overlap(prange, prange_2)
+    test_result("Test PRange::overlap() range in", to_string(*overlap), "1/2")
     
     prange_3 = PRange()
-    prange_3.define(10, 20, 1)
-    overlap = prange.overlap(prange_3)
-    test_result("Test PRange::overlap() range out", overlap.to_string(), "Empty")
+    define_prange(prange_3, 10, 20, 1)
+    overlap = &overlap(prange, prange_3)
+    test_result("Test PRange::overlap() range out", to_string(*overlap), "Empty")
     
     prange_4 = PRange()
-    prange_4.define(-1, 1, 1)
-    overlap = prange.overlap(prange_4)
-    test_result("Test PRange::overlap() low", overlap.to_string(), "0/1")
+    define_prange(prange_4, -1, 1, 1)
+    overlap = &overlap(prange, prange_4)
+    test_result("Test PRange::overlap() low", to_string(*overlap), "0/1")
     
     prange_5 = PRange()
-    prange_5.define(2, 4, 1)
-    overlap = prange.overlap(prange_5)
-    test_result("Test PRange::overlap() high", overlap.to_string(), "2/3")
+    define_prange(prange_5, 2, 4, 1)
+    overlap = &overlap(prange, prange_5)
+    test_result("Test PRange::overlap() high", to_string(*overlap), "2/3")
     
     prange = PRange()
-    prange.define(0, 4, 3)
+    define_prange(prange, 0, 4, 3)
     
     pconstant_1 = PConstant()
-    pconstant_1.define(1)
+    define_pconstant(pconstant_1, 1)
     
     pconstant_2 = PConstant()
-    pconstant_2.define(5)
+    define_pconstant(pconstant_2, 5)
     
     prange_6 = PRange()
-    prange_6.define(2, 3, 1)
+    define_prange(prange_6, 2, 3, 1)
     
     por = POr()
-    por.push(pconstant_1)
-    por.push(pconstant_2)
-    por.push(prange_6)
-    overlap = prange.overlap(por)
-    test_result("Test PRange::overlap() or", overlap.to_string(), "1 | 2/3")
+    push_por(por, pconstant_1)
+    push_por(por, pconstant_2)
+    push_por(por, prange_6)
+    overlap = &overlap(prange, por)
+    test_result("Test PRange::overlap() or", to_string(*overlap), "1 | 2/3")
 }
 
 // POr
 
 function test_por_overlap() {
-    class POr scalar por_1, por_2
-    class PRange scalar prange_1, prange_2
-    class PConstant scalar pconstant_1, pconstant_2, pconstant_3
-    class Pattern scalar overlap
+    struct POr scalar por_1, por_2
+    struct PRange scalar prange_1, prange_2
+    struct PConstant scalar pconstant_1, pconstant_2, pconstant_3
+    pointer scalar overlap
     
     // POr 1 : (0 | 1 | 2/4)
     
     por_1 = POr()
     
     pconstant_1 = PConstant()
-    pconstant_1.define(0)
+    define_pconstant(pconstant_1, 0)
     
     pconstant_2 = PConstant()
-    pconstant_2.define(1)
+    define_pconstant(pconstant_2, 1)
     
     prange_1 = PRange()
-    prange_1.define(2, 4, 1)
+    define_prange(prange_1, 2, 4, 1)
     
-    por_1.push(pconstant_1)
-    por_1.push(pconstant_2)
-    por_1.push(prange_1)
+    push_por(por_1, pconstant_1)
+    push_por(por_1, pconstant_2)
+    push_por(por_1, prange_1)
     
     // POr 2 : (10/20 | 3 | 1)
     
     por_2 = POr()
     
     prange_2 = PRange()
-    prange_2.define(10, 20, 1)
+    define_prange(prange_2, 10, 20, 1)
     
     pconstant_3 = PConstant()
-    pconstant_3.define(3)
+    define_pconstant(pconstant_3, 3)
     
-    por_2.push(prange_2)
-    por_2.push(pconstant_3)
-    por_2.push(pconstant_2)
+    push_por(por_2, prange_2)
+    push_por(por_2, pconstant_3)
+    push_por(por_2, pconstant_2)
     
     // Check
     // - pconstant out
@@ -616,9 +618,9 @@ function test_por_overlap() {
     // - prange out
     // - order does not matter
     
-    overlap = por_1.overlap(por_2)
+    overlap = &overlap(por_1, por_2)
     
-    test_result("Test POr::overlap() or", overlap.to_string(), "1 | 3")
+    test_result("Test POr::overlap() or", to_string(*overlap), "1 | 3")
 }
 
 ///////////////////////////////////////////////////////////////////// includes()
@@ -626,182 +628,182 @@ function test_por_overlap() {
 // PEmpty
 
 function test_pempty_includes() {
-    class PEmpty scalar pempty, pempty_1
-    class PConstant scalar pconstant
+    struct PEmpty scalar pempty, pempty_1
+    struct PConstant scalar pconstant
     real scalar included
     
     pempty = PEmpty()
     
     pempty_1 = PEmpty()
     
-    included = pempty.includes(pempty_1)
+    included = includes(pempty, pempty_1)
     test_result("Test PEmpty::includes() empty", strofreal(included), "1")
     
     pconstant = PConstant()
-    pconstant.define(1)
+    define_pconstant(pconstant, 1)
     
-    included = pempty.includes(pconstant)
+    included = includes(pempty, pconstant)
     test_result("Test PEmpty::includes() constant", strofreal(included), "0")
 }
 
 // PWild
 
 function test_pwild_includes() {
-    class PWild scalar pwild
-    class PEmpty scalar pempty
-    class PConstant scalar pconstant
-    class PRange scalar prange
-    class POr scalar por
+    struct PWild scalar pwild
+    struct PEmpty scalar pempty
+    struct PConstant scalar pconstant
+    struct PRange scalar prange
+    struct POr scalar por
     real scalar included
     
     pwild = PWild()
     
     pempty = PEmpty()
-    included = pwild.includes(pempty)
+    included = includes(pwild, pempty)
     test_result("Test PWild::includes() empty", strofreal(included), "1")
     
     pconstant = PConstant()
-    pconstant.define(1)
-    included = pwild.includes(pconstant)
+    define_pconstant(pconstant, 1)
+    included = includes(pwild, pconstant)
     test_result("Test PWild::includes() constant", strofreal(included), "1")
     
     prange = PRange()
-    prange.define(0, 2, 1)
-    included = pwild.includes(prange)
+    define_prange(prange, 0, 2, 1)
+    included = includes(pwild, prange)
     test_result("Test PWild::includes() range", strofreal(included), "1")
     
     por = POr()
-    por.push(pconstant)
-    por.push(prange)
-    included = pwild.includes(por)
+    push_por(por, pconstant)
+    push_por(por, prange)
+    included = includes(pwild, por)
     test_result("Test PWild::includes() or", strofreal(included), "1")
 }
 
 // PConstant
 
 function test_pconstant_includes() {
-    class PConstant scalar pconstant, pconstant_1, pconstant_2
-    class PEmpty scalar pempty
-    class PRange scalar prange_1, prange_2, prange_3
-    class POr scalar por
-    class Pattern scalar overlap
+    struct PConstant scalar pconstant, pconstant_1, pconstant_2
+    struct PEmpty scalar pempty
+    struct PRange scalar prange_1, prange_2, prange_3
+    struct POr scalar por
+    pointer scalar overlap
     real scalar included
     
     pconstant = PConstant()
-    pconstant.define(1)
+    define_pconstant(pconstant, 1)
     
     pempty = PEmpty()
-    included = pconstant.includes(pempty)
+    included = includes(pconstant, pempty)
     test_result("Test PConstant::includes() empty", strofreal(included), "1")
     
     // PWild is equivalent to POr on its values
     
     pconstant_1 = PConstant()
-    pconstant_1.define(1)
-    included = pconstant.includes(pconstant_1)
+    define_pconstant(pconstant_1, 1)
+    included = includes(pconstant, pconstant_1)
     test_result("Test PConstant::includes() same constant", strofreal(included), "1")
     
     pconstant_2 = PConstant()
-    pconstant_2.define(2)
-    included = pconstant.includes(pconstant_2)
+    define_pconstant(pconstant_2, 2)
+    included = includes(pconstant, pconstant_2)
     test_result("Test PConstant::includes() other constant", strofreal(included), "0")
     
     prange_1 = PRange()
-    prange_1.define(1, 1, 1)
-    included = pconstant.includes(prange_1)
+    define_prange(prange_1, 1, 1, 1)
+    included = includes(pconstant, prange_1)
     test_result("Test PConstant::includes() range constant", strofreal(included), "1")
     
     prange_2 = PRange()
-    prange_2.define(0, 2, 1)
-    included = pconstant.includes(prange_2)
+    define_prange(prange_2, 0, 2, 1)
+    included = includes(pconstant, prange_2)
     test_result("Test PConstant::includes() range in", strofreal(included), "0")
     
     prange_3 = PRange()
-    prange_3.define(2, 3, 1)
-    included = pconstant.includes(prange_3)
+    define_prange(prange_3, 2, 3, 1)
+    included = includes(pconstant, prange_3)
     test_result("Test PConstant::includes() range out", strofreal(included), "0")
     
     por = POr()
     
-    por.push(pconstant_1)
-    included = pconstant.includes(por)
+    push_por(por, pconstant_1)
+    included = includes(pconstant, por)
     test_result("Test PConstant::includes() or in", strofreal(included), "1")
     
-    por.push(pconstant_2)
-    included = pconstant.includes(por)
+    push_por(por, pconstant_2)
+    included = includes(pconstant, por)
     test_result("Test PConstant::includes() or out", strofreal(included), "0")
 }
 
 // PRange
 
 function test_prange_includes() {
-    class PRange scalar prange, prange_1, prange_2, prange_3, prange_4, prange_5
-    class PEmpty scalar pempty
-    class PConstant scalar pconstant_1, pconstant_2
-    class POr scalar por
-    class Pattern scalar overlap
+    struct PRange scalar prange, prange_1, prange_2, prange_3, prange_4, prange_5
+    struct PEmpty scalar pempty
+    struct PConstant scalar pconstant_1, pconstant_2
+    struct POr scalar por
+    pointer scalar overlap
     real scalar included
     
     prange = PRange()
-    prange.define(0, 3, 1)
+    define_prange(prange, 0, 3, 1)
     
     pempty = PEmpty()
-    included = prange.includes(pempty)
+    included = includes(prange, pempty)
     test_result("Test PRange::includes() empty", strofreal(included), "1")
     
     pconstant_1 = PConstant()
-    pconstant_1.define(1)
-    included = prange.includes(pconstant_1)
+    define_pconstant(pconstant_1, 1)
+    included = includes(prange, pconstant_1)
     test_result("Test PRange::includes() constant in", strofreal(included), "1")
     
     pconstant_2 = PConstant()
-    pconstant_2.define(5)
-    included = prange.includes(pconstant_2)
+    define_pconstant(pconstant_2, 5)
+    included = includes(prange, pconstant_2)
     test_result("Test PRange::includes() constant out", strofreal(included), "0")
     
     // PWild is equivalent to POr on its values
     
     prange_1 = PRange()
-    prange_1.define(0, 3, 1)
-    included = prange.includes(prange_1)
+    define_prange(prange_1, 0, 3, 1)
+    included = includes(prange, prange_1)
     test_result("Test PRange::includes() same range", strofreal(included), "1")
     
     prange_2 = PRange()
-    prange_2.define(1, 2, 1)
-    included = prange.includes(prange_2)
+    define_prange(prange_2, 1, 2, 1)
+    included = includes(prange, prange_2)
     test_result("Test PRange::includes() range in", strofreal(included), "1")
     
     prange_3 = PRange()
-    prange_3.define(10, 20, 1)
-    included = prange.includes(prange_3)
+    define_prange(prange_3, 10, 20, 1)
+    included = includes(prange, prange_3)
     test_result("Test PRange::includes() range out", strofreal(included), "0")
     
     prange_4 = PRange()
-    prange_4.define(-1, 1, 1)
-    included = prange.includes(prange_4)
+    define_prange(prange_4, -1, 1, 1)
+    included = includes(prange, prange_4)
     test_result("Test PRange::includes() low", strofreal(included), "0")
     
     prange_5 = PRange()
-    prange_5.define(2, 4, 1)
-    included = prange.includes(prange_5)
+    define_prange(prange_5, 2, 4, 1)
+    included = includes(prange, prange_5)
     test_result("Test PRange::includes() high", strofreal(included), "0")
     
     por = POr()
-    por.push(pconstant_1)
-    included = prange.includes(por)
+    push_por(por, pconstant_1)
+    included = includes(prange, por)
     test_result("Test PRange::includes() or in", strofreal(included), "1")
     
-    por.push(pconstant_2)
-    included = prange.includes(por)
+    push_por(por, pconstant_2)
+    included = includes(prange, por)
     test_result("Test PRange::includes() or out", strofreal(included), "0")
 }
 
 // POr
 
 function test_por_includes() {
-    class POr scalar por, por_1
-    class PConstant scalar pconstant_1, pconstant_2, pconstant_3
-    class PRange scalar prange_1, prange_2, prange_3, prange_4
+    struct POr scalar por, por_1
+    struct PConstant scalar pconstant_1, pconstant_2, pconstant_3
+    struct PRange scalar prange_1, prange_2, prange_3, prange_4
     real scalar included
     
     // POr : (0 | 1/4)
@@ -809,59 +811,59 @@ function test_por_includes() {
     por = POr()
     
     pconstant_1 = PConstant()
-    pconstant_1.define(0)
+    define_pconstant(pconstant_1, 0)
     
     prange_1 = PRange()
-    prange_1.define(1, 4, 1)
+    define_prange(prange_1, 1, 4, 1)
     
-    por.push(pconstant_1)
-    por.push(prange_1)
+    push_por(por, pconstant_1)
+    push_por(por, prange_1)
     
-    included = por.includes(pconstant_1)
+    included = includes(por, pconstant_1)
     test_result("Test POr::includes() constant in", strofreal(included), "1")
     
     pconstant_2 = PConstant()
-    pconstant_2.define(2)
+    define_pconstant(pconstant_2, 2)
     
-    included = por.includes(pconstant_2)
+    included = includes(por, pconstant_2)
     test_result("Test POr::includes() constant in 2", strofreal(included), "1")
     
     pconstant_3 = PConstant()
-    pconstant_3.define(-1)
+    define_pconstant(pconstant_3, -1)
     
-    included = por.includes(pconstant_3)
+    included = includes(por, pconstant_3)
     test_result("Test POr::includes() constant out", strofreal(included), "0")
     
     prange_2 = PRange()
-    prange_2.define(2, 3, 1)
+    define_prange(prange_2, 2, 3, 1)
     
-    included = por.includes(prange_2)
+    included = includes(por, prange_2)
     test_result("Test POr::includes() range in", strofreal(included), "1")
     
     prange_3 = PRange()
-    prange_3.define(-3, -1, 1)
+    define_prange(prange_3, -3, -1, 1)
     
-    included = por.includes(prange_3)
+    included = includes(por, prange_3)
     test_result("Test POr::includes() range out", strofreal(included), "0")
     
     prange_4 = PRange()
-    prange_4.define(0, 2, 1) // = (0 | 1 | 2) in (0 | 1/4)
+    define_prange(prange_4, 0, 2, 1) // = (0 | 1 | 2) in (0 | 1/4)
     
-    included = por.includes(prange_4)
+    included = includes(por, prange_4)
     test_result("Test POr::includes() range in across patterns", strofreal(included), "1")
     
     por_1 = POr()
     
-    por_1.push(pconstant_1)
-    included = por.includes(por_1)
+    push_por(por_1, pconstant_1)
+    included = includes(por, por_1)
     test_result("Test POr::includes() or in 1 element", strofreal(included), "1")
     
-    por_1.push(prange_2)
-    included = por.includes(por_1)
+    push_por(por_1, prange_2)
+    included = includes(por, por_1)
     test_result("Test POr::includes() or in 2 elements", strofreal(included), "1")
     
-    por_1.push(pconstant_3)
-    included = por.includes(por_1)
+    push_por(por_1, pconstant_3)
+    included = includes(por, por_1)
     test_result("Test POr::includes() or out", strofreal(included), "0")    
 }
 
@@ -870,13 +872,13 @@ function test_por_includes() {
 // PEmpty
 
 function test_pempty_difference() {
-    class PEmpty scalar pempty
-    class Pattern scalar difference
-    class PEmpty scalar pempty_1
-    class PWild scalar pwild
-    class PConstant scalar pconstant_1
-    class PRange scalar prange_1
-    class POr scalar por
+    struct PEmpty scalar pempty
+    pointer scalar difference
+    struct PEmpty scalar pempty_1
+    struct PWild scalar pwild
+    struct PConstant scalar pconstant_1
+    struct PRange scalar prange_1
+    struct POr scalar por
     
     pempty = PEmpty()
     
@@ -884,45 +886,45 @@ function test_pempty_difference() {
 
     pempty_1 = PEmpty()
     
-    difference = *pempty.difference(pempty_1)
+    difference = difference(pempty, pempty_1)
 
-    test_result("Test PEmpty::difference() empty", difference.to_string(), "Empty")
+    test_result("Test PEmpty::difference() empty", to_string(*difference), "Empty")
 
     // PWild
 
     pwild = PWild()
     
-    difference = *pempty.difference(pwild)
+    difference = difference(pempty, pwild)
 
-    test_result("Test PEmpty::difference() wild", difference.to_string(), "Empty")
+    test_result("Test PEmpty::difference() wild", to_string(*difference), "Empty")
 
     // PConstant
 
     pconstant_1 = PConstant()
-    pconstant_1.define(1)
+    define_pconstant(pconstant_1, 1)
     
-    difference = *pempty.difference(pconstant_1)
+    difference = difference(pempty, pconstant_1)
 
-    test_result("Test PEmpty::difference() constant", difference.to_string(), "Empty")
+    test_result("Test PEmpty::difference() constant", to_string(*difference), "Empty")
 
     // PRange
 
     prange_1 = PRange()
-    prange_1.define(0, 2, 1)
+    define_prange(prange_1, 0, 2, 1)
     
-    difference = *pempty.difference(prange_1)
+    difference = difference(pempty, prange_1)
 
-    test_result("Test PEmpty::difference() range", difference.to_string(), "Empty")
+    test_result("Test PEmpty::difference() range", to_string(*difference), "Empty")
 
     // POr
 
     por = POr()
-    por.push(pconstant_1)
-    por.push(prange_1)
+    push_por(por, pconstant_1)
+    push_por(por, prange_1)
     
-    difference = *pempty.difference(por)
+    difference = difference(pempty, por)
 
-    test_result("Test PEmpty::difference() or", difference.to_string(), "Empty")
+    test_result("Test PEmpty::difference() or", to_string(*difference), "Empty")
 }
 
 // PWild
@@ -934,293 +936,293 @@ function test_pwild_difference() {
 // PConstant
 
 function test_pconstant_difference() {
-    class PConstant scalar pconstant
-    class Pattern scalar difference
-    class PEmpty scalar pempty
-    class PWild scalar pwild
-    class PConstant scalar pconstant_1, pconstant_2
-    class PRange scalar prange_1, prange_2
-    class POr scalar por
+    struct PConstant scalar pconstant
+    pointer scalar difference
+    struct PEmpty scalar pempty
+    struct PWild scalar pwild
+    struct PConstant scalar pconstant_1, pconstant_2
+    struct PRange scalar prange_1, prange_2
+    struct POr scalar por
     
     pconstant = PConstant()
-    pconstant.define(1)
+    define_pconstant(pconstant, 1)
     
     // PEmpty
 
     pempty = PEmpty()
     
-    difference = *pconstant.difference(pempty)
+    difference = difference(pconstant, pempty)
 
-    test_result("Test PConstant::difference() empty", difference.to_string(), "1")
+    test_result("Test PConstant::difference() empty", to_string(*difference), "1")
 
     // PWild
 
     pwild = PWild()
     
-    difference = *pconstant.difference(pwild)
+    difference = difference(pconstant, pwild)
 
-    test_result("Test PConstant::difference() wild", difference.to_string(), "Empty")
+    test_result("Test PConstant::difference() wild", to_string(*difference), "Empty")
 
     // PConstant
 
     pconstant_1 = PConstant()
-    pconstant_1.define(1)
+    define_pconstant(pconstant_1, 1)
     
-    difference = *pconstant.difference(pconstant_1)
+    difference = difference(pconstant, pconstant_1)
 
-    test_result("Test PConstant::difference() constant same", difference.to_string(), "Empty")
+    test_result("Test PConstant::difference() constant same", to_string(*difference), "Empty")
 
     pconstant_2 = PConstant()
-    pconstant_2.define(2)
+    define_pconstant(pconstant_2, 2)
     
-    difference = *pconstant.difference(pconstant_2)
+    difference = difference(pconstant ,pconstant_2)
 
-    test_result("Test PConstant::difference() constant different", difference.to_string(), "1")
+    test_result("Test PConstant::difference() constant different", to_string(*difference), "1")
 
     // PRange
 
     prange_1 = PRange()
-    prange_1.define(0, 2, 1)
+    define_prange(prange_1, 0, 2, 1)
     
-    difference = *pconstant.difference(prange_1)
+    difference = difference(pconstant, prange_1)
 
-    test_result("Test PConstant::difference() range in", difference.to_string(), "Empty")
+    test_result("Test PConstant::difference() range in", to_string(*difference), "Empty")
 
     prange_2 = PRange()
-    prange_2.define(-2, 0, 1)
+    define_prange(prange_2, -2, 0, 1)
     
-    difference = *pconstant.difference(prange_2)
+    difference = difference(pconstant, prange_2)
 
-    test_result("Test PConstant::difference() range out", difference.to_string(), "1")
+    test_result("Test PConstant::difference() range out", to_string(*difference), "1")
 
     // POr
 
     por = POr()
-    por.push(pconstant_2)
-    por.push(prange_2)
+    push_por(por, pconstant_2)
+    push_por(por, prange_2)
     
-    difference = *pconstant.difference(por)
+    difference = difference(pconstant, por)
 
-    test_result("Test PConstant::difference() range in", difference.to_string(), "1")
+    test_result("Test PConstant::difference() range in", to_string(*difference), "1")
 
-    por.push(pconstant_1)
+    push_por(por, pconstant_1)
     
-    difference = *pconstant.difference(por)
+    difference = difference(pconstant, por)
 
-    test_result("Test PConstant::difference() range out", difference.to_string(), "Empty")
+    test_result("Test PConstant::difference() range out", to_string(*difference), "Empty")
 }
 
 // PRange
 
 function test_prange_difference() {
-    class PRange scalar prange
-    class Pattern scalar difference
-    class PEmpty scalar pempty
-    class PWild scalar pwild
-    class PConstant scalar pconstant_1, pconstant_2, pconstant_3
-    class PRange scalar prange_1, prange_2, prange_3
-    class POr scalar por
+    struct PRange scalar prange
+    pointer scalar difference
+    struct PEmpty scalar pempty
+    struct PWild scalar pwild
+    struct PConstant scalar pconstant_1, pconstant_2, pconstant_3
+    struct PRange scalar prange_1, prange_2, prange_3
+    struct POr scalar por
     
     prange = PRange()
-    prange.define(0, 3, 1)
+    define_prange(prange, 0, 3, 1)
     
     // PEmpty
 
     pempty = PEmpty()
     
-    difference = *prange.difference(pempty)
+    difference = difference(prange, pempty)
 
-    test_result("Test PRange::difference() empty", difference.to_string(), "0/3")
+    test_result("Test PRange::difference() empty", to_string(*difference), "0/3")
 
     // PWild
 
     pwild = PWild()
     
-    difference = *prange.difference(pwild)
+    difference = difference(prange, pwild)
 
-    test_result("Test PRange::difference() wild", difference.to_string(), "Empty")
+    test_result("Test PRange::difference() wild", to_string(*difference), "Empty")
 
     // PConstant
 
     pconstant_1 = PConstant()
-    pconstant_1.define(-1)
+    define_pconstant(pconstant_1, -1)
     
-    difference = *prange.difference(pconstant_1)
+    difference = difference(prange, pconstant_1)
 
-    test_result("Test PRange::difference() constant out", difference.to_string(), "0/3")
+    test_result("Test PRange::difference() constant out", to_string(*difference), "0/3")
 
     pconstant_2 = PConstant()
-    pconstant_2.define(2)
+    define_pconstant(pconstant_2, 2)
     
-    difference = *prange.difference(pconstant_2)
+    difference = difference(prange, pconstant_2)
 
-    test_result("Test PRange::difference() constant middle", difference.to_string(), "0/1 | 3")
+    test_result("Test PRange::difference() constant middle", to_string(*difference), "0/1 | 3")
 
     pconstant_3 = PConstant()
-    pconstant_3.define(3)
+    define_pconstant(pconstant_3, 3)
     
-    difference = *prange.difference(pconstant_3)
+    difference = difference(prange, pconstant_3)
 
-    test_result("Test PRange::difference() constant boundary", difference.to_string(), "0/2")
+    test_result("Test PRange::difference() constant boundary", to_string(*difference), "0/2")
 
     // PRange
 
     prange_1 = PRange()
-    prange_1.define(-2, -1, 1)
+    define_prange(prange_1, -2, -1, 1)
     
-    difference = *prange.difference(prange_1)
+    difference = difference(prange, prange_1)
 
-    test_result("Test PRange::difference() range out", difference.to_string(), "0/3")
+    test_result("Test PRange::difference() range out", to_string(*difference), "0/3")
     
     prange_2 = PRange()
-    prange_2.define(1, 2, 1)
+    define_prange(prange_2, 1, 2, 1)
     
-    difference = *prange.difference(prange_2)
+    difference = difference(prange, prange_2)
 
-    test_result("Test PRange::difference() range in", difference.to_string(), "0 | 3")
+    test_result("Test PRange::difference() range in", to_string(*difference), "0 | 3")
     
     prange_3 = PRange()
-    prange_3.define(0, 3, 1)
+    define_prange(prange_3, 0, 3, 1)
     
-    difference = *prange.difference(prange_3)
+    difference = difference(prange, prange_3)
 
-    test_result("Test PRange::difference() range same", difference.to_string(), "Empty")
+    test_result("Test PRange::difference() range same", to_string(*difference), "Empty")
     
     // POr
     
     por = POr()
-    por.push(pconstant_1)
-    por.push(prange_1)
+    push_por(por, pconstant_1)
+    push_por(por, prange_1)
     
-    difference = *prange.difference(por)
+    difference = difference(prange, por)
 
-    test_result("Test PRange::difference() or out", difference.to_string(), "0/3")
+    test_result("Test PRange::difference() or out", to_string(*difference), "0/3")
     
-    por.push(pconstant_3)
+    push_por(por, pconstant_3)
     
-    difference = *prange.difference(por)
+    difference = difference(prange, por)
 
-    test_result("Test PRange::difference() or in 1", difference.to_string(), "0/2")
+    test_result("Test PRange::difference() or in 1", to_string(*difference), "0/2")
     
-    por.push(prange_2)
+    push_por(por, prange_2)
     
-    difference = *prange.difference(por)
+    difference = difference(prange, por)
 
-    test_result("Test PRange::difference() or in 2", difference.to_string(), "0")
+    test_result("Test PRange::difference() or in 2", to_string(*difference), "0")
 }
 
 // POr
 
 function test_por_difference() {
-    class POr scalar por
-    class Pattern scalar difference
-    class PEmpty scalar pempty
-    class PWild scalar pwild
-    class PConstant scalar pconstant_1, pconstant_2, pconstant_3
-    class PRange scalar prange_1, prange_2, prange_3, prange_4
-    class POr scalar por_1
+    struct POr scalar por
+    pointer scalar difference
+    struct PEmpty scalar pempty
+    struct PWild scalar pwild
+    struct PConstant scalar pconstant_1, pconstant_2, pconstant_3
+    struct PRange scalar prange_1, prange_2, prange_3, prange_4
+    struct POr scalar por_1
     
     por = POr()
     
     pconstant_1 = PConstant()
-    pconstant_1.define(1)
+    define_pconstant(pconstant_1, 1)
     
     prange_1 = PRange()
-    prange_1.define(3, 7, 1)
+    define_prange(prange_1, 3, 7, 1)
     
-    por.push(&pconstant_1)
-    por.push(&prange_1)
+    push_por(por, pconstant_1)
+    push_por(por, prange_1)
     
     // PEmpty
     
     pempty = PEmpty()
     
-    difference = *por.difference(pempty)
+    difference = difference(por, pempty)
 
-    test_result("Test POr::difference() empty", difference.to_string(), "1 | 3/7")
+    test_result("Test POr::difference() empty", to_string(*difference), "1 | 3/7")
     
     // PWild
     
     pwild = PWild()
     
-    difference = *por.difference(pwild)
+    difference = difference(por, pwild)
 
-    test_result("Test POr::difference() wild", difference.to_string(), "Empty")
+    test_result("Test POr::difference() wild", to_string(*difference), "Empty")
     
     // PConstant
     
-    difference = *por.difference(pconstant_1)
+    difference = difference(por, pconstant_1)
 
-    test_result("Test POr::difference() constant in 1", difference.to_string(), "3/7")
+    test_result("Test POr::difference() constant in 1", to_string(*difference), "3/7")
     
     pconstant_2 = PConstant()
-    pconstant_2.define(5)
+    define_pconstant(pconstant_2, 5)
     
-    difference = *por.difference(pconstant_2)
+    difference = difference(por, pconstant_2)
 
-    test_result("Test POr::difference() constant in 2", difference.to_string(), "1 | 3/4 | 6/7")
+    test_result("Test POr::difference() constant in 2", to_string(*difference), "1 | 3/4 | 6/7")
     
     pconstant_3 = PConstant()
-    pconstant_3.define(8)
+    define_pconstant(pconstant_3, 8)
     
-    difference = *por.difference(pconstant_3)
+    difference = difference(por, pconstant_3)
 
-    test_result("Test POr::difference() constant out", difference.to_string(), "1 | 3/7")
+    test_result("Test POr::difference() constant out", to_string(*difference), "1 | 3/7")
     
     // PRange
     
-    difference = *por.difference(prange_1)
+    difference = difference(por, prange_1)
 
-    test_result("Test POr::difference() range in", difference.to_string(), "1")
+    test_result("Test POr::difference() range in", to_string(*difference), "1")
     
     prange_2 = PRange()
-    prange_2.define(1, 4, 1)
+    define_prange(prange_2, 1, 4, 1)
     
-    difference = *por.difference(prange_2)
+    difference = difference(por, prange_2)
 
-    test_result("Test POr::difference() range across", difference.to_string(), "5/7")
+    test_result("Test POr::difference() range across", to_string(*difference), "5/7")
     
     prange_3 = PRange()
-    prange_3.define(-5, 0, 1)
+    define_prange(prange_3, -5, 0, 1)
     
-    difference = *por.difference(prange_3)
+    difference = difference(por, prange_3)
 
-    test_result("Test POr::difference() range out", difference.to_string(), "1 | 3/7")
+    test_result("Test POr::difference() range out", to_string(*difference), "1 | 3/7")
     
     prange_4 = PRange()
-    prange_4.define(0, 8, 1)
+    define_prange(prange_4, 0, 8, 1)
     
-    difference = *por.difference(prange_4)
+    difference = difference(por, prange_4)
 
-    test_result("Test POr::difference() ranger all", difference.to_string(), "Empty")
+    test_result("Test POr::difference() ranger all", to_string(*difference), "Empty")
     
     // POr
     
     por_1 = POr()
-    por_1.push(pconstant_3)
-    por_1.push(prange_3)
+    push_por(por_1, pconstant_3)
+    push_por(por_1, prange_3)
     
-    difference = *por.difference(por_1)
+    difference = difference(por, por_1)
     
-    test_result("Test POr::difference() or out", difference.to_string(), "1 | 3/7")
+    test_result("Test POr::difference() or out", to_string(*difference), "1 | 3/7")
     
-    por_1.push(pconstant_2)
+    push_por(por_1, pconstant_2)
     
-    difference = *por.difference(por_1)
+    difference = difference(por, por_1)
 
-    test_result("Test POr::difference() or in 1", difference.to_string(), "1 | 3/4 | 6/7")
+    test_result("Test POr::difference() or in 1", to_string(*difference), "1 | 3/4 | 6/7")
     
-    por_1.push(prange_2)
+    push_por(por_1, prange_2)
     
-    difference = *por.difference(por_1)
+    difference = difference(por, por_1)
 
-    test_result("Test POr::difference() or in 2", difference.to_string(), "6/7")
+    test_result("Test POr::difference() or in 2", to_string(*difference), "6/7")
     
-    por_1.push(prange_4)
+    push_por(por_1, prange_4)
     
-    difference = *por.difference(por_1)
+    difference = difference(por, por_1)
 
-    test_result("Test POr::difference() or all", difference.to_string(), "Empty")
+    test_result("Test POr::difference() or all", to_string(*difference), "Empty")
 }
 
 ////////////////////////////////////////////////////////////////////// to_expr()
@@ -1228,33 +1230,33 @@ function test_por_difference() {
 // PEmpty
 
 function test_pempty_to_expr() {
-    class PEmpty scalar pempty
+    struct PEmpty scalar pempty
     class Variable scalar variable
 
     variable.name = "test_var"
 
     pempty = PEmpty()
 
-    test_result("Test PEmpty::to_expr()", pempty.to_expr(variable), "")
+    test_result("Test PEmpty::to_expr()", to_expr(pempty, variable), "")
 }
 
 // PWild
 
 function test_pwild_to_expr() {
-    class PWild scalar pwild
+    struct PWild scalar pwild
     class Variable scalar variable
 
     variable.name = "test_var"
 
     pwild = PWild()
 
-    test_result("Test PWild::to_expr()", pwild.to_expr(variable), "1")
+    test_result("Test PWild::to_expr()", to_expr(pwild, variable), "1")
 }
 
 // PConstant
 
 function test_pconstant_to_expr() {
-    class PConstant scalar pconstant
+    struct PConstant scalar pconstant
     class Variable scalar variable
 
     variable.name  = "test_var"
@@ -1265,18 +1267,18 @@ function test_pconstant_to_expr() {
     pconstant = PConstant()
     pconstant.value = 1
 
-    test_result("Test PConstant::to_expr() real", pconstant.to_expr(variable), "test_var == `one_21x'")
+    test_result("Test PConstant::to_expr() real", to_expr(pconstant, variable), "test_var == `one_21x'")
 
     variable.type = "string"
     pconstant.value = variable.get_level_index(`""a""')
 
-    test_result("Test PConstant::to_expr() string", pconstant.to_expr(variable), `"test_var == "a""')
+    test_result("Test PConstant::to_expr() string", to_expr(pconstant, variable), `"test_var == "a""')
 }
 
 // PRange
 
 function test_prange_to_expr() {
-    class PRange scalar prange
+    struct PRange scalar prange
     class Variable scalar variable
 
     variable.name = "test_var"
@@ -1284,48 +1286,49 @@ function test_prange_to_expr() {
     
     prange = PRange()
 
-    prange.define(0, 2, 1)
-    test_result("Test PRange::to_expr() [0, 2]", prange.to_expr(variable), "test_var >= `zero_21x' & test_var <= `two_21x'")
+    define_prange(prange, 0, 2, 1)
+    test_result("Test PRange::to_expr() [0, 2]", to_expr(prange, variable), "test_var >= `zero_21x' & test_var <= `two_21x'")
 }
 
 // POr
 
 function test_por_to_expr() {
-    class POr scalar por
-    class PConstant scalar pconstant
-    class PRange scalar prange
+    struct POr scalar por
+    struct PConstant scalar pconstant
+    struct PRange scalar prange
     class Variable scalar variable
 
     variable.name = "test_var"
     variable.type = "int"
 
     por = POr()
+    init_por(por)
 
-    test_result("Test POr::to_expr() empty", por.to_expr(variable), "")
+    test_result("Test POr::to_expr() empty", to_expr(por, variable), "")
 
     pconstant = PConstant()
     pconstant.value = 1
 
-    por.push(pconstant)
+    push_por(por, pconstant)
 
-    test_result("Test POr::to_expr()", por.to_expr(variable), "test_var == `one_21x'")
+    test_result("Test POr::to_expr()", to_expr(por, variable), "test_var == `one_21x'")
 
     prange = PRange()
-    prange.define(2, 3, 1)
+    define_prange(prange, 2, 3, 1)
 
-    por.push(prange)
+    push_por(por, prange)
 
-    test_result("Test POr::to_expr()", por.to_expr(variable), "(test_var == `one_21x') | (test_var >= `two_21x' & test_var <= `three_21x')")
+    test_result("Test POr::to_expr()", to_expr(por, variable), "(test_var == `one_21x') | (test_var >= `two_21x' & test_var <= `three_21x')")
 }
 
 // Tuple
 
 function test_ptuple_to_expr() {
-    class Tuple scalar tuple_1, tuple_2
-    class PConstant scalar pconstant
-    class PRange scalar prange
-    class PWild scalar pwild
-    class POr scalar por_1, por_2
+    struct Tuple scalar tuple_1, tuple_2
+    struct PConstant scalar pconstant
+    struct PRange scalar prange
+    struct PWild scalar pwild
+    struct POr scalar por_1, por_2
     class Variable vector variables
 
     tuple_1 = Tuple()
@@ -1333,7 +1336,7 @@ function test_ptuple_to_expr() {
     // 1
 
     pconstant = PConstant()
-    pconstant.define(1)
+    define_pconstant(pconstant, 1)
 
     tuple_1.patterns = J(1, 1, NULL)
     tuple_1.patterns[1] = &pconstant
@@ -1342,7 +1345,7 @@ function test_ptuple_to_expr() {
     variables[1].name = "test_var_1"
     variables[1].type = "int"
 
-    test_result("Test Tuple::to_expr(): one element", tuple_1.to_expr(variables), "test_var_1 == `one_21x'")
+    test_result("Test Tuple::to_expr(): one element", to_expr(tuple_1, variables), "test_var_1 == `one_21x'")
 
     // (1, 1/3)
  
@@ -1361,13 +1364,13 @@ function test_ptuple_to_expr() {
     variables[2].name = "test_var_2"
     variables[2].type = "int"
 
-    test_result("Test Tuple::to_expr(): two elements", tuple_1.to_expr(variables), "(test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x')")
+    test_result("Test Tuple::to_expr(): two elements", to_expr(tuple_1, variables), "(test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x')")
 
     // (1 | 1/3, _)
 
     por_1 = POr()
-    por_1.push(pconstant)
-    por_1.push(prange)
+    push_por(por_1, pconstant)
+    push_por(por_1, prange)
 
     pwild = PWild()
 
@@ -1381,7 +1384,7 @@ function test_ptuple_to_expr() {
     variables[2].name = "test_var_2"
     variables[2].type = "int"
 
-    test_result("Test Tuple::to_expr(): wildcard", tuple_1.to_expr(variables), "(test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')")
+    test_result("Test Tuple::to_expr(): wildcard", to_expr(tuple_1, variables), "(test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')")
 
     // (1 | 1/3, _) | (1, 1/3)
     
@@ -1390,8 +1393,8 @@ function test_ptuple_to_expr() {
     tuple_2.patterns[2] = &prange
     
     por_2 = POr()
-    por_2.push(tuple_1)
-    por_2.push(tuple_2)
+    push_por(por_2, tuple_1)
+    push_por(por_2, tuple_2)
     
     variables = Variable(2)
     variables[1].name = "test_var_1"
@@ -1399,7 +1402,7 @@ function test_ptuple_to_expr() {
     variables[2].name = "test_var_2"
     variables[2].type = "int"
     
-    test_result("Test Tuple::to_expr(): POr of tuples", por_2.to_expr(variables), "((test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')) | ((test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x'))")
+    test_result("Test Tuple::to_expr(): POr of tuples", to_expr(por_2, variables), "((test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')) | ((test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x'))")
 }
 
 ////////

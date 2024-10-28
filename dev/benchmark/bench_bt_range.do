@@ -6,20 +6,20 @@ local N_init = 8
 
 mata
 struct BT {
-	real matrix values
+    real matrix values
     real colvector status
 }
 
 void init_bt(`BT' bt) {
-	bt.values = J(`N_init', 2, .)
-	bt.status = J(`N_init', 1, 0)
+    bt.values = J(`N_init', 2, .)
+    bt.status = J(`N_init', 1, 0)
 }
 
 void append(`BT' bt, real matrix values, | real scalar sort) {
-	real scalar i
+    real scalar i
     
     if (args() == 2) {
-    	sort = 1
+        sort = 1
     }
     
     if (sort) {
@@ -33,33 +33,33 @@ void append(`BT' bt, real matrix values, | real scalar sort) {
 }
 
 void push(`BT' bt, real rowvector value) {
-	push_recursive(bt, value, 1)
+    push_recursive(bt, value, 1)
 }
 
 void push_recursive(`BT' bt, real rowvector value, real scalar node) {
-	// "push_recursive at " + strofreal(node)
-	real rowvector res
+    // "push_recursive at " + strofreal(node)
+    real rowvector res
     
-	if (node >= rows(bt.values)) {
-    	// >= : if n is filled, 2n+1 is needed and resizing 2n is not enough
+    if (node >= rows(bt.values)) {
+        // >= : if n is filled, 2n+1 is needed and resizing 2n is not enough
         bt.values = bt.values \ J(rows(bt.values),   2, .)
         bt.status = bt.status \ J(length(bt.status), 1, 0)
     }
     
     if (bt.status[node] == 0) {
-    	// "    push_recursive (" + invtokens(strofreal(value), ", ")  + ") at " + strofreal(node)
-    	bt.values[node, .] = value
-    	bt.status[node] = 1
+        // "    push_recursive (" + invtokens(strofreal(value), ", ")  + ") at " + strofreal(node)
+        bt.values[node, .] = value
+        bt.status[node] = 1
         return
     }
     
     if (value[2] < bt.values[node, 1]) {
-    	push_recursive(bt, value, 2 * node)
+        push_recursive(bt, value, 2 * node)
         return
     }
     
     if (value[1] > bt.values[node, 2]) {
-    	push_recursive(bt, value, 2 * node + 1)
+        push_recursive(bt, value, 2 * node + 1)
         return
     }
     
@@ -67,8 +67,8 @@ void push_recursive(`BT' bt, real rowvector value, real scalar node) {
 }
 
 void merge(`BT' bt, real rowvector value, real scalar node) {
-	// "merge at " + strofreal(node)
-	real rowvector new_value
+    // "merge at " + strofreal(node)
+    real rowvector new_value
     
     assert(node <= rows(bt.values))
     assert(bt.status[node] == 1)
@@ -77,12 +77,12 @@ void merge(`BT' bt, real rowvector value, real scalar node) {
     new_value = min((value[1], bt.values[node, 1])), max((value[2], bt.values[node, 2]))
     
     if (new_value[1] < bt.values[node, 1]) {
-    	res = merge_recursive(bt, new_value, 2 * node, 1)
+        res = merge_recursive(bt, new_value, 2 * node, 1)
         new_value[1] = res[1]
     }
     
     if (new_value[2] > bt.values[node, 2]) {
-    	res = merge_recursive(bt, new_value, 2 * node + 1, 2)
+        res = merge_recursive(bt, new_value, 2 * node + 1, 2)
         new_value[2] = res[2]
     }
     
@@ -90,8 +90,8 @@ void merge(`BT' bt, real rowvector value, real scalar node) {
 }
 
 real rowvector merge_recursive(`BT' bt, real rowvector value, real scalar node, real scalar drop) {
-	// "merge_recursive at " + strofreal(node)
-	real rowvector new_value
+    // "merge_recursive at " + strofreal(node)
+    real rowvector new_value
     
     // drop
     // 0 if should not drop
@@ -99,7 +99,7 @@ real rowvector merge_recursive(`BT' bt, real rowvector value, real scalar node, 
     // 2 if can drop left
 
     if (node > rows(bt.values)) {
-    	// "    exit 1"
+        // "    exit 1"
         return(value)
     }
     
@@ -118,24 +118,24 @@ real rowvector merge_recursive(`BT' bt, real rowvector value, real scalar node, 
     new_value = min((value[1], bt.values[node, 1])), max((value[2], bt.values[node, 2]))
     
     if (new_value[1] < bt.values[node, 1]) {
-    	res = merge_recursive(bt, new_value, 2 * node, drop * drop == 1)
+        res = merge_recursive(bt, new_value, 2 * node, drop * drop == 1)
         new_value[1] = res[1]
     }
     
     if (new_value[2] > bt.values[node, 2]) {
-    	res = merge_recursive(bt, new_value, 2 * node + 1, drop * drop == 2)
+        res = merge_recursive(bt, new_value, 2 * node + 1, drop * drop == 2)
         new_value[2] = res[2]
     }
     
     if (node > 1) {
-    	parent = bt.values[floor(node / 2), .]
+        parent = bt.values[floor(node / 2), .]
         
         if (drop == 1 & new_value[1] <= bt.values[node, 2]) {
-        	drop_recursive(bt, 2 * node + 1)
+            drop_recursive(bt, 2 * node + 1)
         }
         
         if (drop == 2 & new_value[2] >= bt.values[node, 1]) {
-        	drop_recursive(bt, 2 * node)
+            drop_recursive(bt, 2 * node)
         }
         
         remove(bt, node)
@@ -146,7 +146,7 @@ real rowvector merge_recursive(`BT' bt, real rowvector value, real scalar node, 
 
 
 void remove(`BT' bt, real scalar node) {
-	// "remove at " + strofreal(node)
+    // "remove at " + strofreal(node)
     if (node > rows(bt.values)) {
         return
     }
@@ -163,14 +163,14 @@ void remove(`BT' bt, real scalar node) {
 }
 
 void drop_recursive(`BT' bt, real scalar node) {
-	// "drop_recursive at " + strofreal(node)
+    // "drop_recursive at " + strofreal(node)
     if (node > rows(bt.values)) {
-    	// "    exit 1"
+        // "    exit 1"
         return
     }
     
     if (bt.status[node] == 0) {
-    	// "    exit 2"
+        // "    exit 2"
         return
     }
 
@@ -182,14 +182,14 @@ void drop_recursive(`BT' bt, real scalar node) {
 }
 
 void move_up_recursive(`BT' bt, real scalar node) {
-	// "move_up_recursive at " + strofreal(node)
+    // "move_up_recursive at " + strofreal(node)
     if (node > rows(bt.values)) {
-    	// "    exit 1"
+        // "    exit 1"
         return
     }
     
     if (bt.status[node] == 0) {
-    	// "    exit 2"
+        // "    exit 2"
         return
     }
 
@@ -208,10 +208,10 @@ void move_up_recursive(`BT' bt, real scalar node) {
 }
 
 real matrix sort_merge(real matrix x) {
-	real matrix res
-	real scalar i, k
+    real matrix res
+    real scalar i, k
     
-	res = sort(x, (1, -2))
+    res = sort(x, (1, -2))
     k = 1
     for (i = 2; i <= rows(res); i++) {
         if (res[i, 1] > res[k, 2]) {
@@ -228,44 +228,44 @@ real matrix sort_merge(real matrix x) {
 }
 
 void append_sorted(`BT' bt, real matrix A) {
-	append_sorted_recursive(bt, A, 1, rows(A))
+    append_sorted_recursive(bt, A, 1, rows(A))
 }
 
 void append_sorted_recursive(`BT' bt, real matrix A, real scalar min, real scalar max) {
     if (min > max) {
-    	return
+        return
     }
     
     if (min == max) {
-    	push(bt, A[min, .])
+        push(bt, A[min, .])
     }
     else {
-    	mid = ceil((min + max) / 2)
-    	push(bt, A[mid, .])
+        mid = ceil((min + max) / 2)
+        push(bt, A[mid, .])
         append_sorted_recursive(bt, A, min, mid - 1)
         append_sorted_recursive(bt, A, mid + 1, max)
     }
 }
 
 real matrix BT_to_array(`BT' bt) {
-	real colvector A
+    real colvector A
     
     A = J(sum(bt.status), 2, .)
-	(void) BT_to_array_recursive(bt, A, 1, 1)
+    (void) BT_to_array_recursive(bt, A, 1, 1)
     
     return(A)
 }
 
 real scalar BT_to_array_recursive(`BT' bt, real matrix A, real scalar index, real scalar node) {
     if (node > rows(bt.values)) {
-    	return(index)
+        return(index)
     }
     
     if (bt.status[node] == 0) {
-    	return(index)
+        return(index)
     }
     
-	index = BT_to_array_recursive(bt, A, index, 2 * node)
+    index = BT_to_array_recursive(bt, A, index, 2 * node)
     A[index, .] = bt.values[node, .]
     index = BT_to_array_recursive(bt, A, index + 1, 2 * node + 1)
     
@@ -273,11 +273,11 @@ real scalar BT_to_array_recursive(`BT' bt, real matrix A, real scalar index, rea
 }
 
 void balance(`BT' bt) {
-	real colvector A
+    real colvector A
     
     A = BT_to_array(bt)
     
-	init_bt(bt)
+    init_bt(bt)
     append_sorted(bt, A)
 }
 end
@@ -321,7 +321,7 @@ timer_clear()
 rseed(15)
 
 for (t = 1; t <= T; t++) {
-	init_bt(bt_1)
+    init_bt(bt_1)
     init_bt(bt_2)
     init_bt(bt_3)
     

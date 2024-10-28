@@ -3,193 +3,38 @@ mata set matastrict on
 
 //////////////////////////////////////////////////////////////////////// Pattern
 
-// The parent class for all patterns
-class Pattern {
-    virtual void define()                                                       // Define the instance members
-    virtual string scalar to_string()                                           // Turns the class content in a string
-    virtual void print()                                                        // Print the class content
-    virtual string scalar to_expr()                                             // Turns the class content in an expression based on a variable
-    virtual transmorphic scalar compress()                                      // Simplifies the class content if possible
-    virtual transmorphic scalar overlap()                                       // Returns the set of common values with another pattern
-    virtual real scalar includes()                                              // Check if the pattern is included in another
-    virtual pointer scalar difference()                                         // Returns the set of values not included in another patterns 
-    
-    // Other methods
-    void new()
-}
-
 // Empty pattern
-class PEmpty extends Pattern {
-    // Members
-    
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-}
+struct PEmpty { }
 
 // Wild card '_'
-class PWild extends Pattern {
+struct PWild {
     // Members
-    class POr scalar values                                                     // The union of all possible levels
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-    void push()                                                                 // Add new value to the patterns
+    struct POr scalar values                                                     // The union of all possible levels                                                            // Add new value to the patterns
 }
 
 // Constant
-class PConstant extends Pattern {
-    // Members
+struct PConstant {
     real scalar value                                                           // The value (real or string index)
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-    real scalar includes_pwild()                                                // Includes PWild()
-    real scalar includes_pconstant()                                            // Includes PConstant()
-    real scalar includes_prange()                                               // Includes PRange()
-    real scalar includes_por()                                                  // Includes POr()
 }
 
 // Real or Float Range
-class PRange extends Pattern {
-    // Members
+struct PRange {
     real scalar min                                                             // Minimum value
     real scalar max                                                             // Maximum value
     real scalar type_nb                                                         // 1 int, 2 float, 3 double
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-    transmorphic scalar overlap_pconstant()                                     // Overlap with PConstant()
-    transmorphic scalar overlap_prange()                                        // Overlap with PRange()
-    transmorphic scalar overlap_por()                                           // Overlap with POr()
-    pointer scalar difference_pconstant()                                       // Difference with PConstant()
-    pointer scalar difference_prange()                                          // Difference with PRange()
-    pointer scalar difference_por()                                             // Difference with POr()
-    real scalar includes_pwild()                                                // Includes PWild()
-    real scalar includes_pconstant()                                            // Includes PConstant()
-    real scalar includes_prange()                                               // Includes PRange()
-    real scalar includes_por()                                                  // Includes POr()
-}
-
-class PatternList extends Pattern {
-    // Members
-    public pointer vector patterns                                              // An array of pointers to patterns
-    public real scalar capacity                                                 // Number of pre-allocated pointers
-    public real scalar length                                                   // Number of patterns initiated
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()                                                                  // Initiates the instance with a capacity
-    pointer scalar get()                                                        // Returns a pointer to the desired pattern
-    transmorphic scalar get_pat()                                               // Return the desired pattern
-    void resize()                                                               // Resize to the desired size
-    void push()                                                                 // Add a pointer to the end of the patterns
-    void append()                                                               // Add a vector of pointer to the end of the patterns
-    void replace()                                                              // Replace the desired pattern
-    void remove()                                                               // Remove the value at a given index and shift all the following ones
-    void swap_remove()                                                          // Swap the value with the last one and decrement the length
-    void clear()                                                                // Redefine the legnth as 0 and ignore all values
-    void check_integer()                                                        // Check if the value is an integer
-    void check_range()                                                          // Check if the index is in the range of the array
 }
 
 // Or pattern, which is a list of pointers to patterns
-class POr extends Pattern {
+struct POr {
     // Members
-    class PatternList scalar patterns                                           // A dynamic array of patterns
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-    real scalar includes_pconstant()                                            // Includes PConstant()
-    real scalar includes_default()                                              // Includes PWild(), PRange() or POr()
-    real scalar len()                                                           // Get the # of patterns
-    void push()                                                                 // Push a new pattern
-    void append_por()                                                           // Append a new por
-    pointer scalar get()                                                        // Returns a pointer to the desired pattern
-    transmorphic scalar get_pat()                                               // Return the desired pattern
-    void clear()                                                                // Remove all the patterns
+    pointer vector patterns                                           // A dynamic array of patterns
+    real scalar length
 }
 
-class Tuple extends Pattern {
+struct Tuple {
     // Members
     real scalar arm_id                                                          // The corresponding arm #
     pointer vector patterns                                                     // An array of patterns
-
-    // Pattern methods
-    void define()
-    string scalar to_string()
-    void print()
-    string scalar to_expr()
-    transmorphic scalar compress()
-    transmorphic scalar overlap()
-    real scalar includes()
-    pointer scalar difference()
-    
-    // Other methods
-    void new()
-    transmorphic scalar overlap_tuple()                                         // Overlap with Tuple()
-    transmorphic scalar overlap_por()                                           // Overlap with POr()
-    pointer scalar difference_tuple()                                        
-    pointer scalar difference_por()                                        
-    transmorphic scalar difference_vec()                                        // Computes the difference with an array of patterns
 }
 
 /////////////////////////////////////////////////////////////////////// Variable
@@ -204,7 +49,7 @@ class Variable {
     private real scalar max
     real scalar check                                                           // Is the variable checked
     real scalar sorted                                                          // Are the levels sorted
-
+    
     void new()
     string scalar to_string()
     void print()
@@ -278,7 +123,7 @@ class Usefulness {
 // The result of all the checks
 class Match_report {
     class Usefulness vector usefulness                                          // The usefulness of each arm
-    class Pattern scalar missings                                               // The missing patterns
+    pointer scalar missings                                                     // The missing patterns
 
     void new()
     string vector to_string()
