@@ -15,7 +15,7 @@ For more information on the syntax and for examples, check the documentation [pd
 The code can be installed from this repository with:
 
 ```
-net install pmatch, from("https://raw.githubusercontent.com/MaelAstruc/stata_match/master/pkg")
+net install pmatch, replace from("https://raw.githubusercontent.com/MaelAstruc/stata_match/master/pkg")
 ```
 
 ## Limitations

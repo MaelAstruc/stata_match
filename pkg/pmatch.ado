@@ -1,6 +1,45 @@
-*! version 0.0.15  06 Oct 2024
+*! version 0.0.16  25 Feb 2025
 
 **#************************************************************ src/declare.mata
+
+//////////////////////////////////////////////////////////////////// Local types
+
+local T              transmorphic      matrix
+local POINTER        pointer           scalar
+local POINTERS       pointer           vector
+local REAL           real              scalar
+local STRING         string            scalar
+local STRINGS        string            vector
+
+local PATTERN        real              matrix
+
+local EMPTY          real              rowvector
+local WILD           real              matrix
+local CONSTANT       real              rowvector
+local RANGE          real              rowvector
+local OR             real              matrix
+
+local EMPTY_TYPE     0
+local WILD_TYPE      1
+local CONSTANT_TYPE  2
+local RANGE_TYPE     3
+local OR_TYPE        4
+
+local INT_TYPE       1
+local FLOAT_TYPE     2
+local DOUBLE_TYPE    3
+local STRING_TYPE    4
+
+local TUPLEEMPTY     struct TupleEmpty scalar
+local TUPLEOR        struct TupleOr    scalar
+local TUPLE          struct Tuple      scalar
+local TUPLEWILD      struct TupleWild  scalar
+
+local VARIABLE       class Variable    scalar
+local VARIABLES      class Variable    vector
+
+local ARM            class Arm         scalar
+local ARMS           class Arm         vector
 
 mata
 mata set matastrict on
@@ -8,38 +47,45 @@ mata set matastrict on
 //////////////////////////////////////////////////////////////////////// Pattern
 
 // Empty pattern
-struct PEmpty { }
+// Simple vector with 4 columns
+// (0, 0, 0, 0)
 
 // Wild card '_'
-struct PWild {
-    // Members
-    struct POr scalar values                                                     // The union of all possible levels                                                            // Add new value to the patterns
-}
+// Matrix with first row for type
+// Following rows for levels patterns similar to POr
+// (1, number_values, 0, 0)
+// (...)
 
 // Constant
-struct PConstant {
-    real scalar value                                                           // The value (real or string index)
-}
+// Simple vector with 4 columns
+// (2, value, value, variable_type)
 
 // Real or Float Range
-struct PRange {
-    real scalar min                                                             // Minimum value
-    real scalar max                                                             // Maximum value
-    real scalar type_nb                                                         // 1 int, 2 float, 3 double
-}
+// Simple vector with 4 columns
+// (3, min, max, variable_type)
 
-// Or pattern, which is a list of pointers to patterns
-struct POr {
-    // Members
-    pointer vector patterns                                           // A dynamic array of patterns
-    real scalar length
-}
+// Or pattern
+// Matrix with first row for type and number of patterns
+// Following rows for patterns patterns similar to POr
+// (4, number_values, 0, 0)
+// (...)
+
+struct TupleEmpty { }
+
+struct TupleWild { }
 
 struct Tuple {
     // Members
     real scalar arm_id                                                          // The corresponding arm #
-    pointer vector patterns                                                     // An array of patterns
+    pointer(`PATTERN') vector patterns                                          // An array of patterns
 }
+
+struct TupleOr {
+    // Members
+    pointer(struct Tuple vector) scalar list                                    // A dynamic array of patterns
+    real scalar length
+}
+
 
 /////////////////////////////////////////////////////////////////////// Variable
 
@@ -88,9 +134,11 @@ struct Htable {
     transmorphic rowvector keys
     real         rowvector status
 }
+
 //////////////////////////////////////////////////////////////////////////// Arm
 
 // The condition part of the Arm
+
 struct LHS {
     real scalar arm_id                                                          // The arm #
     pointer scalar pattern                                                      // The corresponding patterns
@@ -110,6 +158,7 @@ class Arm {
 ///////////////////////////////////////////////////////////////////// Usefulness
 
 // The result after checking if an arm is useful
+
 class Usefulness {
     real scalar useful                                                          // 1 if the pattern is useful, 0 otherwize
     real scalar has_wildcard                                                    // 1 if the arm includes wild_cards, 0 otherwize
@@ -125,6 +174,7 @@ class Usefulness {
 }
 
 // The result of all the checks
+
 class Match_report {
     class Usefulness vector usefulness                                          // The usefulness of each arm
     pointer scalar missings                                                     // The missing patterns
@@ -135,1203 +185,31 @@ class Match_report {
     string vector to_string_por()
     void print()
 }
+
 end
 
 
-**#************************************************************ src/pattern.mata
+**#************************************************************** src/utils.mata
 
-local T         transmorphic     scalar
-local POINTER   pointer          scalar
-local POINTERS  pointer          vector
-local REAL      real             scalar
-local STRING    string           scalar
-
-local EMPTY     struct PEmpty    scalar
-local WILD      struct PWild     scalar
-local CONSTANT  struct PConstant scalar
-local RANGE     struct PRange    scalar
-local OR        struct POr       scalar
-local TUPLE     struct Tuple     scalar
-
-local VARIABLE  class Variable   scalar
-local VARIABLES class Variable   vector
 
 mata
 
-///////////////////////////////////////////////////////////////////// define_*()
-
-void define_pempty(`EMPTY' pempty) {
-}
-
-void define_pwild(`WILD' pwild, `VARIABLE' variable) {
-    `CONSTANT' pconstant
-    `REAL' i
-    
-    init_por(pwild.values)
-    
-    if (length(variable.levels) == 0) {
-        push_por(pwild.values, PEmpty())
-        return
-    }
-    
-    if (variable.type == "string") {
-        for (i = 1; i <= length(variable.levels); i++) {
-            pconstant = PConstant()
-            define_pconstant(pconstant, i)
-            push_por(pwild.values, pconstant)
-        }
-    }
-    else if (variable.type == "int") {
-        for (i = 1; i <= length(variable.levels); i++) {
-            pconstant = PConstant()
-            define_pconstant(pconstant, variable.levels[i])
-            push_por(pwild.values, pconstant)
-        }
-    }
-    else if (variable.type == "float") {
-        for (i = 1; i <= length(variable.levels); i++) {
-            pconstant = PConstant()
-            define_pconstant(pconstant, variable.levels[i])
-            push_por(pwild.values, pconstant)
-        }
-    }
-    else if (variable.type == "double") {
-        for (i = 1; i <= length(variable.levels); i++) {
-            pconstant = PConstant()
-            define_pconstant(pconstant, variable.levels[i])
-            push_por(pwild.values, pconstant)
-        }
-    }
-    else {
-        errprintf(
-            "Unexpected variable type for variable '%s': '%s'\n",
-            variable.name, variable.stata_type
-        )
-        exit(_error(3256))
-    }
-}
-
-void define_pconstant(`CONSTANT' pconstant, `REAL' value) {
-    pconstant.value = value
-}
-
-void define_prange(`RANGE' prange, `REAL' min, `REAL' max, `REAL' type_nb) {
-    if (isint(type_nb) & type_nb >= 1 & type_nb <= 3) {
-        prange.type_nb = type_nb
-    }
-    else {
-        errprintf("Range type number field should be 1, 2 or 3\n")
-        exit(_error(3498))
-    }
-
-    if (min == . | max == .) {
-        errprintf("Range boundaries should be non-missing reals\n")
-        exit(_error(3253))
-    }
-    
-    /*if (min > max) {
-        errprintf("Range minimum (%s) should be smaller than its maximum (%s)\n", min, max)
-        exit(_error(3498))
-    }*/
-    
-    if (prange.type_nb == 1) {
-        if (!isint(min) | !isint(max)) {
-            errprintf("Range is discrete but boundaries are not integers\n")
-            exit(_error(3498))
-        }
-    }
-    
-    prange.min = min
-    prange.max = max
-}
-
-void define_por(`OR' por, `POINTERS' patterns) {
-    init_por(por)
-    append(por, patterns)
-}
-
-//////////////////////////////////////////////////////////////////// to_string()
-
-`STRING' to_string(`T' pattern) {
-    if (structname(pattern) == "PEmpty") {
-        return(to_string_pempty(pattern))
-    }
-    else if (structname(pattern) == "PWild") {
-        return(to_string_pwild(pattern))
-    }
-    else if (structname(pattern) == "PConstant") {
-        return(to_string_pconstant(pattern))
-    }
-    else if (structname(pattern) == "PRange") {
-        return(to_string_prange(pattern))
-    }
-    else if (structname(pattern) == "POr") {
-        return(to_string_por(pattern))
-    }
-    else if (structname(pattern) == "Tuple") {
-        return(to_string_tuple(pattern))
-    }
-    else {
-        unknown_pattern(pattern)
-    }
-}
-
-`STRING' to_string_pempty(`EMPTY' pempty) {
-    return("Empty")
-}
-
-`STRING' to_string_pwild(`WILD' pwild, | `REAL' detailed) {
-    if (args() == 1) {
-        detailed = 0
-    }
-    
-    if (detailed == 0) {
-        return("_")
-    }
-    else {
-        return(to_string_por(pwild.values))
-    }
-}
-
-`STRING' to_string_pconstant(`CONSTANT' pconstant) {
-    return(strofreal(pconstant.value))
-}
-
-`STRING' to_string_prange(`RANGE' prange) {
-    return(strofreal(prange.min) + "/" + strofreal(prange.max))
-}
-
-`STRING' to_string_por(`OR' por) {
-    string vector strings
-    `REAL' i
-
-    strings = J(1, por.length, "")
-
-    for (i = 1; i <= por.length; i++) {
-        strings[i] = to_string(*por.patterns[i])
-    }
-
-    return(invtokens(strings, " | "))
-}
-
-`STRING' to_string_tuple(`TUPLE' tuple) {
-    string vector strings
-    `REAL' i, n_pat
-    
-    n_pat = length(tuple.patterns)
-
-    if (n_pat == 0) {
-        return("Empty Tuple: Error")
-    }
-    
-    strings = J(1, n_pat, "")
-    
-    for (i = 1; i <= n_pat; i++) {
-        strings[i] = to_string(*tuple.patterns[i])
-    }
-    
-    if (n_pat == 1) {
-        return(invtokens(strings, ", "))
-    }
-    else {
-        return("(" + invtokens(strings, ", ") + ")")
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////// print()
-
-void print(`T' pattern) {
-    to_string(pattern)
-}
-
-////////////////////////////////////////////////////////////////////// to_expr()
-
-`STRING' to_expr(`T' pattern, `VARIABLES' variable) {
-    if (structname(pattern) == "PEmpty") {
-        return(to_expr_pempty(pattern, variable))
-    }
-    else if (structname(pattern) == "PWild") {
-        return(to_expr_pwild(pattern, variable))
-    }
-    else if (structname(pattern) == "PConstant") {
-        return(to_expr_pconstant(pattern, variable))
-    }
-    else if (structname(pattern) == "PRange") {
-        return(to_expr_prange(pattern, variable))
-    }
-    else if (structname(pattern) == "POr") {
-        return(to_expr_por(pattern, variable))
-    }
-    else if (structname(pattern) == "Tuple") {
-        return(to_expr_tuple(pattern, variable))
-    }
-    else {
-        unknown_pattern(pattern)
-    }
-}
-
-`STRING' to_expr_pempty(`EMPTY' pempty, `VARIABLE' variable) {
-    return("")
-}
-
-`STRING' to_expr_pwild(`WILD' pwild, `VARIABLE' variable) {
-    return("1")
-}
-
-`STRING' to_expr_pconstant(`CONSTANT' pconstant, `VARIABLE' variable) {
-    if (variable.type == "string") {
-        return(sprintf("%s == %s", variable.name, variable.levels[pconstant.value]))
-    }
-    else {
-        return(sprintf("%s == %21x", variable.name, pconstant.value))
-    }
-}
-
-`STRING' to_expr_prange(`RANGE' prange, `VARIABLE' variable) {
-    return(sprintf(
-        "%s >= %21x & %s <= %21x",
-        variable.name, prange.min, variable.name, prange.max
-    ))
-}
-
-`STRING' to_expr_por(`OR' por, `VARIABLES' variable) {
-    string vector exprs
-    `REAL' i
-    
-    assert(!missing(por.length))
-    
-    if (por.length == 0) {
-        return("")
-    }
-    
-    if (por.length == 1) {
-        return(to_expr(*por.patterns[1], variable))
-    }
-
-    exprs = J(1, por.length, "")
-    
-    for (i = 1; i <= por.length; i++) {
-        exprs[i] = "(" + to_expr(*por.patterns[i], variable) + ")"
-    }
-
-    return(invtokens(exprs, " | "))
-}
-
-`STRING' to_expr_tuple(`TUPLE' tuple, `VARIABLES' variables) {
-    `POINTER' pattern
-    string vector exprs
-    `REAL' i, k, n_pat
-
-    n_pat = length(tuple.patterns)
-    
-    if (n_pat != length(variables)) {
-        errprintf(
-            "The tuples and variables have different sizes %f and %f",
-            n_pat, length(variables)
-        )
-        exit(_error(3300))
-    }
-    
-    exprs = J(1, n_pat, "")
-
-    k = 0
-    for (i = 1; i <= n_pat; i++) {
-        pattern = &compress(*tuple.patterns[i])
-        if (structname(*pattern) != "PWild" & structname(*pattern) != "PEmpty") {
-            k++
-            exprs[k] = to_expr(*pattern, variables[i])
-        }
-    }
-    
-    if (k == 0) {
-        return("1")
-    }
-    
-    // Add parentheses if there is more than 1 condition
-    if (k > 1) {
-        for (i = 1; i <= k; i++) {
-            exprs[i] = "(" + exprs[i] + ")"
-        }
-    }
-    
-    return(invtokens(exprs[1..k], " & "))
-}
-
-///////////////////////////////////////////////////////////////////// compress()
-
-`T' compress(`T' pattern) {
-    if (structname(pattern) == "PEmpty") {
-        return(compress_pempty(pattern))
-    }
-    else if (structname(pattern) == "PWild") {
-        return(compress_pwild(pattern))
-    }
-    else if (structname(pattern) == "PConstant") {
-        return(compress_pconstant(pattern))
-    }
-    else if (structname(pattern) == "PRange") {
-        return(compress_prange(pattern))
-    }
-    else if (structname(pattern) == "POr") {
-        return(compress_por(pattern))
-    }
-    else if (structname(pattern) == "Tuple") {
-        return(compress_tuple(pattern))
-    }
-    else {
-        unknown_pattern(pattern)
-    }
-}
-
-`T' compress_pempty(`EMPTY' pempty) {
-    return(pempty)
-}
-
-`T' compress_pwild(`WILD' pwild) {
-    return(pwild)
-}
-
-`T' compress_pconstant(`CONSTANT' pconstant) {
-    return(pconstant)
-}
-
-`T' compress_prange(`RANGE' prange) {
-    `CONSTANT' pconstant
-    
-    if (prange.min > prange.max) {
-        return(PEmpty())
-    }
-    else if (prange.min == prange.max) {
-        pconstant.value = prange.min
-        return(pconstant)
-    }
-    else {
-        return(prange)
-    }
-}
-
-`T' compress_por(`OR' por) {
-    `OR' por_compressed
-    `POINTER' pattern_compressed
-    `REAL' i
-    
-    init_por(por_compressed)
-    
-    for (i = 1; i <= por.length; i++) {
-        pattern_compressed = &compress(*por.patterns[i])
-        if (structname(*pattern_compressed) == "PEmpty") {
-            continue
-        }
-        else if (structname(*pattern_compressed) == "PWild") {
-            return(*pattern_compressed)
-        }
-        else {
-            if (!includes_por(por_compressed, *pattern_compressed)) {
-                push_por(por_compressed, *pattern_compressed) 
-            }
-        }
-    }
-    
-    if (por_compressed.length == 0) {
-        return(PEmpty())
-    }
-    if (por_compressed.length == 1) {
-        return(*por_compressed.patterns[1])
-    }
-    else {
-        return(por_compressed)
-    }
-}
-
-`T' compress_tuple(`TUPLE' tuple) {
-    `TUPLE' tuple_compressed
-    `REAL' i
-
-    tuple_compressed.arm_id = tuple.arm_id
-    tuple_compressed.patterns = J(length(tuple.patterns), 1, NULL)
-    
-    for (i = 1; i <= length(tuple.patterns); i++) {
-        tuple_compressed.patterns[i] = &compress(*tuple.patterns[i])
-        if (structname(*tuple_compressed.patterns[i]) == "PEmpty") {
-            return(PEmpty())
-        }
-    }
-
-    return(tuple_compressed)
-}
-
-////////////////////////////////////////////////////////////////////// overlap()
-
-`T' overlap(`T' pattern_1, `T' pattern_2) {
-    if (structname(pattern_1) == "PEmpty") {
-        return(overlap_pempty(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "PWild") {
-        return(overlap_pwild(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "PConstant") {
-        return(overlap_pconstant(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "PRange") {
-        return(overlap_prange(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "POr") {
-        return(overlap_por(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "Tuple") {
-        return(overlap_tuple(pattern_1, pattern_2))
-    }
-    else {
-        unknown_pattern(pattern_1)
-    }
-}
-
-`T' overlap_pempty(`EMPTY' pempty, `T' pattern) {
-    return(pempty)
-}
-
-`T' overlap_pwild(`WILD' pwild, `T' pattern) {
-    return(pattern)
-}
-
-`T' overlap_pconstant(`CONSTANT' pconstant, `T' pattern) {
-    if (includes(pattern, pconstant)) {
-        return(pconstant)
-    }
-    else {
-        return(PEmpty())
-    }
-}
-
-`T' overlap_prange(`RANGE' prange, `T' pattern) {
-    if (structname(pattern) == "PEmpty") {
-        return(PEmpty())
-    }
-    else if (structname(pattern) == "PWild") {
-        return(prange)
-    }
-    else if (structname(pattern) == "PConstant") {
-        return(overlap_prange_pconstant(prange, pattern))
-    }
-    else if (structname(pattern) == "PRange") {
-        return(overlap_prange_prange(prange, pattern))
-    }
-    else if (structname(pattern) == "POr") {
-        return(overlap_por(pattern, prange))
-    }
-    else {
-        unknown_pattern(pattern)
-    }
-}
-
-`T' overlap_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
-    if (includes_prange_pconstant(prange, pconstant)) {
-        return(pconstant)
-    }
-    else {
-        return(PEmpty())
-    }
-}
-
-`T' overlap_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
-    `RANGE' inter_range
-    
-    if (prange_1.min > prange_2.max) return(PEmpty())
-    if (prange_1.max < prange_2.min) return(PEmpty())
-
-    inter_range.type_nb = prange_2.type_nb
-
-    // Determine the minimum
-    inter_range.min = max((prange_1.min, prange_2.min))
-    inter_range.max = min((prange_1.max, prange_2.max))
-
-    // Return the compressed version
-    return(compress_prange(inter_range))
-}
-
-// The outcome is compressed, but need to check if the pattern is included
-// If X = 1/3 and Y = 2/4, Z = 3 and T = 2/3
-// (1/3 | 2/4 | 3) & T => (2/3 | 2/3 | 3)
-// If (X | Y | Z) was compressed such that no element is included in another
-// (1/3 | 2/4 | 3) => (1/3 | 2/4)
-// X and Y are not included in one another
-// Compressing would require to merge the overlaping patterns
-// (1/3 | 2/4 | 3) => 1/4
-// In this case all the compressed elements are exclusive
-// The overlaps of a compressed POr and a pattern would always be compressed
-// This would work for tuples to
-`T' overlap_por(`OR' por, `T' pattern) {
-    `OR' por_overlap
-    `POINTER' overlap
-    `REAL' i
-    
-    init_por(por_overlap)
-
-    for (i = 1; i <= por.length; i++) {
-        overlap = &overlap(*por.patterns[i], pattern)
-        if (structname(*overlap) == "PEmpty") {
-            continue
-        }
-        else if (structname(*overlap) == "PWild") {
-            return(*overlap)
-        }
-        else {
-            if (!includes_por(por_overlap, *overlap)) {
-                push_por(por_overlap, *overlap)
-            }
-        }
-    }
-    
-    if (por_overlap.length == 0) {
-        return(PEmpty())
-    }
-    if (por_overlap.length == 1) {
-        return(*por_overlap.patterns[1])
-    }
-    else {
-        return(por_overlap)
-    }
-}
-
-`T' overlap_tuple(`TUPLE' tuple, `T' pattern) {
-    if (structname(pattern) == "PEmpty") {
-        return(PEmpty())
-    }
-    else if (structname(pattern) == "PWild") {
-        return(tuple)
-    }
-    else if (structname(pattern) == "Tuple") {
-        return(overlap_tuple_tuple(tuple, pattern))
-    }
-    else if (structname(pattern) == "POr") {
-        return(overlap_tuple_por(tuple, pattern))
-    }
-    else {
-        unknown_pattern(pattern)
-    }
-}
-
-`T' overlap_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
-    `TUPLE' tuple_overlap
-    `REAL' i
-    
-    check_tuples(tuple_1, tuple_2)
-    
-    tuple_overlap.patterns = J(1, length(tuple_1.patterns), NULL)
-
-    // We compute the overlap of each pattern in the tuple
-    for (i = 1; i <= length(tuple_1.patterns); i++) {
-        tuple_overlap.patterns[i] = &overlap(
-            *tuple_1.patterns[i],
-            *tuple_2.patterns[i]
-        )
-        if (structname(*tuple_overlap.patterns[i]) == "PEmpty") {
-            return(PEmpty())
-        }
-    }
-
-    return(tuple_overlap)
-}
-
-`T' overlap_tuple_por(`TUPLE' tuple, `OR' por) {
-    `OR' por_overlap
-    `REAL' i
-    
-    init_por(por_overlap)
-    
-    por_overlap.patterns = J(1, length(por.patterns), NULL)
-    
-    for (i = 1; i <= por.length; i++) {
-        push_por(por_overlap, overlap_tuple_tuple(tuple, *por.patterns[i]))
-    }
-    
-    return(compress(por_overlap))
-}
-
-///////////////////////////////////////////////////////////////////// includes()
-
-`REAL' includes(`T' pattern_1, `T' pattern_2) {
-    if (structname(pattern_1) == "PEmpty") {
-        return(includes_pempty(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "PWild") {
-        return(includes_pwild(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "PConstant") {
-        return(includes_pconstant(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "PRange") {
-        return(includes_prange(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "POr") {
-        return(includes_por(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "Tuple") {
-        return(includes_tuple(pattern_1, pattern_2))
-    }
-    else {
-        unknown_pattern(pattern_1)
-    }
-}
-
-`REAL' includes_pempty(`EMPTY' pempty, `T' pattern) {
-    return(structname(pattern) == "PEmpty")
-}
-
-`REAL' includes_pwild(`WILD' pwild, `T' pattern) {
-    return(1)
-}
-
-`REAL' includes_pconstant(`CONSTANT' pconstant, `T' pattern) {
-    if (structname(pattern) == "PEmpty") {
-        return(1)
-    }
-    else if (structname(pattern) == "PWild") {
-        return(includes_pconstant_pwild(pconstant, pattern))
-    }
-    else if (structname(pattern) == "PConstant") {
-        return(includes_pconstant_pconstant(pconstant, pattern))
-    }
-    else if (structname(pattern) == "PRange") {
-        return(includes_pconstant_prange(pconstant, pattern))
-    }
-    else if (structname(pattern) == "POr") {
-        return(includes_pconstant_por(pconstant, pattern))
-    }
-    else {
-        unknown_pattern(pattern)
-    }
-}
-
-`REAL' includes_pconstant_pwild(`CONSTANT' pconstant, `WILD' pwild) {
-    return(includes_pconstant_por(pconstant, pwild.values))
-}
-
-`REAL' includes_pconstant_pconstant(`CONSTANT' pconstant_1, `CONSTANT' pconstant_2) {
-    return(pconstant_1.value == pconstant_2.value)
-}
-
-`REAL' includes_pconstant_prange(`CONSTANT' pconstant, `RANGE' prange) {
-    return(pconstant.value == prange.min & pconstant.value == prange.max)
-}
-
-`REAL' includes_pconstant_por(`CONSTANT' pconstant, `OR' por) {
-    `REAL' i
-    
-    for (i = 1; i <= por.length; i++) {
-        if (!includes_pconstant(pconstant, *por.patterns[i])) {
-            return(0)
-        }
-    }
-    
-    return(1)
-}
-
-`REAL' includes_prange(`RANGE' prange, `T' pattern) {
-    if (structname(pattern) == "PEmpty") {
-        return(1)
-    }
-    else if (structname(pattern) == "PWild") {
-        return(includes_prange_pwild(prange, pattern))
-    }
-    else if (structname(pattern) == "PConstant") {
-        return(includes_prange_pconstant(prange, pattern))
-    }
-    else if (structname(pattern) == "PRange") {
-        return(includes_prange_prange(prange, pattern))
-    }
-    else if (structname(pattern) == "POr") {
-        return(includes_prange_por(prange, pattern))
-    }
-    else {
-        unknown_pattern(pattern)
-    }
-}
-
-`REAL' includes_prange_pwild(`RANGE' prange, `WILD' pwild) {
-    return(includes_prange_por(prange, pwild.values))
-}
-
-`REAL' includes_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
-    return(pconstant.value >= prange.min & pconstant.value <= prange.max)
-}
-
-`REAL' includes_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
-    return(prange_2.min >= prange_1.min & prange_2.max <= prange_1.max)
-}
-
-`REAL' includes_prange_por(`RANGE' prange, `OR' por) {
-    `REAL' i
-    
-    for (i = 1; i <= por.length; i++) {
-        if (!includes_prange(prange, *por.patterns[i])) {
-            return(0)
-        }
-    }
-    
-    return(1)
-}
-
-`REAL' includes_por(`OR' por, `T' pattern) {
-    if (structname(pattern) == "PEmpty") {
-        return(1)
-    }
-    else if (structname(pattern) == "PConstant") {
-        return(includes_por_pconstant(por, pattern))
-    }
-    else {
-        return(includes_por_default(por, pattern))
-    }
-}
-
-`REAL' includes_por_pconstant(`OR' por, `CONSTANT' pconstant) {
-    `REAL' i
-    
-    for (i = 1; i <= por.length; i++) {
-        if (includes(*por.patterns[i], pconstant)) {
-            return(1)
-        }
-    }
-    
-    return(0)
-}
-
-`REAL' includes_por_default(`OR' por, `T' pattern) {
-    `POINTERS' difference
-    `REAL' i, n_pat
-    
-    difference = difference_list(pattern, por)
-    
-    n_pat = 0
-    
-    for (i = 1; i <= length(difference); i++) {
-        if (difference[i] == NULL) break
-        n_pat++
-    }
-    
-    if (n_pat == 0) {
-        return(1)
-    }
-    else {
-        // difference_list() removes all the empty patterns
-        // So if there is anything, there are patterns of pattern not in por
-        return(0)
-    }
-}
-
-`REAL' includes_tuple(`TUPLE' tuple, `T' pattern) {
-    if (structname(pattern) == "PEmpty") {
-        return(1)
-    }
-    if (structname(pattern) == "PWild") {
-        // TODO: loop over all wildcards
-        return(0)
-    }
-    else if (structname(pattern) == "Tuple") {
-        return(includes_tuple_tuple(tuple, pattern))
-    }
-    else if (structname(pattern) == "POr") {
-        return(includes_tuple_por(tuple, pattern))
-    }
-    else {
-        unknown_pattern(pattern)
-    }
-}
-
-`REAL' includes_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
-    `REAL' i
-    
-    check_tuples(tuple_1, tuple_2)
-    
-    for (i = 1; i <= length(tuple_1.patterns); i++) {
-        if (!includes(*tuple_1.patterns[i], *tuple_2.patterns[i])) {
-            return(0)
-        }
-    }
-
-    return(1)
-}
-
-`REAL' includes_tuple_por(`TUPLE' tuple, `OR' por) {
-    `REAL' i
-    
-    for (i = 1; i <= por.length; i++) {
-        if (!includes_tuple(tuple, *por.patterns[i])) {
-            return(0)
-        }
-    }
-
-    return(1)
-}
-
-/////////////////////////////////////////////////////////////////// difference()
-
-`POINTER' difference(`T' pattern_1, `T' pattern_2) {
-    if (structname(pattern_1) == "PEmpty") {
-        return(difference_pempty(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "PWild") {
-        return(difference_pwild(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "PConstant") {
-        return(difference_pconstant(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "PRange") {
-        return(difference_prange(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "POr") {
-        return(difference_por(pattern_1, pattern_2))
-    }
-    else if (structname(pattern_1) == "Tuple") {
-        return(difference_tuple(pattern_1, pattern_2))
-    }
-    else {
-        unknown_pattern(pattern_1)
-    }
-}
-
-// The result is compressed
-`POINTER' difference_pempty(`EMPTY' pempty, `T' pattern) {
-    return(&pempty)
-}
-
-`POINTER' difference_pwild(`WILD' pwild, `T' pattern) {
-    return(difference_por(pwild.values, pattern))
-}
-
-// The result is compressed
-`POINTER' difference_pconstant(`CONSTANT' pconstant, `T' pattern) {
-    if (includes(pattern, pconstant)) {
-        return(&(PEmpty()))
-    }
-    else {
-        return(&pconstant)
-    }
-}
-
-`POINTER' difference_prange(`RANGE' prange, `T' pattern) {
-    if (structname(pattern) == "PEmpty") {
-        return(&prange)
-    }
-    else if (structname(pattern) == "PWild") {
-        return(&(PEmpty()))
-    }
-    else if (structname(pattern) == "PConstant") {
-        return(difference_prange_pconstant(prange, pattern))
-    }
-    else if (structname(pattern) == "PRange") {
-        return(difference_prange_prange(prange, pattern))
-    }
-    else if (structname(pattern) == "POr") {
-        return(difference_prange_por(prange, pattern))
-    }
-    else {
-        unknown_pattern(pattern)
-    }
-}
-
-// The result is compressed
-`POINTER' difference_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
-    `RANGE' prange_low, prange_high
-    `OR' pranges
-    
-    init_por(pranges)
-    
-    if (pconstant.value < prange.min | pconstant.value > prange.max) {
-        return(&prange)
-    }
-    
-    if (pconstant.value != prange.min) {
-        prange_low.min = prange.min
-        prange_low.max = pconstant.value - get_epsilon(pconstant.value, prange.type_nb)
-        prange_low.type_nb = prange.type_nb
-        push_por(pranges, prange_low)
-    }
-    
-    if (pconstant.value != prange.max) {
-        prange_high.min = pconstant.value + get_epsilon(pconstant.value, prange.type_nb)
-        prange_high.max = prange.max
-        prange_high.type_nb = prange.type_nb
-        push_por(pranges, prange_high)
-    }
-    
-    return(&compress(pranges))
-}
-
-// The result is compressed
-`POINTER' difference_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
-    `RANGE' prange_low, prange_high
-    `OR' pranges
-    
-    init_por(pranges)
-    
-    if (prange_2.max < prange_1.min | prange_2.min > prange_1.max) {
-        return(&prange_1)
-    }
-    
-    // First half
-    if (prange_2.min <= prange_1.min) {
-        // Nothing there is no first half
-    }
-    else {
-        prange_low.min = prange_1.min
-        prange_low.max = prange_2.min - get_epsilon(prange_2.min, prange_1.type_nb)
-        prange_low.type_nb = prange_1.type_nb
-        push_por(pranges, prange_low)
-    }
-    
-    // Second half
-    if (prange_2.max >= prange_1.max) {
-        // Nothing there is no second half
-    }
-    else {
-        prange_high.min = prange_2.max + get_epsilon(prange_2.max, prange_1.type_nb)
-        prange_high.max = prange_1.max
-        prange_high.type_nb = prange_1.type_nb
-        push_por(pranges, prange_high)
-    }
-    
-    return(&compress(pranges))
-}
-
-`POINTER' difference_prange_por(`RANGE' prange, `OR' por) {
-    `OR' por_differences
-    
-    init_por(por_differences)
-
-    append(por_differences, difference_list(prange, por))
-    
-    return(&por_differences)
-}
-
-// The result is NOT compressed
-`POINTER' difference_por(`OR' por, `T' pattern) {
-    `OR' por_differences
-    `REAL' i
-    
-    init_por(por_differences)
-
-    // Loop over all patterns in Or and compute the difference
-    for (i = 1; i <= por.length; i++) {
-        push_por(por_differences, *difference(*por.patterns[i], pattern))
-    }
-    
-    if (por_differences.length == 0) {
-        return(&(PEmpty()))
-    }
-    else {
-        return(&por_differences)
-    }
-}
-
-`POINTER' difference_tuple(`TUPLE' tuple, `T' pattern) {
-    if (structname(pattern) == "PEmpty") {
-        return(&tuple)
-    }
-    if (structname(pattern) == "PWild") {
-        return(&(PEmpty()))
-    }
-    else if (structname(pattern) == "Tuple") {
-        return(difference_tuple_tuple(tuple, pattern))
-    }
-    else if (structname(pattern) == "POr") {
-        return(difference_tuple_por(tuple, pattern))
-    }
-    else {
-        unknown_pattern(pattern)
-    }
-    
-}
-
-/*
-For two patterns of size n: (p_1, ...p_n) and (q_1, ..., q_n), we compute the
-difference recursively. For the first patterns p_1 and q_1 we compute the
-intersection inter_1, a pattern and the difference diff_1, a vectors of
-patterns.
-
-If n = 1, the difference is equal to diff_1.
-
-If n == 2, the difference is composed of two parts:
-    1. (diff_1, p_2), the combinaision of all the patterns in diff_n-1 with the pattern_n.
-    2. (inter_1, diff_2), the combinaison of inter_n-1 with all the patterns in diff_n if diff_n is non-empty.
-
-We recursively compute the difference between two tuples:
-    1. We compute the interesection and the difference between two fields
-    2. If they are the last fields, we return the difference
-    3. Else we enter the recursive parts
-        3.1 If
-
-We then compute the difference between the remaining fields
-(p_2, ..., p_n) and (q_2, ..., q_n).
-
-For the a field n, the difference is equal to diff_n. For a field (n-1),
-
-We recursively build the difference of all the fields up to the first one.
-*/
-`POINTER' difference_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
-    `OR' res_inter, res_diff, result, por
-    `POINTER' new_diff, main_pattern, other_pattern, field_inter
-    `POINTERS' field_diff
-    `TUPLE' new_main, new_other, new_diff_i
-    `REAL' i
-    
-    check_tuples(tuple_1, tuple_2)
-    
-    init_por(res_inter)
-    init_por(res_diff)
-    init_por(result)
-    init_por(por)
-    
-    // Compute the field difference
-    main_pattern = tuple_1.patterns[1]
-    other_pattern = tuple_2.patterns[1]
-
-    field_inter = &overlap(*main_pattern, *other_pattern)
-    field_diff = difference(*main_pattern, *other_pattern)
-
-    // If there are no other fields
-    if (length(tuple_1.patterns) == 1) {
-        if (structname(*field_diff) != "PEmpty") {
-            push_por(
-                res_diff,
-                tuple_from_patterns(field_diff)
-            )
-        }
-    }
-    else {
-        // If the fields difference is empty there is no difference part
-        if (structname(*field_diff) != "PEmpty") {
-            push_por(
-                res_diff,
-                tuple_from_patterns((
-                    field_diff,
-                    tuple_1.patterns[2..length(tuple_1.patterns)]
-                ))
-            )
-        }
-
-        // If the fields intersection is empty there is intersection part
-        if (structname(*field_inter) != "PEmpty") {
-            // Build two tuples with the reaining patterns
-            new_main.patterns = tuple_1.patterns[2..length(tuple_1.patterns)]
-            new_other.patterns = tuple_2.patterns[2..length(tuple_2.patterns)]
-
-            // Compute the difference
-            new_diff = difference(new_main, new_other)
-
-            // If non empty, we fill the tuples
-            if (eltype(*new_diff) != "struct") {
-                exit(420)
-            }
-            if (structname(*new_diff) == "Tuple") {
-                new_diff_i = *new_diff
-                push_por(
-                    res_inter,
-                    tuple_from_patterns((
-                        field_inter, 
-                        new_diff_i.patterns
-                    ))
-                )
-            }
-            else if (structname(*new_diff) == "POr") {
-                por = *new_diff
-                for (i = 1; i <= por.length; i++) {
-                    new_diff_i = *por.patterns[i]
-                    push_por(
-                        res_inter,
-                        tuple_from_patterns((
-                            field_inter,
-                            new_diff_i.patterns
-                        ))
-                    )
-                }
-            }
-            else if (structname(*new_diff) != "PEmpty") {
-                unknown_pattern(*new_diff)
-            }
-        }
-    }
-    
-    push_por(result, res_inter)
-    push_por(result, res_diff)
-
-    return(&compress(result))
-}
-
-`TUPLE' tuple_from_patterns(`POINTERS' patterns) {
-    `TUPLE' tuple
-
-    tuple.patterns = patterns
-    
-    return(tuple)
-}
-
-`POINTER' difference_tuple_por(`TUPLE' tuple, `OR' por) {
-    `OR' por_result
-    
-    init_por(por_result)
-    
-    append(por_result, difference_list(tuple, por))
-
-    return(&compress(por_result))
-}
-
-`POINTERS' difference_list(`T' pattern, `OR' por) {
-    `OR' differences, new_differences
-    `REAL' i, j
-    
-    init_por(differences)
-    
-    push_por(differences, pattern)
-
-    // Loop over all pattern in Or
-    for (i = 1; i <= por.length; i++) {
-        init_por(new_differences)
-
-        // Compute the difference
-        for (j = 1; j <= differences.length; j++) {
-            append(
-                new_differences,
-                difference(*differences.patterns[j], *por.patterns[i])
-            )
-        }
-
-        if (new_differences.length == 0) {
-            break
-        }
-        
-        // if we don't precise ".patterns" it creates a new instance
-        differences.patterns = new_differences.patterns
-        differences.length = new_differences.length
-    }
-
-    drop_empty_patterns(differences)
-    
-    return(differences.patterns)
-}
-
-void drop_empty_patterns(`OR' por) {
-    `REAL' i
-    
-    for (i = 1; i <= por.length; i++) {
-        if (structname(*por.patterns[i]) == "PEmpty") {
-            por.patterns[i] = por.patterns[por.length]
-            por.patterns[por.length] = NULL
-            por.length = por.length - 1
-            i--
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////// Utils
-
-`REAL' function isbool(`REAL' x) {
+`REAL' isbool(`REAL' x) {
     return(x == 0 | x == 1)
 }
 
-`REAL' function isint(`REAL' x) {
+`REAL' isint(`REAL' x) {
     return(x == trunc(x))
+}
+
+void check_var_type(`REAL' variable_type) {
+    if (!isint(variable_type) | variable_type < 0 | variable_type > 4) {
+        errprintf(
+            "Variable type number field should be 1, 2, 3 or 4: found %f\n",
+            variable_type
+        )
+        exit(_error(3498))
+    }
 }
 
 `STRING' type_details(object) {
@@ -1361,22 +239,925 @@ void unknown_pattern(`T' pattern) {
     exit(_error(3250))
 }
 
-void check_tuples(`TUPLE' tuple_1, `TUPLE' tuple_2) {
-    if (length(tuple_1.patterns) != length(tuple_2.patterns)) {
-        errprintf(
-            "Different number of patter in tuples: %f != %f\n",
-            length(tuple_1.patterns), length(tuple_2.patterns)
-        )
-        exit(_error(3200))
+end
+
+
+**#********************************************************** src/interface.mata
+
+mata
+
+//////////////////////////////////////////////////////////////////// to_string()
+
+`STRING' to_string(`T' pattern) {
+    if (eltype(pattern) == "real") {
+        if (pattern[1, 1] == `EMPTY_TYPE') {
+            return(to_string_pempty(pattern))
+        }
+        else if (pattern[1, 1] == `WILD_TYPE') {
+            return(to_string_pwild(pattern))
+        }
+        else if (pattern[1, 1] == `CONSTANT_TYPE') {
+            return(to_string_pconstant(pattern))
+        }
+        else if (pattern[1, 1] == `RANGE_TYPE') {
+            return(to_string_prange(pattern))
+        }
+        else if (pattern[1, 1] == `OR_TYPE') {
+            return(to_string_por(pattern))
+        }
+    }
+    else if (eltype(pattern) == "struct") {
+        if (structname(pattern) == "Tuple") {
+            return(to_string_tuple(pattern))
+        }
+        else if (structname(pattern) == "TupleOr") {
+            return(to_string_tupleor(pattern))
+        }
+        else if (structname(pattern) == "TupleEmpty") {
+            return("Empty")
+        }
+    }
+    
+    unknown_pattern(pattern)
+}
+
+//////////////////////////////////////////////////////////////////////// print()
+
+void print(`PATTERN' pattern) {
+    to_string(pattern)
+}
+
+////////////////////////////////////////////////////////////////////// to_expr()
+
+`STRING' to_expr(`T' pattern, `VARIABLES' variable) {
+    if (eltype(pattern) == "real") {
+        if (pattern[1, 1] == `EMPTY_TYPE') {
+            return(to_expr_pempty(pattern, variable))
+        }
+        else if (pattern[1, 1] == `WILD_TYPE') {
+            return(to_expr_pwild(pattern, variable))
+        }
+        else if (pattern[1, 1] == `CONSTANT_TYPE') {
+            return(to_expr_pconstant(pattern, variable))
+        }
+        else if (pattern[1, 1] == `RANGE_TYPE') {
+            return(to_expr_prange(pattern, variable))
+        }
+        else if (pattern[1, 1] == `OR_TYPE') {
+            return(to_expr_por(pattern, variable))
+        }
+    }
+    else if (eltype(pattern) == "struct") {
+        if (structname(pattern) == "Tuple") {
+            return(to_expr_tuple(pattern, variable))
+        }
+        else if (structname(pattern) == "TupleOr") {
+            return(to_expr_tupleor(pattern, variable))
+        }
+        else if (structname(pattern) == "TupleEmpty") {
+            return("")
+        }
+    }
+    unknown_pattern(pattern)
+}
+
+///////////////////////////////////////////////////////////////////// compress()
+
+`T' compress(`T' pattern) {
+    if (eltype(pattern) == "real") {
+        if (pattern[1, 1] == `EMPTY_TYPE') {
+            return(compress_pempty(pattern))
+        }
+        else if (pattern[1, 1] == `WILD_TYPE') {
+            return(compress_pwild(pattern))
+        }
+        else if (pattern[1, 1] == `CONSTANT_TYPE') {
+            return(compress_pconstant(pattern))
+        }
+        else if (pattern[1, 1] == `RANGE_TYPE') {
+            return(compress_prange(pattern))
+        }
+        else if (pattern[1, 1] == `OR_TYPE') {
+            return(compress_por(pattern))
+        }
+    }
+    else if (eltype(pattern) == "struct") {
+        if (structname(pattern) == "Tuple") {
+            return(compress_tuple(pattern))
+        }
+        else if (structname(pattern) == "TupleOr") {
+            return(compress_tupleor(pattern))
+        }
+        else if (structname(pattern) == "TupleEmpty") {
+            return(pattern)
+        }
+    }
+    unknown_pattern(pattern)
+}
+
+////////////////////////////////////////////////////////////////////// overlap()
+
+`T' overlap(`T' pattern_1, `T' pattern_2) {
+    if (eltype(pattern_1) == "real") {
+        if (pattern_1[1, 1] == `EMPTY_TYPE') {
+            return(overlap_pempty(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `WILD_TYPE') {
+            return(overlap_pwild(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `CONSTANT_TYPE') {
+            return(overlap_pconstant(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `RANGE_TYPE') {
+            return(overlap_prange(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `OR_TYPE') {
+            return(overlap_por(pattern_1, pattern_2))
+        }
+    }
+    else if (eltype(pattern_1) == "struct") {
+        if (structname(pattern_1) == "Tuple") {
+            return(overlap_tuple(pattern_1, pattern_2))
+        }
+        else if (structname(pattern_1) == "TupleOr") {
+            return(overlap_tupleor(pattern_1, pattern_2))
+        }
+        else if (structname(pattern_1) == "TupleEmpty") {
+            return(pattern_1)
+        }
+    }
+    else {
+        unknown_pattern(pattern_1)
     }
 }
 
-void init_por(`OR' por) {
-    por.length = 0
-    por.patterns = J(1, 8, NULL)
+///////////////////////////////////////////////////////////////////// includes()
+
+`REAL' includes(`PATTERN' pattern_1, `PATTERN' pattern_2) {
+    if (eltype(pattern_1) == "real") {
+        if (pattern_1[1, 1] == `EMPTY_TYPE') {
+            return(includes_pempty(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `WILD_TYPE') {
+            return(includes_pwild(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `CONSTANT_TYPE') {
+            return(includes_pconstant(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `RANGE_TYPE') {
+            return(includes_prange(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `OR_TYPE') {
+            return(includes_por(pattern_1, pattern_2))
+        }
+    }
+    else if (eltype(pattern_1) == "struct") {
+        if (structname(pattern_1) == "Tuple") {
+            return(includes_tuple(pattern_1, pattern_2))
+        }
+        else if (structname(pattern_1) == "TupleOr") {
+            return(includes_tupleor(pattern_1, pattern_2))
+        }
+        else if (structname(pattern_1) == "TupleEmpty") {
+            return(1)
+        }
+    }
+    else {
+        unknown_pattern(pattern_1)
+    }
 }
 
-void push_por(`OR' por, `T' pattern) {
+/////////////////////////////////////////////////////////////////// difference()
+
+`T' difference(`T' pattern_1, `T' pattern_2) {
+    if (eltype(pattern_1) == "real") {
+        if (pattern_1[1, 1] == `EMPTY_TYPE') {
+            return(difference_pempty(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `WILD_TYPE') {
+            return(difference_pwild(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `CONSTANT_TYPE') {
+            return(difference_pconstant(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `RANGE_TYPE') {
+            return(difference_prange(pattern_1, pattern_2))
+        }
+        else if (pattern_1[1, 1] == `OR_TYPE') {
+            return(difference_por(pattern_1, pattern_2))
+        }
+    }
+    else if (eltype(pattern_1) == "struct") {
+        if (structname(pattern_1) == "Tuple") {
+            return(difference_tuple(pattern_1, pattern_2))
+        }
+        else if (structname(pattern_1) == "TupleOr") {
+            return(difference_tupleor(pattern_1, pattern_2))
+        }
+        else if (structname(pattern_1) == "TupleEmpty") {
+            return(pattern_2)
+        }
+    }
+    else {
+        unknown_pattern(pattern_1)
+    }
+}
+
+
+end
+
+
+**#************************************************************ src/pattern.mata
+
+mata
+
+///////////////////////////////////////////////////////////////////// new_*()
+
+`EMPTY' new_pempty() {
+    return((`EMPTY_TYPE', 0, 0, 0))
+}
+
+`WILD' new_pwild(`VARIABLE' variable) {
+    `WILD' pwild
+    `CONSTANT' pconstant
+    `REAL' i, n_pat, variable_type
+    
+    variable_type = variable.get_type_nb()
+    
+    check_var_type(variable_type)
+    
+    n_pat = length(variable.levels)
+    
+    pwild = (`WILD_TYPE', n_pat, 0, variable_type) \ J(n_pat, 4, 0)
+    
+    if (variable.type == "string") {
+        for (i = 1; i <= n_pat; i++) {
+            pconstant = new_pconstant(i, variable_type)
+            pwild[i + 1, .] = pconstant
+        }
+    }
+    else if (variable.type == "int") {
+        for (i = 1; i <= n_pat; i++) {
+            pconstant = new_pconstant(variable.levels[i], variable_type)
+            pwild[i + 1, .] = pconstant
+        }
+    }
+    else if (variable.type == "float") {
+        for (i = 1; i <= n_pat; i++) {
+            pconstant = new_pconstant(variable.levels[i], variable_type)
+            pwild[i + 1, .] = pconstant
+        }
+    }
+    else if (variable.type == "double") {
+        for (i = 1; i <= n_pat; i++) {
+            pconstant = new_pconstant(variable.levels[i], variable_type)
+            pwild[i + 1, .] = pconstant
+        }
+    }
+    else {
+        errprintf(
+            "Unexpected variable type for variable '%s': '%s'\n",
+            variable.name, variable.stata_type
+        )
+        exit(_error(3256))
+    }
+    
+    return(pwild)
+}
+
+`CONSTANT' new_pconstant(`REAL' value, `REAL' variable_type) {
+    check_var_type(variable_type)
+    
+    return((`CONSTANT_TYPE', value, value, variable_type))
+}
+
+`RANGE' new_prange(`REAL' min, `REAL' max, `REAL' variable_type) {
+    check_var_type(variable_type)
+
+    if (min == . | max == .) {
+        errprintf("Range boundaries should be non-missing reals\n")
+        exit(_error(3253))
+    }
+    
+    if (variable_type == 1 | variable_type == 4) {
+        if (!isint(min) | !isint(max)) {
+            errprintf("Range is discrete but boundaries are not integers\n")
+            exit(_error(3498))
+        }
+    }
+    
+    return((`RANGE_TYPE', min, max, variable_type))
+}
+
+`OR' new_por() {
+    return((`OR_TYPE', 0, 0, 0) \ J(8, 4, 0))
+}
+
+//////////////////////////////////////////////////////////////////// to_string()
+
+`STRING' to_string_pempty(`EMPTY' pempty) {
+    return("Empty")
+}
+
+`STRING' to_string_pwild(`WILD' pwild, | `REAL' detailed) {
+    if (args() == 1) {
+        detailed = 0
+    }
+    
+    if (detailed == 0) {
+        return("_")
+    }
+    else {
+        return(to_string_por(pwild))
+    }
+}
+
+`STRING' to_string_pconstant(`CONSTANT' pconstant) {
+    return(strofreal(pconstant[1, 2]))
+}
+
+`STRING' to_string_prange(`RANGE' prange) {
+    return(strofreal(prange[1, 2]) + "/" + strofreal(prange[1, 3]))
+}
+
+`STRING' to_string_por(`OR' por) {
+    `STRINGS' strings
+    `REAL' i, n_pat
+    
+    n_pat = por[1, 2]
+    
+    strings = J(1, n_pat, "")
+    
+    for (i = 1; i <= n_pat; i++) {
+        strings[i] = to_string(por[i + 1, .])
+    }
+    
+    return(invtokens(strings, " | "))
+}
+
+////////////////////////////////////////////////////////////////////// to_expr()
+
+`STRING' to_expr_pempty(`EMPTY' pempty, `VARIABLE' variable) {
+    return("")
+}
+
+`STRING' to_expr_pwild(`WILD' pwild, `VARIABLE' variable) {
+    return("1")
+}
+
+`STRING' to_expr_pconstant(`CONSTANT' pconstant, `VARIABLE' variable) {
+    if (variable.type == "string") {
+        return(sprintf("%s == %s", variable.name, variable.levels[pconstant[1, 2]]))
+    }
+    else {
+        return(sprintf("%s == %21x", variable.name, pconstant[1, 2]))
+    }
+}
+
+`STRING' to_expr_prange(`RANGE' prange, `VARIABLE' variable) {
+    return(sprintf(
+        "%s >= %21x & %s <= %21x",
+        variable.name, prange[1, 2], variable.name, prange[1, 3]
+    ))
+}
+
+`STRING' to_expr_por(`OR' por, `VARIABLES' variable) {
+    `STRINGS' exprs
+    `REAL' i, n_pat
+    
+    n_pat = por[1, 2]
+    
+    if (n_pat == 0) {
+        return("")
+    }
+    
+    if (n_pat== 1) {
+        return(to_expr(por[2, .], variable))
+    }
+
+    exprs = J(1, n_pat, "")
+    
+    for (i = 1; i <= n_pat; i++) {
+        exprs[i] = "(" + to_expr(por[i + 1, .], variable) + ")"
+    }
+
+    return(invtokens(exprs, " | "))
+}
+
+///////////////////////////////////////////////////////////////////// compress()
+
+`PATTERN' compress_pempty(`EMPTY' pempty) {
+    return(pempty)
+}
+
+`PATTERN' compress_pwild(`WILD' pwild) {
+    return(pwild)
+}
+
+`PATTERN' compress_pconstant(`CONSTANT' pconstant) {
+    return(pconstant)
+}
+
+`PATTERN' compress_prange(`RANGE' prange) {
+    `CONSTANT' pconstant
+    
+    if (prange[1, 2] > prange[1, 3]) {
+        return(new_pempty())
+    }
+    else if (prange[1, 2] == prange[1, 3]) {
+        pconstant = new_pconstant(prange[1, 2], prange[1, 4])
+        return(pconstant)
+    }
+    else {
+        return(prange)
+    }
+}
+
+`PATTERN' compress_por(`OR' por) {
+    `OR' por_compressed
+    `PATTERN' pattern_compressed
+    `REAL' i, n_pat
+    
+    por_compressed = new_por()
+    
+    n_pat = por[1, 2]
+    
+    for (i = 1; i <= n_pat; i++) {
+        pattern_compressed = compress(por[i + 1, .])
+        if (pattern_compressed[1, 1] == `EMPTY_TYPE') {
+            continue
+        }
+        else if (pattern_compressed[1, 1] == `WILD_TYPE') {
+            return(pattern_compressed)
+        }
+        else {
+            if (!includes_por(por_compressed, pattern_compressed)) {
+                push_por(por_compressed, pattern_compressed) 
+            }
+        }
+    }
+    
+    if (por_compressed[1, 2] == 0) {
+        return(new_pempty())
+    }
+    else if (por_compressed[1, 2] == 1) {
+        return(por_compressed[2, .])
+    }
+    else {
+        return(por_compressed)
+    }
+}
+
+////////////////////////////////////////////////////////////////////// overlap()
+
+`PATTERN' overlap_pempty(`EMPTY' pempty, `PATTERN' pattern) {
+    return(pempty)
+}
+
+`PATTERN' overlap_pwild(`WILD' pwild, `PATTERN' pattern) {
+    return(pattern)
+}
+
+`PATTERN' overlap_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
+    if (includes(pattern, pconstant)) {
+        return(pconstant)
+    }
+    else {
+        return(new_pempty())
+    }
+}
+
+`PATTERN' overlap_prange(`RANGE' prange, `PATTERN' pattern) {
+    if (pattern[1, 1] == `EMPTY_TYPE') {
+        return(new_pempty())
+    }
+    else if (pattern[1, 1] == `WILD_TYPE') {
+        return(prange)
+    }
+    else if (pattern[1, 1] == `CONSTANT_TYPE') {
+        return(overlap_prange_pconstant(prange, pattern))
+    }
+    else if (pattern[1, 1] == `RANGE_TYPE') {
+        return(overlap_prange_prange(prange, pattern))
+    }
+    else if (pattern[1, 1] == `OR_TYPE') {
+        return(overlap_por(pattern, prange))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+`PATTERN' overlap_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
+    if (includes_prange_pconstant(prange, pconstant)) {
+        return(pconstant)
+    }
+    else {
+        return(new_pempty())
+    }
+}
+
+`PATTERN' overlap_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
+    `RANGE' inter_range
+    `REAL' min, max
+    
+    if (prange_1[1, 2] > prange_2[1, 3]) return(new_pempty())
+    if (prange_1[1, 3] < prange_2[1, 2]) return(new_pempty())
+
+    // Determine the minimum
+    min = max((prange_1[1, 2], prange_2[1, 2]))
+    max = min((prange_1[1, 3], prange_2[1, 3]))
+
+    inter_range = new_prange(min, max, prange_1[1, 4])
+    
+    // Return the compressed version
+    return(compress_prange(inter_range))
+}
+
+// The outcome is compressed, but need to check if the pattern is included
+// If X = 1/3 and Y = 2/4, Z = 3 and T = 2/3
+// (1/3 | 2/4 | 3) & T => (2/3 | 2/3 | 3)
+// If (X | Y | Z) was compressed such that no element is included in another
+// (1/3 | 2/4 | 3) => (1/3 | 2/4)
+// X and Y are not included in one another
+// Compressing would require to merge the overlaping patterns
+// (1/3 | 2/4 | 3) => 1/4
+// In this case all the compressed elements are exclusive
+// The overlaps of a compressed POr and a pattern would always be compressed
+// This would work for tuples to
+`PATTERN' overlap_por(`OR' por, `PATTERN' pattern) {
+    `OR' por_overlap
+    `PATTERN' overlap
+    `REAL' i
+    
+    por_overlap = new_por()
+
+    for (i = 1; i <= por[1, 2]; i++) {
+        overlap = overlap(por[i + 1, .], pattern)
+        
+        if (overlap[1, 1] == `EMPTY_TYPE') {
+            continue
+        }
+        else if (overlap[1, 1] == `WILD_TYPE') {
+            return(overlap)
+        }
+        else {
+            if (!includes_por(por_overlap, overlap)) {
+                push_por(por_overlap, overlap)
+            }
+        }
+    }
+    
+    if (por_overlap[1, 2] == 0) {
+        return(new_pempty())
+    }
+    if (por_overlap[1, 2] == 1) {
+        return(por_overlap[2, .])
+    }
+    else {
+        return(por_overlap)
+    }
+}
+
+///////////////////////////////////////////////////////////////////// includes()
+
+`REAL' includes_pempty(`EMPTY' pempty, `PATTERN' pattern) {
+    return(pattern[1, 1] == `EMPTY_TYPE')
+}
+
+`REAL' includes_pwild(`WILD' pwild, `PATTERN' pattern) {
+    return(1)
+}
+
+`REAL' includes_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
+    if (pattern[1, 1] == `EMPTY_TYPE') {
+        return(1)
+    }
+    else if (pattern[1, 1] == `WILD_TYPE') {
+        return(includes_pconstant_pwild(pconstant, pattern))
+    }
+    else if (pattern[1, 1] == `CONSTANT_TYPE') {
+        return(includes_pconstant_pconstant(pconstant, pattern))
+    }
+    else if (pattern[1, 1] == `RANGE_TYPE') {
+        return(includes_pconstant_prange(pconstant, pattern))
+    }
+    else if (pattern[1, 1] == `OR_TYPE') {
+        return(includes_pconstant_por(pconstant, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+`REAL' includes_pconstant_pwild(`CONSTANT' pconstant, `WILD' pwild) {
+    return(includes_pconstant_por(pconstant, pwild))
+}
+
+`REAL' includes_pconstant_pconstant(`CONSTANT' pconstant_1, `CONSTANT' pconstant_2) {
+    return(pconstant_1[1, 2] == pconstant_2[1, 2])
+}
+
+`REAL' includes_pconstant_prange(`CONSTANT' pconstant, `RANGE' prange) {
+    return(pconstant[1, 2] == prange[1, 2] & pconstant[1, 2] == prange[1, 3])
+}
+
+`REAL' includes_pconstant_por(`CONSTANT' pconstant, `OR' por) {
+    `REAL' i
+    
+    for (i = 1; i <= por[1, 2]; i++) {
+        if (!includes_pconstant(pconstant, por[i + 1, .])) {
+            return(0)
+        }
+    }
+    
+    return(1)
+}
+
+`REAL' includes_prange(`RANGE' prange, `PATTERN' pattern) {
+    if (pattern[1, 1] == `EMPTY_TYPE') {
+        return(1)
+    }
+    else if (pattern[1, 1] == `WILD_TYPE') {
+        return(includes_prange_pwild(prange, pattern))
+    }
+    else if (pattern[1, 1] == `CONSTANT_TYPE') {
+        return(includes_prange_pconstant(prange, pattern))
+    }
+    else if (pattern[1, 1] == `RANGE_TYPE') {
+        return(includes_prange_prange(prange, pattern))
+    }
+    else if (pattern[1, 1] == `OR_TYPE') {
+        return(includes_prange_por(prange, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+`REAL' includes_prange_pwild(`RANGE' prange, `WILD' pwild) {
+    return(includes_prange_por(prange, pwild))
+}
+
+`REAL' includes_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
+    return(pconstant[1, 2] >= prange[1, 2] & pconstant[1, 2] <= prange[1, 3])
+}
+
+`REAL' includes_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
+    return(prange_2[1, 2] >= prange_1[1, 2] & prange_2[1, 3] <= prange_1[1, 3])
+}
+
+`REAL' includes_prange_por(`RANGE' prange, `OR' por) {
+    `REAL' i
+    
+    for (i = 1; i <= por[1, 2]; i++) {
+        if (!includes_prange(prange, por[i + 1, .])) {
+            return(0)
+        }
+    }
+    
+    return(1)
+}
+
+`REAL' includes_por(`OR' por, `PATTERN' pattern) {
+    if (pattern[1, 1] == `EMPTY_TYPE') {
+        return(1)
+    }
+    else if (pattern[1, 1] == `CONSTANT_TYPE') {
+        return(includes_por_pconstant(por, pattern))
+    }
+    else {
+        return(includes_por_default(por, pattern))
+    }
+}
+
+`REAL' includes_por_pconstant(`OR' por, `CONSTANT' pconstant) {
+    `REAL' i
+    
+    for (i = 1; i <= por[1, 2]; i++) {
+        if (includes(por[i + 1, .], pconstant)) {
+            return(1)
+        }
+    }
+    
+    return(0)
+}
+
+`REAL' includes_por_default(`OR' por, `PATTERN' pattern) {
+    `POINTERS' difference
+    `REAL' i, n_pat
+    
+    difference = difference_list(pattern, por)
+    
+    if (difference[1, 1] == `EMPTY_TYPE') {
+        return(1)
+    }
+    else if (difference[1, 1] == `OR_TYPE' & difference[1, 2] == 0) {
+        return(1)
+    }
+    else {
+        // difference_list() removes all the empty patterns
+        // So if there is anything, there are patterns not in por
+        return(0)
+    }
+}
+
+/////////////////////////////////////////////////////////////////// difference()
+
+// The result is compressed
+`PATTERN' difference_pempty(`EMPTY' pempty, `PATTERN' pattern) {
+    return(pempty)
+}
+
+`PATTERN' difference_pwild(`WILD' pwild, `PATTERN' pattern) {
+    return(difference_por(pwild, pattern))
+}
+
+// The result is compressed
+`PATTERN' difference_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
+    if (includes(pattern, pconstant)) {
+        return(new_pempty())
+    }
+    else {
+        return(pconstant)
+    }
+}
+
+`PATTERN' difference_prange(`RANGE' prange, `PATTERN' pattern) {
+    if (pattern[1, 1] == `EMPTY_TYPE') {
+        return(prange)
+    }
+    else if (pattern[1, 1] == `WILD_TYPE') {
+        return(new_pempty())
+    }
+    else if (pattern[1, 1] == `CONSTANT_TYPE') {
+        return(difference_prange_pconstant(prange, pattern))
+    }
+    else if (pattern[1, 1] == `RANGE_TYPE') {
+        return(difference_prange_prange(prange, pattern))
+    }
+    else if (pattern[1, 1] == `OR_TYPE') {
+        return(difference_prange_por(prange, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+// The result is compressed
+`PATTERN' difference_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
+    `RANGE' prange_low, prange_high
+    `OR' pranges
+    
+    pranges = new_por()
+    
+    if (pconstant[1, 2] < prange[1, 2] | pconstant[1, 2] > prange[1, 3]) {
+        return(prange)
+    }
+    
+    if (pconstant[1, 2] != prange[1, 2]) {
+        prange_low = new_prange(
+            prange[1, 2],
+            pconstant[1, 2] - get_epsilon(pconstant[1, 2], prange[1, 4]),
+            prange[1, 4]
+        )
+        push_por(pranges, prange_low)
+    }
+    
+    if (pconstant[1, 2] != prange[1, 3]) {
+        prange_high = new_prange(
+            pconstant[1, 2] + get_epsilon(pconstant[1, 2], prange[1, 4]),
+            prange[1, 3],
+            prange[1, 4]
+        )
+        push_por(pranges, prange_high)
+    }
+    
+    return(compress(pranges))
+}
+
+// The result is compressed
+`PATTERN' difference_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
+    `RANGE' prange_low, prange_high
+    `OR' pranges
+    
+    pranges = new_por()
+    
+    if (prange_2[1, 3] < prange_1[1, 2] | prange_2[1, 2] > prange_1[1, 3]) {
+        return(prange_1)
+    }
+    
+    // First half
+    if (prange_2[1, 2] <= prange_1[1, 2]) {
+        // Nothing there is no first half
+    }
+    else {
+        prange_low = new_prange(
+            prange_1[1, 2],
+            prange_2[1, 2] - get_epsilon(prange_2[1, 2], prange_1[1, 4]),
+            prange_1[1, 4]
+        )
+        push_por(pranges, prange_low)
+    }
+    
+    // Second half
+    if (prange_2[1, 3] >= prange_1[1, 3]) {
+        // Nothing there is no second half
+    }
+    else {
+        prange_high = new_prange(
+            prange_2[1, 3] + get_epsilon(prange_2[1, 3], prange_1[1, 4]),
+            prange_1[1, 3],
+            prange_1[1, 4]
+        )
+        push_por(pranges, prange_high)
+    }
+    
+    return(compress(pranges))
+}
+
+`PATTERN' difference_prange_por(`RANGE' prange, `OR' por) {
+    `OR' por_differences
+    
+    por_differences = new_por()
+
+    append_por(por_differences, difference_list(prange, por))
+    
+    return(por_differences)
+}
+
+// The result is NOT compressed
+`PATTERN' difference_por(`OR' por, `PATTERN' pattern) {
+    `OR' por_differences
+    `REAL' i
+    
+    por_differences = new_por()
+
+    // Loop over all patterns in Or and compute the difference
+    for (i = 1; i <= por[1, 2]; i++) {
+        push_por(por_differences, difference(por[i + 1, .], pattern))
+    }
+    
+    if (por_differences[1, 2] == 0) {
+        return(new_pempty())
+    }
+    else {
+        return(por_differences)
+    }
+}
+
+`PATTERN' difference_list(`PATTERN' pattern, `OR' por) {
+    `OR' differences, new_differences
+    `REAL' i, j
+    
+    differences = new_por()
+    push_por(differences, pattern)
+
+    if (por[1, 2] == 0) {
+        return(differences)
+    }
+    
+    // Loop over all pattern in Or
+    for (i = 1; i <= por[1, 2]; i++) {
+        new_differences = new_por()
+
+        // Compute the difference
+        for (j = 1; j <= differences[1, 2]; j++) {
+            append_por(
+                new_differences,
+                difference(differences[j + 1, .], por[i + 1, .])
+            )
+        }
+        
+        differences = new_differences
+
+        if (new_differences[1, 2] == 0) {
+            break
+        }
+    }
+    
+    drop_empty_patterns(differences)
+    
+    return(differences)
+}
+
+void drop_empty_patterns(`OR' por) {
+    `REAL' i
+    
+    // TODO: matrix version
+    for (i = 1; i <= por[1, 2]; i++) {
+        if (por[i + 1, 1] == 0) {
+            por[i + 1, .] = por[por[1, 2] + 1, .]
+            por[por[1, 2] + 1, 1..3] = (0, 0, 0)
+            por[1, 2] = por[1, 2] - 1
+            i--
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////// Utils
+
+void push_por(`OR' por, `PATTERN' pattern) {
     // New fun :
     // - with ref we create a ref to pattern
     // - in a loop creates pattern takes the last value of the loop
@@ -1389,28 +1170,28 @@ void push_por(`OR' por, `T' pattern) {
     // - to avoid creating all object every time, this is done within functions
     
     // Ideally we should drop this but there might be bugs latter
-    if (por.length == .) {
-        init_por(por)
+    
+    if (length(por) == 0 || por[1, 2] == .) {
+        por = new_por()
     }
     
-    if (structname(pattern) == "PEmpty") {
+    if (pattern[1, 1] == `EMPTY_TYPE') {
         // Ignore
         return
     }
-    else if (structname(pattern) == "PWild") {
-        return(push_por_copy_pwild(por, pattern))
+    else if (pattern[1, 1] == `WILD_TYPE') {
+        push_por_copy_pwild(por, pattern)
     }
-    else if (structname(pattern) == "PConstant") {
-        return(push_por_copy_pconstant(por, pattern))
+    else if (pattern[1, 1] == `CONSTANT_TYPE') {
+        push_por_copy_pconstant(por, pattern)
     }
-    else if (structname(pattern) == "PRange") {
-        return(push_por_copy_prange(por, pattern))
+    else if (pattern[1, 1] == `RANGE_TYPE') {
+        push_por_copy_prange(por, pattern)
     }
-    else if (structname(pattern) == "POr") {
-        append_por(por, pattern)
-    }
-    else if (structname(pattern) == "Tuple") {
-        return(push_por_copy_tuple(por, pattern))
+    else if (pattern[1, 1] == `OR_TYPE') {
+        if (pattern[1, 2] > 0) {
+            append_por(por, pattern[2..(pattern[1, 2] + 1), .])
+        }
     }
     else {
         unknown_pattern(pattern)
@@ -1418,76 +1199,765 @@ void push_por(`OR' por, `T' pattern) {
 }
 
 void push_por_copy_pwild(`OR' por, `WILD' pwild) {
-    `WILD' wild_copy
-    
-    wild_copy = pwild
-    
-    por.patterns = &wild_copy, J(1, 7, NULL)
-    por.length = 1
+    por = pwild
 }
 
 void push_por_copy_pconstant(`OR' por, `CONSTANT' pconstant) {
-    `CONSTANT' pconstant_copy
-    
-    if (por.length == 1) {
-        if (structname(*por.patterns[1]) == "PWild") {
-            return
-        }
+    if (por[1, 2] == rows(por) - 1) {
+        por = por \ J(rows(por) - 1, 4, 0)
     }
     
-    if (por.length == length(por.patterns)) {
-        por.patterns = por.patterns, J(1, length(por.patterns), NULL)
-    }
-    
-    pconstant_copy = pconstant
-    
-    por.length = por.length + 1
-    por.patterns[por.length] = &pconstant_copy
+    por[1, 2] = por[1, 2] + 1
+    por[por[1, 2] + 1, .] = pconstant
 }
 
 void push_por_copy_prange(`OR' por, `RANGE' prange) {
-    `RANGE' prange_copy
-    
-    if (por.length == 1) {
-        if (structname(*por.patterns[1]) == "PWild") {
-            return
-        }
+    if (por[1, 2] == rows(por) - 1) {
+        por = por \ J(rows(por) - 1, 4, 0)
     }
     
-    if (por.length == length(por.patterns)) {
-        por.patterns = por.patterns, J(1, length(por.patterns), NULL)
-    }
-    
-    prange_copy = prange
-    
-    por.length = por.length + 1
-    por.patterns[por.length] = &prange_copy
+    por[1, 2] = por[1, 2] + 1
+    por[por[1, 2] + 1, .] = prange
 }
 
-void push_por_copy_tuple(`OR' por, `TUPLE' tuple) {
+void append_por(`OR' por, `PATTERN' patterns) {
+    `REAL' i, pat_start, pat_end, n_pat, n_pat_new
+    
+    if (patterns[1, 1] == `OR_TYPE') {
+        n_pat = patterns[1, 2]
+        pat_start = 2
+    }
+    else {
+        n_pat = rows(patterns)
+        pat_start = 1
+    }
+    
+    pat_end = pat_start + n_pat - 1
+    
+    if (n_pat == 0) {
+        return
+    }
+    
+    if (por[1, 2] + n_pat >= rows(por) - 1) {
+        // Get the next power of 2 number of patterns
+        n_pat_new = por[1, 2] + n_pat
+        n_pat_new = log(n_pat_new) / log(2)
+        n_pat_new = ceil(n_pat_new)
+        n_pat_new = exp(n_pat_new * log(2))
+        por = por \ J(n_pat_new, 4, 0)
+    }
+    
+    por[(por[1, 2] + 2)..(por[1, 2] + n_pat + 1), .] = patterns[pat_start..pat_end, .]
+    por[1, 2] = por[1, 2] + n_pat
+}
+
+end
+
+
+**#************************************************************* src/tuples.mata
+
+mata
+
+// Empty and TupleEmpty patterns needs a scalar for the type
+// Constant and Ranger patterns need a vector for the type and the values
+// Wildcard and Or patterns need a matrix to store the other patterns
+// Tuple and TupleWild patterns need 3 dimensions to store the previous patterns
+// TupleOr need 4 dimensions to store multiple Tuple patterns
+
+// Mata goes up to 2 dimensions with matrices
+// 3 dimensions are done by storing pointers to matrices
+// 4 dimensions with vectors of pointers to matrices
+// ...
+
+// We need to create separate data structures for the larger dimensions
+
+// This could be avoided if we could store pointers as reals in the matrices
+// From there we could access the other matrices
+// Then we wouldn't need to TupleEmpty, TupleWild and TupleOr
+
+// TupleOr with 2 columns would be like:
+// (      OrType,  length)
+// (TuplePointer, pointer) -> (     TupleType, length)
+//                            (PatternPointer,      .) -> (ConstantType,  value)
+//                            (PatternPointer,      .) -> (      OrType, length)
+//                                                        (ConstantType,  value)
+
+// But we cannot mix reals and pointers
+// So I create yet another file for data structures
+
+///////////////////////////////////////////////////////////////////////// new()
+
+`TUPLEOR' new_tupleor() {
+    `TUPLEOR' tuples
+    
+    tuples = TupleOr()
+    tuples.length = 0
+    tuples.list = J(1, 8, NULL)
+    
+    return(tuples)
+}
+
+//////////////////////////////////////////////////////////////////// to_string()
+
+`STRING' to_string_tuple(`TUPLE' tuple) {
+    `STRINGS' strings
+    `REAL' i, n_pat
+    
+    n_pat = length(tuple.patterns)
+    
+    if (n_pat == 0) {
+        return("Empty Tuple: Error")
+    }
+    
+    strings = J(1, n_pat, "")
+    
+    for (i = 1; i <= n_pat; i++) {
+        strings[i] = to_string(*tuple.patterns[i])
+    }
+    
+    if (n_pat == 1) {
+        return(invtokens(strings, ", "))
+    }
+    else {
+        return("(" + invtokens(strings, ", ") + ")")
+    }
+}
+
+`STRING' to_string_tupleor(`TUPLEOR' tuples) {
+    `STRINGS' strings
+    `REAL' i
+
+    strings = J(1, tuples.length, "")
+
+    for (i = 1; i <= tuples.length; i++) {
+        strings[i] = to_string_tuple(*tuples.list[i])
+    }
+
+    return(invtokens(strings, " | "))
+}
+
+
+////////////////////////////////////////////////////////////////////// to_expr()
+
+`STRING' to_expr_tuple(`TUPLE' tuple, `VARIABLES' variables) {
+    `POINTER' pattern
+    `STRINGS' exprs
+    `REAL' i, k, n_pat
+
+    n_pat = length(tuple.patterns)
+    
+    if (n_pat != length(variables)) {
+        errprintf(
+            "The tuples and variables have different sizes %f and %f",
+            n_pat, length(variables)
+        )
+        exit(_error(3300))
+    }
+    
+    exprs = J(1, n_pat, "")
+
+    k = 0
+    for (i = 1; i <= n_pat; i++) {
+        pattern = compress(*tuple.patterns[i])
+        if (pattern[1, 1] != `EMPTY_TYPE' & pattern[1, 1] != `WILD_TYPE') {
+            k++
+            exprs[k] = to_expr(pattern, variables[i])
+        }
+    }
+    
+    if (k == 0) {
+        return("1")
+    }
+    
+    // Add parentheses if there is more than 1 condition
+    if (k > 1) {
+        for (i = 1; i <= k; i++) {
+            exprs[i] = "(" + exprs[i] + ")"
+        }
+    }
+    
+    return(invtokens(exprs[1..k], " & "))
+}
+
+`STRING' to_expr_tupleor(`TUPLEOR' tuples, `VARIABLES' variable) {
+    `STRINGS' exprs
+    `REAL' i
+    
+    assert(!missing(tuples.length))
+    
+    if (tuples.length == 0) {
+        return("")
+    }
+    
+    if (tuples.length == 1) {
+        return(to_expr(tuples.list[1], variable))
+    }
+
+    exprs = J(1, tuples.length, "")
+    
+    for (i = 1; i <= tuples.length; i++) {
+        exprs[i] = "(" + to_expr_tuple(*tuples.list[i], variable) + ")"
+    }
+
+    return(invtokens(exprs, " | "))
+}
+
+///////////////////////////////////////////////////////////////////// compress()
+
+`T' compress_tuple(`TUPLE' tuple) {
+    `TUPLE' tuple_compressed
+    `REAL' i
+
+    tuple_compressed.arm_id = tuple.arm_id
+    tuple_compressed.patterns = J(length(tuple.patterns), 1, NULL)
+    
+    for (i = 1; i <= length(tuple.patterns); i++) {
+        tuple_compressed.patterns[i] = &compress(*tuple.patterns[i])
+        if ((*tuple_compressed.patterns[i])[1, 1] == `EMPTY_TYPE') {
+            return(TupleEmpty())
+        }
+    }
+
+    return(tuple_compressed)
+}
+
+`T' compress_tupleor(`TUPLEOR' tuples) {
+    `TUPLEOR' tuples_compressed
+    `POINTER' pattern_compressed
+    `REAL' i
+    
+    tuples_compressed = new_tupleor()
+    
+    for (i = 1; i <= tuples.length; i++) {
+        pattern_compressed = &compress(*tuples.list[i])
+        if (structname(*pattern_compressed) == "TupleEmpty") {
+            continue
+        }
+        else if (structname(*pattern_compressed) == "TupleWild") {
+            return(*pattern_compressed)
+        }
+        else {
+            if (!includes_tupleor(tuples_compressed, *pattern_compressed)) {
+                push_tupleor(tuples_compressed, *pattern_compressed) 
+            }
+        }
+    }
+    
+    if (tuples_compressed.length == 0) {
+        return(TupleEmpty())
+    }
+    if (tuples_compressed.length == 1) {
+        return(*tuples_compressed.list[1])
+    }
+    else {
+        return(tuples_compressed)
+    }
+}
+
+////////////////////////////////////////////////////////////////////// overlap()
+
+// The outcome is compressed, but need to check if the pattern is included
+// If X = 1/3 and Y = 2/4, Z = 3 and T = 2/3
+// (1/3 | 2/4 | 3) & T => (2/3 | 2/3 | 3)
+// If (X | Y | Z) was compressed such that no element is included in another
+// (1/3 | 2/4 | 3) => (1/3 | 2/4)
+// X and Y are not included in one another
+// Compressing would require to merge the overlaping patterns
+// (1/3 | 2/4 | 3) => 1/4
+// In this case all the compressed elements are exclusive
+// The overlaps of a compressed tuples and a pattern would always be compressed
+// This would work for tuples too
+
+`T' overlap_tuple(`TUPLE' tuple, `T' pattern) {
+    if (structname(pattern) == "TupleEmpty") {
+        return(TupleEmpty())
+    }
+    else if (structname(pattern) == "TupleWild") {
+        return(tuple)
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(overlap_tuple_tuple(tuple, pattern))
+    }
+    else if (structname(pattern) == "TupleOr") {
+        return(overlap_tuple_tupleor(tuple, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+`T' overlap_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
+    `TUPLE' tuple_overlap
+    `REAL' i
+    
+    check_tuples(tuple_1, tuple_2)
+    
+    tuple_overlap.patterns = J(1, length(tuple_1.patterns), NULL)
+
+    // We compute the overlap of each pattern in the tuple
+    for (i = 1; i <= length(tuple_1.patterns); i++) {
+        tuple_overlap.patterns[i] = &overlap(
+            *tuple_1.patterns[i],
+            *tuple_2.patterns[i]
+        )
+        if ((*tuple_overlap.patterns[i])[1, 1] == 0) {
+            return(TupleEmpty())
+        }
+    }
+
+    return(tuple_overlap)
+}
+
+`T' overlap_tuple_tupleor(`TUPLE' tuple, `TUPLEOR' tuples) {
+    `TUPLEOR' tuples_overlap
+    `REAL' i
+    
+    tuples_overlap = new_tupleor()
+    
+    tuples_overlap.list = J(1, length(tuples.list), NULL)
+    
+    for (i = 1; i <= tuples.length; i++) {
+        push_tupleor(tuples_overlap, overlap_tuple_tuple(tuple, *tuples.list[i]))
+    }
+    
+    return(compress(tuples_overlap))
+}
+
+`T' overlap_tupleor(`TUPLEOR' tuples, `T' pattern) {
+    `TUPLEOR' tuples_overlap
+    `POINTER' overlap
+    `REAL' i
+    
+    if (structname(pattern) == "TupleEmpty") {
+        return(TupleEmpty())
+    }
+    if (structname(pattern) == "TupleWild") {
+        return(tuples)
+    }
+    
+    tuples_overlap = new_tupleor()
+
+    for (i = 1; i <= tuples.length; i++) {
+        overlap = &overlap(*tuples.list[i], pattern)
+        if (structname(*overlap) == "TupleEmpty") {
+            continue
+        }
+        else if (structname(*overlap) == "TupleWild") {
+            return(*overlap)
+        }
+        else {
+            if (!includes_tupleor(tuples_overlap, *overlap)) {
+                push_tupleor(tuples_overlap, *overlap)
+            }
+        }
+    }
+    
+    if (tuples_overlap.length == 0) {
+        return(TupleEmpty())
+    }
+    if (tuples_overlap.length == 1) {
+        return(*tuples_overlap.list[1])
+    }
+    else {
+        return(tuples_overlap)
+    }
+}
+
+///////////////////////////////////////////////////////////////////// includes()
+
+`REAL' includes_tuple(`TUPLE' tuple, `T' pattern) {
+    if (structname(pattern) == "TupleEmpty") {
+        return(1)
+    }
+    if (structname(pattern) == "TupleWild") {
+        // TODO: loop over all wildcards
+            
+        errprintf("TupleWild is not implemented yet, please come back latter")
+        exit(_error(3000))
+        
+        return(0)
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(includes_tuple_tuple(tuple, pattern))
+    }
+    else if (structname(pattern) == "TupleOr") {
+        return(includes_tuple_tupleor(tuple, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+`REAL' includes_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
+    `REAL' i
+    
+    check_tuples(tuple_1, tuple_2)
+    
+    for (i = 1; i <= length(tuple_1.patterns); i++) {
+        if (!includes(*tuple_1.patterns[i], *tuple_2.patterns[i])) {
+            return(0)
+        }
+    }
+
+    return(1)
+}
+
+`REAL' includes_tuple_tupleor(`TUPLE' tuple, `TUPLEOR' tuples) {
+    `REAL' i
+    
+    for (i = 1; i <= tuples.length; i++) {
+        if (!includes_tuple(tuple, *tuples.list[i])) {
+            return(0)
+        }
+    }
+
+    return(1)
+}
+
+`REAL' includes_tupleor(`TUPLEOR' tuples, `T' pattern) {
+    if (structname(pattern) == "TupleEmpty") {
+        return(1)
+    }
+    else if (structname(pattern) == "TupleWild") {
+        // TODO: fix latter with real implementation of TupleWild
+            
+        errprintf("TupleWild is not implemented yet, please come back latter")
+        exit(_error(3000))
+        
+        return(0)
+    }
+    else {
+        return(includes_tuples_tuple(tuples, pattern))
+    }
+}
+
+`REAL' includes_tuples_tuple(`TUPLEOR' tuples, `TUPLE' tuple) {
+    `POINTERS' difference
+    `REAL' i, n_pat
+    
+    difference = difference_list_tupleor(tuple, tuples)
+    
+    n_pat = 0
+    
+    for (i = 1; i <= length(difference); i++) {
+        if (difference[i] == NULL) break
+        n_pat++
+    }
+    
+    if (n_pat == 0) {
+        return(1)
+    }
+    else {
+        // difference_list_tupleor() removes all the empty patterns
+        // So if there is anything, there are patterns of pattern not in tuples
+        return(0)
+    }
+}
+
+/////////////////////////////////////////////////////////////////// difference()
+
+`T' difference_tuple(`TUPLE' tuple, `T' pattern) {
+    if (structname(pattern) == "TupleEmpty") {
+        return(tuple)
+    }
+    if (structname(pattern) == "TupleWild") {
+        return((TupleEmpty()))
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(difference_tuple_tuple(tuple, pattern))
+    }
+    else if (structname(pattern) == "TupleOr") {
+        return(difference_tuple_tupleor(tuple, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+/*
+For two patterns of size n: (p_1, ...p_n) and (q_1, ..., q_n), we compute the
+difference recursively. For the first patterns p_1 and q_1 we compute the
+intersection inter_1, a pattern and the difference diff_1, a vectors of
+patterns.
+
+If n = 1, the difference is equal to diff_1.
+
+If n == 2, the difference is composed of two parts:
+    1. (diff_1, p_2), the combinaision of all the patterns in diff_n-1 with the pattern_n.
+    2. (inter_1, diff_2), the combinaison of inter_n-1 with all the patterns in diff_n if diff_n is non-empty.
+
+We recursively compute the difference between two tuples:
+    1. We compute the interesection and the difference between two fields
+    2. If they are the last fields, we return the difference
+    3. Else we enter the recursive parts
+        3.1 If
+
+We then compute the difference between the remaining fields
+(p_2, ..., p_n) and (q_2, ..., q_n).
+
+For the a field n, the difference is equal to diff_n. For a field (n-1),
+
+We recursively build the difference of all the fields up to the first one.
+*/
+`T' difference_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
+    `TUPLEOR' res_inter, res_diff, result, tuples
+    `POINTER' new_diff, main_pattern, other_pattern, field_inter
+    `POINTERS' field_diff
+    `TUPLE' new_main, new_other, new_diff_i
+    `REAL' i
+    
+    check_tuples(tuple_1, tuple_2)
+    
+    res_inter = new_tupleor()
+    res_diff = new_tupleor()
+    result = new_tupleor()
+    tuples = new_tupleor()
+    
+    // Compute the field difference
+    main_pattern = tuple_1.patterns[1]
+    other_pattern = tuple_2.patterns[1]
+
+    field_inter = &overlap(*main_pattern, *other_pattern)
+    field_diff = difference(*main_pattern, *other_pattern)
+
+    // If there are no other fields
+    if (length(tuple_1.patterns) == 1) {
+        if (field_diff[1, 1] != 0) {
+            push_tupleor(
+                res_diff,
+                tuple_from_patterns(&field_diff)
+            )
+        }
+    }
+    else {
+        // If the fields difference is empty there is no difference part
+        if (field_diff[1, 1] != 0) {
+            push_tupleor(
+                res_diff,
+                tuple_from_patterns((
+                    &field_diff,
+                    tuple_1.patterns[2..length(tuple_1.patterns)]
+                ))
+            )
+        }
+
+        // If the fields intersection is empty there is intersection part
+        if ((*field_inter)[1, 1] != 0) {
+            // Build two tuples with the reaining patterns
+            new_main.patterns = tuple_1.patterns[2..length(tuple_1.patterns)]
+            new_other.patterns = tuple_2.patterns[2..length(tuple_2.patterns)]
+
+            // Compute the difference
+            new_diff = &difference(new_main, new_other)
+
+            // If non empty, we fill the tuples
+            if (structname(*new_diff) == "Tuple") {
+                new_diff_i = *new_diff
+                push_tupleor(
+                    res_inter,
+                    tuple_from_patterns((
+                        field_inter, 
+                        new_diff_i.patterns
+                    ))
+                )
+            }
+            else if (structname(*new_diff) == "TupleOr") {
+                tuples = *new_diff
+                for (i = 1; i <= tuples.length; i++) {
+                    new_diff_i = *tuples.list[i]
+                    push_tupleor(
+                        res_inter,
+                        tuple_from_patterns((
+                            field_inter,
+                            new_diff_i.patterns
+                        ))
+                    )
+                }
+            }
+            else if (structname(*new_diff) != "TupleEmpty") {
+                unknown_pattern(*new_diff)
+            }
+        }
+    }
+    
+    push_tupleor(result, res_inter)
+    push_tupleor(result, res_diff)
+
+    return(compress(result))
+}
+
+`TUPLE' tuple_from_patterns(`POINTERS' patterns) {
+    `TUPLE' tuple
+
+    tuple.patterns = patterns
+    
+    return(tuple)
+}
+
+`T' difference_tuple_tupleor(`TUPLE' tuple, `TUPLEOR' tuples) {
+    `TUPLEOR' tuples_result
+    
+    tuples_result = new_tupleor()
+    
+    append_tupleor(tuples_result, difference_list_tupleor(tuple, tuples))
+    
+    return(compress(tuples_result))
+}
+
+// The result is NOT compressed
+`POINTER' difference_tupleor(`TUPLEOR' tuples, `T' pattern) {
+    if (structname(pattern) == "TupleEmpty") {
+        return(tuples)
+    }
+    if (structname(pattern) == "TupleWild") {
+        return((TupleEmpty()))
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(difference_tupleor_tuple(tuples, pattern))
+    }
+    else if (structname(pattern) == "TupleOr") {
+        return(difference_tupleor_tuple(tuples, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+`POINTER' difference_tupleor_tuple(`TUPLEOR' tuples, `T' tuple) {
+    `TUPLEOR' tuples_differences
+    `REAL' i
+    
+    tuples_differences = new_tupleor()
+    
+    // Loop over all patterns in Or and compute the difference
+    for (i = 1; i <= tuples.length; i++) {
+        push_tupleor(tuples_differences, difference(*tuples.list[i], tuple))
+    }
+    
+    if (tuples_differences.length == 0) {
+        return((TupleEmpty()))
+    }
+    else {
+        return(tuples_differences)
+    }
+}
+
+
+`POINTERS' difference_list_tupleor(`T' pattern, `TUPLEOR' tuples) {
+    `TUPLEOR' differences, new_differences
+    `REAL' i, j
+    
+    differences = new_tupleor()
+    
+    push_tupleor(differences, pattern)
+
+    // Loop over all pattern in Or
+    for (i = 1; i <= tuples.length; i++) {
+        new_differences = new_tupleor()
+
+        // Compute the difference
+        for (j = 1; j <= differences.length; j++) {
+            push_tupleor(
+                new_differences,
+                difference(*differences.list[j], *tuples.list[i])
+            )
+        }
+
+        // if we don't precise ".list" it creates a new instance
+        differences.list = new_differences.list
+        differences.length = new_differences.length
+        
+        if (new_differences.length == 0) {
+            break
+        }
+    }
+    
+    return(differences.list)
+}
+
+////////////////////////////////////////////////////////////////////////// Utils
+
+void check_tuples(`TUPLE' tuple_1, `TUPLE' tuple_2) {
+    if (length(tuple_1.patterns) != length(tuple_2.patterns)) {
+        errprintf(
+            "Different number of patter in tuples: %f != %f\n",
+            length(tuple_1.patterns), length(tuple_2.patterns)
+        )
+        exit(_error(3200))
+    }
+}
+
+void push_tupleor(`TUPLEOR' tuples, `T' pattern) {
+    // New fun :
+    // - with ref we create a ref to pattern
+    // - in a loop creates pattern takes the last value of the loop
+    // - we end up with all values equal to the last
+    // - we need to copy the value before creating the ref
+    // - for this we create a new variable to force the hard copy
+    // - we don't know the type of pattern/struct
+    // - we cannot use transmorphic because it drops the structname
+    // - we need to create one variable per pattern type
+    // - to avoid creating all object every time, this is done within functions
+    
+    // Ideally we should drop this but there might be bugs latter
+    if (tuples.length == .) {
+        tuples = new_tupleor()
+    }
+    
+    if (structname(pattern) == "TupleEmpty") {
+        // Ignore
+        return
+    }
+    else if (structname(pattern) == "TupleWild") {
+        return(push_tuples_copy_pwild(tuples, pattern))
+    }
+    else if (structname(pattern) == "TupleOr") {
+        append_tupleor_tupleor(tuples, pattern)
+    }
+    else if (structname(pattern) == "Tuple") {
+        return(push_tuples_copy_tuple(tuples, pattern))
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+}
+
+void push_tuples_copy_pwild(`TUPLEOR' tuples, `TUPLEWILD' tuplewild) {
+    struct TupleWild scalar wild_copy
+    
+    errprintf("TupleWild is not implemented yet, please come back latter")
+    exit(_error(3000))
+    
+    wild_copy = tuplewild
+    
+    tuples.list = &wild_copy, J(1, 7, NULL)
+    tuples.length = 1
+}
+
+void push_tuples_copy_tuple(`TUPLEOR' tuples, `TUPLE' tuple) {
     `TUPLE' tuple_copy
     
-    if (por.length == 1) {
-        if (structname(*por.patterns[1]) == "PWild") {
+    if (tuples.length == 1) {
+        if (structname(*tuples.list[1]) == "TupleWild") {
             return
         }
     }
     
-    if (por.length == length(por.patterns)) {
-        por.patterns = por.patterns, J(1, length(por.patterns), NULL)
+    if (tuples.length == length(tuples.list)) {
+        tuples.list = tuples.list, J(1, length(tuples.list), NULL)
     }
     
     tuple_copy = tuple
     
-    por.length = por.length + 1
-    por.patterns[por.length] = &tuple_copy
+    tuples.length = tuples.length + 1
+    tuples.list[tuples.length] = &tuple_copy
 }
 
-void append(`OR' por, `POINTERS' patterns) {
+void append_tupleor(`TUPLEOR' tuples, `POINTERS' patterns) {
     `REAL' i, n_pat, n_pat_new
     
-    if (por.length == .) {
-        init_por(por)
+    if (tuples.length == .) {
+        tuples = new_tupleor()
     }
     
     n_pat = 0
@@ -1503,25 +1973,25 @@ void append(`OR' por, `POINTERS' patterns) {
         return
     }
     
-    if (por.length + n_pat >= length(por.patterns)) {
+    if (tuples.length + n_pat >= length(tuples.list)) {
         // Get the next power of 2 number of patterns
-        n_pat_new = por.length + n_pat
+        n_pat_new = tuples.length + n_pat
         n_pat_new = log(n_pat_new) / log(2)
         n_pat_new = ceil(n_pat_new)
         n_pat_new = exp(n_pat_new * log(2))
-        por.patterns = por.patterns, J(1, n_pat_new, NULL)
+        tuples.list = tuples.list, J(1, n_pat_new, NULL)
     }
     
-    por.patterns[(por.length + 1)..(por.length + n_pat)] = patterns[1..n_pat]
-    por.length = por.length + n_pat
+    tuples.list[(tuples.length + 1)..(tuples.length + n_pat)] = patterns[1..n_pat]
+    tuples.length = tuples.length + n_pat
 }
 
-void append_por(`OR' por_1, `OR' por_2) {
-    if (por_2.length == 0) {
+void append_tupleor_tupleor(`TUPLEOR' tuples_1, `TUPLEOR' tuples_2) {
+    if (tuples_2.length == 0) {
         return
     }
     else {
-        append(por_1, por_2.patterns[1..por_2.length])
+        append_tupleor(tuples_1, tuples_2.list[1..tuples_2.length])
     }
 }
 
@@ -1549,7 +2019,7 @@ struct Htable scalar htable_create(transmorphic scalar default_key, |real scalar
         capacity = `CAPACITY'
     }
     
-    H = Htable()
+    H          = Htable()
     H.capacity = capacity
     H.N        = 0
     H.dkey     = default_key 
@@ -1622,17 +2092,18 @@ void htable_expand(struct Htable H) {
 transmorphic colvector htable_keys(struct Htable H) {
     return(sort(select(H.keys, H.status)', 1))
 }
+
 end
 
 
 **#*********************************************************** src/variable.mata
 
 mata
-class Variable vector function init_variables(string scalar vars_exp, real scalar check) {
-    class Variable vector variables
-    pointer scalar t
-    real scalar i, n_vars
-    string vector vars_str
+`VARIABLES' init_variables(`STRING' vars_exp, `REAL' check) {
+    `VARIABLES' variables
+    `POINTER'   t
+    `REAL'      i, n_vars
+    `STRINGS'   vars_str
     
     t = tokeninit()
     tokenset(t, vars_exp)
@@ -1652,9 +2123,9 @@ class Variable vector function init_variables(string scalar vars_exp, real scala
 
 void Variable::new() {}
 
-string scalar Variable::to_string() {
+`STRING' Variable::to_string() {
     string rowvector levels_str
-    real scalar i
+    `REAL' i
 
     levels_str = J(1, length(this.levels), "")
 
@@ -1679,7 +2150,7 @@ void Variable::print() {
     printf("%s", this.to_string())
 }
 
-void Variable::init(string scalar variable, real scalar check) {
+void Variable::init(`STRING' variable, `REAL' check) {
     this.name = variable
     this.levels_len = 0
     this.min = .a
@@ -1692,7 +2163,7 @@ void Variable::init(string scalar variable, real scalar check) {
 }
 
 void Variable::init_type() {
-    string scalar var_type
+    `STRING' var_type
 
     var_type = st_vartype(this.name)
     this.stata_type = var_type
@@ -1812,7 +2283,7 @@ void Variable::init_levels_float_base() {
 // Removed some things not needed such as the frequency
 // Benchmarks in dev/benchmark/levelsof_strL.do
 void Variable::init_levels_strL() {
-    string scalar n_init, indices
+    `STRING' n_init, indices
     real matrix cond, i, w
     
     n_init = st_tempname()
@@ -1838,7 +2309,7 @@ void Variable::init_levels_strN() {
 }
 
 void Variable::init_levels_tab() {
-    string scalar matname
+    `STRING' matname
     
     matname = st_tempname()
     
@@ -1890,8 +2361,8 @@ void Variable::init_levels_hash() {
 }
 
 real scalar Variable::should_tab() {
-    real scalar     n, s, N, S, multi
-    string scalar   state
+    `REAL'          n, s, N, S, multi
+    `STRING'        state
     real colvector  x, y
     real matrix     t
     
@@ -1922,7 +2393,7 @@ real scalar Variable::should_tab() {
 }
 
 void Variable::quote_levels() {
-    real scalar i
+    `REAL' i
     
     for (i = 1; i <= length(this.levels); i++) {
         this.levels[i] = `"""' + this.levels[i] + `"""'
@@ -1930,7 +2401,7 @@ void Variable::quote_levels() {
 }
 
 real scalar Variable::get_level_index(transmorphic scalar level) {
-    real scalar index
+    `REAL' index
     
     if (this.sorted == 1) {
         index = binary_search(&this.levels, this.levels_len, level)
@@ -1952,8 +2423,8 @@ real scalar Variable::get_level_index(transmorphic scalar level) {
     return(index)
 }
 
-real scalar function binary_search(pointer(transmorphic vector) vec, real scalar length, transmorphic scalar value) {
-    real scalar left, right, i
+real scalar binary_search(pointer(transmorphic vector) vec, `REAL' length, transmorphic scalar value) {
+    `REAL' left, right, i
     transmorphic scalar val
     
     left = 1
@@ -2025,7 +2496,8 @@ real scalar Variable::get_type_nb() {
     }
     else {
         // TODO: improve error
-        exit(1)
+        errprintf("Unknown variable type %s", this.type)
+        exit(_error(3300))
     }
 }
 
@@ -2035,7 +2507,7 @@ real scalar Variable::get_type_nb() {
 real colvector Variable::reorder_levels() {
     real vector indices, new_indices
     transmorphic matrix table
-    real scalar i, k
+    `REAL' i, k
     
     if (this.type != "string" | this.check == 1) {
         // TODO: improve error
@@ -2079,7 +2551,7 @@ end
 
 mata
 // From levelsof functions
-real scalar multiplicity(real scalar s, real scalar n) {
+real scalar multiplicity(`REAL' s, `REAL' n) {
         return(1/(1 - (s/n)^(1/(n - 1))))
 }
 end
@@ -2106,16 +2578,16 @@ void Arm::print() {
 }
 
 void function eval_arms(
-    string scalar varname,
-    class Arm vector arms,
-    class Variable vector variables,
-    real   scalar gen_first,
-    string scalar dtype
+    `STRING' varname,
+    `ARMS' arms,
+    `VARIABLES' variables,
+    `REAL' gen_first,
+    `STRING' dtype
 ) {
-    class Arm scalar arm
-    pointer scalar pattern
-    string scalar command, condition, statement
-    real scalar i, n, _rc
+    `ARM' arm
+    `POINTER' pattern
+    `STRING' command, condition, statement
+    `REAL' i, n, _rc
 
     n = length(arms)
     
@@ -2166,13 +2638,9 @@ end
 
 mata
 
-class Arm vector function parse_string(
-        string scalar str,
-        class Variable vector variables,
-        real scalar check
-) {
-    class Arm vector arms
-    pointer scalar t
+`ARMS' parse_string(`STRING' str, `VARIABLES' variables, `REAL' check) {
+    `ARMS' arms
+    `POINTER' t
 
     t = tokenize(str)
 
@@ -2185,20 +2653,21 @@ class Arm vector function parse_string(
     return(arms)
 }
 
-class Arm vector function parse_arms (
-        pointer t,
-        class Variable vector variables
-) {
-    class Arm scalar arm
-    class Arm vector arms
-    real scalar i
+`ARMS' parse_arms(`POINTER' t, `VARIABLES' variables) {
+    `ARM' arm
+    `ARMS' arms
+    `REAL' i
 
     arms = Arm(0)
     i = 0
 
     while (tokenpeek(t) != "") {
         arm = parse_arm(t, ++i, variables)
-        if (structname(*arm.lhs.pattern) == "PEmpty") {
+        
+        if (structname(*arm.lhs.pattern) == "TupleEmpty") {
+            errprintf("Arm %f is considered empty\n", i)
+        }
+        else if (isreal(*arm.lhs.pattern) & (*arm.lhs.pattern)[1, 1] == `EMPTY_TYPE') {
             errprintf("Arm %f is considered empty\n", i)
         }
         else {
@@ -2209,12 +2678,8 @@ class Arm vector function parse_arms (
     return(arms)
 }
 
-class Arm scalar function parse_arm(
-        pointer t,
-        real scalar arm_id,
-        class Variable vector variables
-    ) {
-    class Arm scalar arm
+`ARM' parse_arm(`POINTER' t, `REAL' arm_id, `VARIABLES' variables) {
+    `ARM' arm
 
     arm.id = arm_id
     arm.lhs.arm_id = arm_id
@@ -2223,7 +2688,7 @@ class Arm scalar function parse_arm(
         arm.lhs.pattern = &parse_or(t, variables[1], arm_id)
     }
     else {
-        arm.lhs.pattern = &parse_tuples(t, variables, arm_id)
+        arm.lhs.pattern = &parse_tupleor(t, variables, arm_id)
     }
 
     check_next(t, "=", arm_id)
@@ -2235,13 +2700,9 @@ class Arm scalar function parse_arm(
     return(arm)
 }
 
-transmorphic scalar function parse_pattern(
-    pointer t,
-    class Variable scalar variable,
-    real scalar arm_id
-) {
-    string scalar tok, var_label
-    real scalar number
+`PATTERN' parse_pattern(`POINTER' t, `VARIABLE' variable, `REAL' arm_id) {
+    `STRING' tok, var_label
+    `REAL' number
 
     tok = tokenget(t)
 
@@ -2253,10 +2714,10 @@ transmorphic scalar function parse_pattern(
             number = variable.get_level_index(tok)
             if (number == 0) {
                 errprintf("Unknown level : %s\n", tok)
-                return(PEmpty())
+                return(new_pempty())
             }
             else {
-                return(parse_constant(number))
+                return(parse_constant(number, variable))
             }
         }
         else {
@@ -2323,52 +2784,49 @@ transmorphic scalar function parse_pattern(
     }
 }
 
-transmorphic scalar function parse_number(
-    pointer t,
-    real scalar number,
-    real scalar arm_id,
-    class Variable scalar variable
+`PATTERN' parse_number(
+    `POINTER' t,
+    `REAL' number,
+    `REAL' arm_id,
+    `VARIABLE' variable
 ) {
-    string scalar next
+    `STRING' next
 
     next = tokenpeek(t)
+    
     if (israngesym(next)) {
         (void) tokenget(t)
         return(parse_range(t, next, number, arm_id, variable))
     }
     else {
-        return(parse_constant(number))
+        return(parse_constant(number, variable))
     }
 }
 
 ///////////////////////////////////////////////////////////////// Parse patterns
 
-struct PWild scalar function parse_wild(class Variable scalar variable) {
-    struct PWild scalar pwild
-    define_pwild(pwild, variable)
-    return(pwild)
+`EMPTY' parse_empty(`VARIABLE' variable) {
+    return(new_pempty())
 }
 
-struct PEmpty scalar function parse_empty() {
-    return(PEmpty())
+`WILD' parse_wild(`VARIABLE' variable) {
+    return(new_pwild(variable))
 }
 
-struct PConstant scalar function parse_constant(transmorphic scalar value) {
-    class PConstant scalar pconstant
-    define_pconstant(pconstant, value)
-    return(pconstant)
+`CONSTANT' parse_constant(`REAL' value, `VARIABLE' variable) {
+    return(new_pconstant(value, variable.get_type_nb()))
 }
 
-struct PRange scalar function parse_range(
-    pointer scalar t,
-    string scalar symbole,
-    real scalar min,
-    real scalar arm_id,
-    class Variable scalar variable
+`RANGE' parse_range(
+    `POINTER' t,
+    `STRING' symbole,
+    `REAL' min,
+    `REAL' arm_id,
+    `VARIABLE' variable
 ) {
-    struct PRange scalar prange
-    string scalar next
-    real scalar max, epsilon
+    `RANGE' prange
+    `STRING' next
+    `REAL' max, epsilon, var_type
     
     next = tokenget(t)
     
@@ -2386,36 +2844,37 @@ struct PRange scalar function parse_range(
         }
     }
     
+    var_type = variable.get_type_nb()
+    
     if (symbole == "/") {
     }
     else if (symbole == "!/") {
-        min = min + get_epsilon(min, variable.get_type_nb())
+        min = min + get_epsilon(min, var_type)
     }
     else if (symbole == "/!") {
-        max = max - get_epsilon(max, variable.get_type_nb())
+        max = max - get_epsilon(max, var_type)
     }
     else if (symbole == "!!") {
-        min = min + get_epsilon(min, variable.get_type_nb())
-        max = max - get_epsilon(max, variable.get_type_nb())
+        min = min + get_epsilon(min, var_type)
+        max = max - get_epsilon(max, var_type)
     }
     else {
-        "Unexpected symbole: " + symbole
+        errprintf("Unexpected symbole: %s\n", symbole)
+        exit(_error(3498))
     }
 
-    define_prange(prange, min, max, variable.get_type_nb())
-
-    return(prange)
+    return(new_prange(min, max, var_type))
 }
 
 // We to shift the epsilon depending on the precision of x in base 2
-real scalar get_epsilon(real scalar x, real scalar type_nb) {
-    real scalar epsilon, epsilon0, x_log2, epsilon_log2, epsilon0_log2
+`REAL' get_epsilon(`REAL' x, `REAL' type_nb) {
+    `REAL' epsilon, epsilon0, x_log2, epsilon_log2, epsilon0_log2
     
     // We define epsilon and epsilon0 depending on the type
     //    epsilon  is the smallest 'e' such that x != x + e
     //    epsilon0 is the smallest 'e' such that 0 != 0 + e
     
-    if (type_nb == 1) {
+    if (type_nb == 1 | type_nb == 4) {
         return(1)
     }
     else if (type_nb == 2) {
@@ -2427,8 +2886,7 @@ real scalar get_epsilon(real scalar x, real scalar type_nb) {
         epsilon0 = 1.0000000000000X-3fe
     }
     else {
-        // TODO: improve error
-        errprintf("Expected a variable type 1, 2 or 3, found %f", type_nb)
+        errprintf("Expected a variable type 1, 2, 3 or 4, found %f", type_nb)
         exit(_error(3250))
     }
     
@@ -2446,33 +2904,37 @@ real scalar get_epsilon(real scalar x, real scalar type_nb) {
     }
 }
 
-struct POr scalar function parse_or(
-    pointer t,
-    class Variable scalar variable,
-    real scalar arm_id
-) {
-    struct POr scalar por
+`OR' parse_or(`POINTER' t, `VARIABLE' variable, `REAL' arm_id) {
+    `OR' por
+    `PATTERN' pat
 
-    init_por(por)
+    por = new_por()
     
     do {
-        push_por(por, parse_pattern(t, variable, arm_id))
+        pat = parse_pattern(t, variable, arm_id)
+        
+        if (pat[1, 1] == `WILD_TYPE') {
+            return(pat)
+        }
+        else {
+            push_por(por, pat)
+        }
     } while (match_next(t, "|"))
 
     return(compress_por(por))
 }
 
-struct Tuple scalar function parse_tuple(
-    pointer t,
-    class Variable vector variables,
-    real scalar arm_id
-) {
-    struct Tuple scalar tuple
-    real scalar i
+`TUPLE' parse_tuple(`POINTER' t, `VARIABLES' variables, `REAL' arm_id) {
+    `TUPLE' tuple
+    `REAL' i
 
     tuple.patterns = J(1, length(variables), NULL)
 
     i = 0
+    
+    if (tokenpeek(t) == "_") {
+        return(TupleWild())
+    }
     
     check_next(t, "(", arm_id)
 
@@ -2502,35 +2964,28 @@ struct Tuple scalar function parse_tuple(
     return(tuple)
 }
 
-struct POr scalar function parse_tuples(
-    pointer t,
-    class Variable vector variables,
-    real scalar arm_id
-) {
-    struct POr scalar por
+`TUPLEOR' parse_tupleor(`POINTER' t, `VARIABLES' variables, `REAL' arm_id) {
+    `TUPLEOR' tuples
     
-    init_por(por)
+    tuples = new_tupleor()
 
     do {
-        push_por(por, parse_tuple(t, variables, arm_id))
+        push_tupleor(tuples, parse_tuple(t, variables, arm_id))
     } while (match_next(t, "|"))
     
-    return(compress_por(por))
+    return(compress_tupleor(tuples))
 }
 
 //////////////////////////////////////////////////////////////////// Parse Value
 
-string scalar function parse_value(pointer t) {
-    string scalar value
-
-    value = consume(t, ",")
-    return(value)
+`STRING' parse_value(`POINTER' t) {
+    return(consume(t, ","))
 }
 
 ////////////////////////////////////////////////////////////////////////// Utils
 
-pointer scalar function tokenize(string scalar str) {
-    pointer scalar t
+`POINTER' tokenize(`STRING' str) {
+    `POINTER' t
     
     t = tokeninitstata()
     tokenpchars(t, ("=", ",", "/", "!/", "/!", "!!", "(", ")", "|"))
@@ -2539,8 +2994,8 @@ pointer scalar function tokenize(string scalar str) {
     return(t)
 }
 
-string scalar function consume(pointer t, string scalar str) {
-    string scalar tok, inside, value
+`STRING' consume(`POINTER' t, `STRING' str) {
+    `STRING' tok, inside, value
 
     value = ""
     while (tokenpeek(t) != str & tokenpeek(t) != "") {
@@ -2554,8 +3009,8 @@ string scalar function consume(pointer t, string scalar str) {
     return(value)
 }
 
-real scalar function match_next(pointer t, string scalar str) {
-    string scalar next
+`REAL' match_next(`POINTER' t, `STRING' str) {
+    `STRING' next
     
     next = tokenpeek(t)
     
@@ -2568,8 +3023,8 @@ real scalar function match_next(pointer t, string scalar str) {
     }
 }
 
-void function check_next(pointer t, string scalar str, real scalar arm_id) {
-    string scalar next
+void check_next(`POINTER' t, `STRING' str, `REAL' arm_id) {
+    `STRING' next
 
     next = tokenget(t)
     
@@ -2579,55 +3034,67 @@ void function check_next(pointer t, string scalar str, real scalar arm_id) {
     }
 }
 
-real scalar function isnumber(string scalar str) {
+`REAL' isnumber(`STRING' str) {
     return(str == "." | strtoreal(str) != .)
 }
 
-real scalar function isquoted(string scalar str) {
+`REAL' isquoted(`STRING' str) {
     return(strmatch(str, `""*""'))
 }
 
-string scalar function unquote(string scalar str) {
+`STRING' unquote(`STRING' str) {
     return(ustrregexra(str, `"(^"|"$)"', ""))
 }
 
-real scalar function israngesym(str) {
+`REAL' israngesym(`STRING' str) {
     return(str == "/" | str == "!/" | str == "/!" | str == "!!")
 }
 
-real scalar function check_wildcard(transmorphic scalar pattern) {
+`REAL' check_wildcard(`T' pattern) {
     if (eltype(pattern) == "pointer") {
         return(check_wildcard(*pattern))
     }
-    else if (structname(pattern) == "PEmpty") {
-        return(0)
+    else if (eltype(pattern) == "real") {
+        if (pattern[1, 1] == `EMPTY_TYPE') {
+            return(0)
+        }
+        else if (pattern[1, 1] == `WILD_TYPE') {
+            return(1)
+        }
+        else if (pattern[1, 1] == `CONSTANT_TYPE') {
+            return(0)
+        }
+        else if (pattern[1, 1] == `RANGE_TYPE') {
+            return(0)
+        }
+        else if (pattern[1, 1] == `OR_TYPE') {
+            return(check_wildcard_por(pattern))
+        }
     }
-    else if (structname(pattern) == "PWild") {
-        return(1)
+    else if (eltype(pattern) == "struct") {
+        if (structname(pattern) == "Tuple") {
+            return(check_wildcard_tuple(pattern))
+        }
+        else if (structname(pattern) == "TupleEmpty") {
+            return(0)
+        }
+        else if (structname(pattern) == "TupleWild") {
+            return(1)
+        }
+        else if (structname(pattern) == "TupleOr") {
+            return(check_wildcard_tupleor(pattern))
+        }
     }
-    else if (structname(pattern) == "PConstant") {
-        return(0)
-    }
-    else if (structname(pattern) == "PRange") {
-        return(0)
-    }
-    else if (structname(pattern) == "POr") {
-        return(check_wildcard_por(pattern))
-    }
-    else if (structname(pattern) == "Tuple") {
-        return(check_wildcard_tuple(pattern))
-    }
-    else {
-        // From pattern.mata
-        unknown_pattern(pattern)
-    }
+    
+    // If no early return
+    unknown_pattern(pattern)
 }
 
-real scalar function check_wildcard_por(struct POr scalar por) {
-    real scalar i
+`REAL' check_wildcard_por(`OR' por) {
+    `REAL' i
     
-    for (i = 1; i <= por.length; i++) {
-        if (check_wildcard(*por.patterns[i]) == 1) {
+    for (i = 1; i <= por[1, 2]; i++) {
+        if (check_wildcard(por[i + 1, 1]) == 1) {
             return(1)
         }
     }
@@ -2635,8 +3102,8 @@ real scalar function check_wildcard_por(struct POr scalar por) {
     return(0)
 }
 
-real scalar function check_wildcard_tuple(struct Tuple scalar tuple) {
-    real scalar i
+`REAL' check_wildcard_tuple(`TUPLE' tuple) {
+    `REAL' i
     
     for (i = 1; i <= length(tuple.patterns); i++) {
         if (check_wildcard(*tuple.patterns[i]) == 1) {
@@ -2647,11 +3114,20 @@ real scalar function check_wildcard_tuple(struct Tuple scalar tuple) {
     return(0)
 }
 
-void function reorder_levels(
-    class Arm vector arms,
-    class Variable vector variables
-) {
-    real scalar i
+`REAL' check_wildcard_tupleor(`TUPLEOR' tuples) {
+    `REAL' i
+    
+    for (i = 1; i <= tuples.length; i++) {
+        if (check_wildcard(*tuples.list[i]) == 1) {
+            return(1)
+        }
+    }
+    
+    return(0)
+}
+
+void reorder_levels(`ARMS' arms, `VARIABLES' variables) {
+    `REAL' i
     pointer(real colvector) vector tables
     
     tables = J(1, length(variables), NULL)
@@ -2668,100 +3144,146 @@ void function reorder_levels(
     }
 }
 
-void function reindex_levels_arms(
-    class Arm vector arms,
+void reindex_levels_arms(
+    `ARMS' arms,
     pointer(real colvector) vector tables
 ) {
-    real scalar i
+    `REAL' i
     
     // Get a list of vector to recast indices
-    for (i = 1; i < length(arms); i++) {
+    for (i = 1; i <= length(arms); i++) {
         reindex_levels_arm(arms[i], tables)
     }
 }
 
-void function reindex_levels_arm(
-    class Arm scalar arm,
+void reindex_levels_arm(
+    `ARM' arm,
     pointer(real colvector) vector tables
 ) {
-    reindex_levels_pattern(*arm.lhs.pattern, tables)
+    reindex_levels_pattern(*arm.lhs.pattern, 1, tables)
 }
 
-void function reindex_levels_pattern(
-    transmorphic scalar pattern,
+void reindex_levels_pattern(
+    `T' pattern,
+    `REAL' index,
     pointer(real colvector) vector tables
 ) {
-    if (structname(pattern) == "PEmpty") {
-        // Nothing
+    if (eltype(pattern) == "real") {
+        if (pattern[1, 1] == `EMPTY_TYPE') {
+            // Nothing
+        }
+        else if (pattern[index, 1] == `WILD_TYPE') {
+            reindex_levels_pwild(pattern, index, tables)
+        }
+        else if (pattern[index, 1] == `CONSTANT_TYPE') {
+            reindex_levels_pconstant(pattern, index, tables)
+        }
+        else if (pattern[index, 1] == `RANGE_TYPE') {
+            reindex_levels_prange(pattern, index, tables)
+        }
+        else if (pattern[index, 1] == `OR_TYPE') {
+            reindex_levels_por(pattern, index, tables)
+        }
+        else {
+            unknown_pattern(pattern)
+        }
     }
-    else if (structname(pattern) == "PWild") {
-        reindex_levels_pwild(pattern, tables)
-    }
-    else if (structname(pattern) == "PConstant") {
-        reindex_levels_pconstant(pattern, tables)
-    }
-    else if (structname(pattern) == "PRange") {
-        reindex_levels_prange(pattern, tables)
-    }
-    else if (structname(pattern) == "POr") {
-        reindex_levels_por(pattern, tables)
-    }
-    else if (structname(pattern) == "Tuple") {
-        reindex_levels_tuple(pattern, tables)
+    else if (eltype(pattern) == "struct") {
+        if (structname(pattern) == "Tuple") {
+            reindex_levels_tuple(pattern, tables)
+        }
+        else if (structname(pattern) == "TupleEmpty") {
+            // Nothing
+        }
+        else if (structname(pattern) == "TupleWild") {
+            // TODO: Implement it
+            // reindex_levels_tuplewild(pattern, tables)
+            errprintf("Wild card for tuples is not implemented yet")
+            exit(9999)
+        }
+        else if (structname(pattern) == "TupleOr") {
+            reindex_levels_tupleor(pattern, tables)
+        }
+        else {
+            unknown_pattern(pattern)
+        }
     }
     else {
-        // TODO: improve error
         unknown_pattern(pattern)
     }
 }
 
-void function reindex_levels_pwild(
-    struct PWild scalar pwild,
+void reindex_levels_pwild(
+    `PATTERN' pwild,
+    `REAL' index,
     pointer(real colvector) vector tables
 ) {
-    reindex_levels_por(pwild.values, tables)
-}
-
-void function reindex_levels_pconstant(
-    struct PConstant scalar pconstant,
-    pointer(real colvector) scalar tables
-) {
-    if (tables != NULL) {
-        pconstant.value = (*tables)[pconstant.value]
-    }
-}
-
-void function reindex_levels_prange(
-    struct PRange scalar prange,
-    pointer(real colvector) scalar tables
-) {
-    if (tables != NULL) {
-        prange.min = (*tables)[prange.min]
-        prange.max = (*tables)[prange.max]
-    }
-}
-
-void function reindex_levels_por(
-    struct POr scalar por,
-    pointer(real colvector) vector tables
-) {
-    real scalar i
+    // Rebuild the wild pattern
     
-    for (i = 1; i <= por.length; i++) {
-        reindex_levels_pattern(*por.patterns[i], tables)
+    pwild = (`WILD_TYPE' \ J(length(*tables), 1, `CONSTANT_TYPE')) ,
+            (length(*tables) \ *tables),
+            (0 \ *tables),
+            J(length(*tables) + 1, 1, pwild[1, 4])
+}
+
+void reindex_levels_pconstant(
+    `PATTERN' pconstant,
+    `REAL' index,
+    pointer(real colvector) scalar tables
+) {
+    `REAL' value
+    
+    if (tables != NULL) {
+        value = (*tables)[pconstant[index, 2]]
+        pconstant[index, 2] = value
+        pconstant[index, 3] = value
     }
 }
 
-void function reindex_levels_tuple(
-    struct Tuple scalar tuple,
+void reindex_levels_prange(
+    `PATTERN' prange,
+    `REAL' index,
+    pointer(real colvector) scalar tables
+) {
+    if (tables != NULL) {
+        prange[index, 2] = (*tables)[prange[index, 2]]
+        prange[index, 3] = (*tables)[prange[index, 3]]
+    }
+}
+
+void reindex_levels_por(
+    `PATTERN' por,
+    `REAL' index,
     pointer(real colvector) vector tables
 ) {
-    real scalar i
+    `REAL' i
+    
+    for (i = 1; i <= por[1, 2]; i++) {
+        reindex_levels_pattern(por, i + 1, tables)
+    }
+}
+
+void reindex_levels_tuple(
+    `TUPLE' tuple,
+    pointer(real colvector) vector tables
+) {
+    `REAL' i
     
     for (i = 1; i <= length(tuple.patterns); i++) {
         if (tables[i] != NULL) {
-            reindex_levels_pattern(tuple.patterns[i], tables[i])
+            reindex_levels_pattern(*tuple.patterns[i], 1, tables[i])
         }
+    }
+}
+
+void reindex_levels_tupleor(
+    `TUPLEOR' tuples,
+    pointer(real colvector) vector tables
+) {
+    `REAL' i
+    
+    for (i = 1; i <= tuples.length; i++) {
+        reindex_levels_pattern(*tuples.list[i], 1, tables)
     }
 }
 end
@@ -2804,10 +3326,7 @@ string vector Usefulness::to_string() {
             lhs = (*this.overlaps)[i]
             overlap = lhs.pattern
             
-            if (structname(*overlap) != "PEmpty") {
-                str = str,
-                    sprintf("    Arm %f: %s", lhs.arm_id, ::to_string(*overlap))
-            }
+            str = str, sprintf("    Arm %f: %s", lhs.arm_id, ::to_string(*overlap))
         }
     }
     
@@ -2853,14 +3372,19 @@ string vector Match_report::to_string() {
         return(strings)
     }
 
-    if (structname(*this.missings) == "PEmpty") {
+    if ((*this.missings)[1, 1] == `EMPTY_TYPE' | structname(*this.missings) == "TupleEmpty") {
         return(strings)
     }
 
     strings = strings, "Warning : Missing cases"
 
-    if (structname(*this.missings) == "POr") {
-        strings = strings, to_string_por(*this.missings)
+    if (eltype(*this.missings) == "real") {
+        if ((*this.missings)[1, 1] == `OR_TYPE') {
+            strings = strings, to_string_por(*this.missings)
+        }
+        else {
+            strings = strings, to_string_pattern((*this.missings)[1, .])
+        }
     }
     else {
         strings = strings, to_string_pattern(*this.missings)
@@ -2869,20 +3393,22 @@ string vector Match_report::to_string() {
     return(strings)
 }
 
-string scalar Match_report::to_string_pattern(transmorphic scalar pattern) {
+string scalar Match_report::to_string_pattern(`T' pattern) {
     return(sprintf("    %s", ::to_string(pattern)))
 }
 
-string vector Match_report::to_string_por(struct POr scalar por) {
+string vector Match_report::to_string_por(`POR' por) {
     string vector strings
-    real scalar i
+    `REAL' i, n_pat
+    
+    n_pat = por[1, 2]
 
-    strings = J(1, por.length, "")
-    
-    for (i = 1; i <= por.length; i++) {
-        strings[i] = this.to_string_pattern(*por.patterns[i])
+    strings = J(1, n_pat, "")
+
+    for (i = 1; i <= n_pat; i++) {
+        strings[i] = this.to_string_pattern(por[i + 1, .])
     }
-    
+
     return(strings)
 }
 
@@ -2903,20 +3429,18 @@ end
 
 **#********************************************************** src/algorithm.mata
 
+
 mata
 
 ////////////////////////////////////////////////////////////////// Main function
 
-void function check_match( ///
-        class Arm vector arms, ///
-        class Variable vector variables ///
-    ) {
+void function check_match(`ARMS' arms, `VARIABLES' variables) {
     class Match_report scalar report
     class Usefulness scalar usefulness
-    pointer scalar missings
-    class Arm scalar arm
-    class Arm vector useful_arms
-    real scalar i
+    `POINTER' missings
+    `ARM' arm
+    `ARMS' useful_arms
+    `REAL' i
 
     // bench_on("- usefulness")
     report.usefulness = check_useful(arms)
@@ -2950,12 +3474,12 @@ void function check_match( ///
 
 /////////////////////////////////////////////////////////////// Check usefulness
 
-function check_useful(class Arm vector arms) {
-    class Arm vector useful_arms
-    class Arm scalar new_arm
+class Usefulness vector check_useful(`ARMS' arms) {
+    `ARMS' useful_arms
+    `ARM' new_arm
     class Usefulness scalar usefulness
     class Usefulness vector usefulness_vec
-    real scalar i, n_arms
+    `REAL' i, n_arms
 
     useful_arms = Arm(0)
 
@@ -2983,17 +3507,16 @@ function check_useful(class Arm vector arms) {
     return(usefulness_vec)
 }
 
-class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
-    pointer scalar tuple, differences
+class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
+    `POINTER' tuple, differences, overlap_i
     struct LHS vector overlaps
     struct LHS scalar lhs_empty
     class Usefulness scalar result
-    class Arm scalar ref_arm
-    pointer scalar overlap_i
-    real scalar i, k
-
-    lhs_empty.pattern = &(PEmpty())
-
+    `ARM' ref_arm
+    `REAL' i, k
+    
+    lhs_empty.pattern = &new_pempty()
+    
     overlaps = LHS(length(useful_arms))
     
     tuple = arm.lhs.pattern
@@ -3021,12 +3544,12 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
         overlap_i = &overlap(*tuple, *ref_arm.lhs.pattern)
         // bench_off("+ Overlap()")
         
-        if (structname(*overlap_i) != "PEmpty") {
+        if ((*overlap_i)[1, 1] != `EMPTY_TYPE' & structname(*overlap_i) != "TupleEmpty") {
             k++
             overlaps[k].pattern = overlap_i
             overlaps[k].arm_id = ref_arm.id
             // bench_on("+ Difference()")
-            differences = difference(*differences, *overlap_i)
+            differences = &difference(*differences, *overlap_i)
             // bench_off("+ Difference()")
         }
     }
@@ -3045,7 +3568,7 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
         // Ensure that differences are compressed to remove this
         differences = &compress(*differences)
         
-        if (structname(*differences) == "PEmpty") {
+        if ((*differences)[1, 1] == `EMPTY_TYPE' | structname(*differences) == "TupleEmpty") {
             // If no pattern remains, the pattern is not useful
             result.useful = 0
             result.any_overlap = 1
@@ -3064,36 +3587,34 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
     return(result)
 }
 
-function get_and_compress(struct LHS vector overlaps, i) {
+`T' get_and_compress(struct LHS vector overlaps, i) {
     return(&compress(*overlaps[i].pattern))
 }
 
 ///////////////////////////////////////////////////////////// Check completeness
 
-class Tuple vector function check_exhaustiveness( ///
-        class Arm vector arms, ///
-        class Variable vector variables ///
-    ) {
-    class Arm scalar wild_arm
-    struct PWild vector pwilds
-    struct Tuple scalar tuple
+`T' check_exhaustiveness(`ARMS' arms, `VARIABLES' variables ) {
+    `ARM' wild_arm
+    pointer(`WILD') vector pwilds
+    `TUPLE' tuple
     class Usefulness scalar usefulness
-    real scalar i
-
-    pwilds = PWild(length(variables))
+    `REAL' i
+    
+    pwilds = J(length(variables), 1, NULL)
 
     for (i = 1; i <= length(variables); i++) {
-        define_pwild(pwilds[i], variables[i])
+        pwilds[i] = &new_pwild(variables[i])
+        (*pwilds[i])[1, 1] = `OR_TYPE'
     }
 
     if (length(variables) == 1) {
-        wild_arm.lhs.pattern = &pwilds[1].values
+        wild_arm.lhs.pattern = pwilds[1]
     }
     else {
         tuple.patterns = J(1, length(variables), NULL)
 
         for (i = 1; i <= length(variables); i++) {
-            tuple.patterns[i] = &pwilds[i].values
+            tuple.patterns[i] = pwilds[i]
         }
 
         wild_arm.lhs.pattern = &tuple
@@ -3102,7 +3623,7 @@ class Tuple vector function check_exhaustiveness( ///
     // bench_on("  - is_useful() 2")
     usefulness = is_useful(wild_arm, arms)
     // bench_off("  - is_useful() 2")
-
+    
     return(*usefulness.differences)
 }
 
@@ -3115,16 +3636,16 @@ end
 // The // bench_on() and // bench_off() functions are not used in the online code)
 
 mata
-function pmatch(
-    string scalar newvar,
-    string scalar vars_exp,
-    string scalar body,
-    real   scalar check,
-    real   scalar gen_first,
-    string scalar dtype
+void pmatch(
+    `STRING' newvar,
+    `STRING' vars_exp,
+    `STRING' body,
+    `REAL'   check,
+    `REAL'   gen_first,
+    `STRING' dtype
 ) {
-    class Variable vector variables
-    class Arm vector arms, useful_arms
+    `VARIABLES' variables
+    `ARMS' arms, useful_arms
 
     // bench_on("total")
     

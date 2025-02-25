@@ -1,9 +1,9 @@
 mata
-class Variable vector function init_variables(string scalar vars_exp, real scalar check) {
-    class Variable vector variables
-    pointer scalar t
-    real scalar i, n_vars
-    string vector vars_str
+`VARIABLES' init_variables(`STRING' vars_exp, `REAL' check) {
+    `VARIABLES' variables
+    `POINTER'   t
+    `REAL'      i, n_vars
+    `STRINGS'   vars_str
     
     t = tokeninit()
     tokenset(t, vars_exp)
@@ -23,9 +23,9 @@ class Variable vector function init_variables(string scalar vars_exp, real scala
 
 void Variable::new() {}
 
-string scalar Variable::to_string() {
+`STRING' Variable::to_string() {
     string rowvector levels_str
-    real scalar i
+    `REAL' i
 
     levels_str = J(1, length(this.levels), "")
 
@@ -50,7 +50,7 @@ void Variable::print() {
     printf("%s", this.to_string())
 }
 
-void Variable::init(string scalar variable, real scalar check) {
+void Variable::init(`STRING' variable, `REAL' check) {
     this.name = variable
     this.levels_len = 0
     this.min = .a
@@ -63,7 +63,7 @@ void Variable::init(string scalar variable, real scalar check) {
 }
 
 void Variable::init_type() {
-    string scalar var_type
+    `STRING' var_type
 
     var_type = st_vartype(this.name)
     this.stata_type = var_type
@@ -183,7 +183,7 @@ void Variable::init_levels_float_base() {
 // Removed some things not needed such as the frequency
 // Benchmarks in dev/benchmark/levelsof_strL.do
 void Variable::init_levels_strL() {
-    string scalar n_init, indices
+    `STRING' n_init, indices
     real matrix cond, i, w
     
     n_init = st_tempname()
@@ -209,7 +209,7 @@ void Variable::init_levels_strN() {
 }
 
 void Variable::init_levels_tab() {
-    string scalar matname
+    `STRING' matname
     
     matname = st_tempname()
     
@@ -261,8 +261,8 @@ void Variable::init_levels_hash() {
 }
 
 real scalar Variable::should_tab() {
-    real scalar     n, s, N, S, multi
-    string scalar   state
+    `REAL'          n, s, N, S, multi
+    `STRING'        state
     real colvector  x, y
     real matrix     t
     
@@ -293,7 +293,7 @@ real scalar Variable::should_tab() {
 }
 
 void Variable::quote_levels() {
-    real scalar i
+    `REAL' i
     
     for (i = 1; i <= length(this.levels); i++) {
         this.levels[i] = `"""' + this.levels[i] + `"""'
@@ -301,7 +301,7 @@ void Variable::quote_levels() {
 }
 
 real scalar Variable::get_level_index(transmorphic scalar level) {
-    real scalar index
+    `REAL' index
     
     if (this.sorted == 1) {
         index = binary_search(&this.levels, this.levels_len, level)
@@ -323,8 +323,8 @@ real scalar Variable::get_level_index(transmorphic scalar level) {
     return(index)
 }
 
-real scalar function binary_search(pointer(transmorphic vector) vec, real scalar length, transmorphic scalar value) {
-    real scalar left, right, i
+real scalar binary_search(pointer(transmorphic vector) vec, `REAL' length, transmorphic scalar value) {
+    `REAL' left, right, i
     transmorphic scalar val
     
     left = 1
@@ -396,7 +396,8 @@ real scalar Variable::get_type_nb() {
     }
     else {
         // TODO: improve error
-        exit(1)
+        errprintf("Unknown variable type %s", this.type)
+        exit(_error(3300))
     }
 }
 
@@ -406,7 +407,7 @@ real scalar Variable::get_type_nb() {
 real colvector Variable::reorder_levels() {
     real vector indices, new_indices
     transmorphic matrix table
-    real scalar i, k
+    `REAL' i, k
     
     if (this.type != "string" | this.check == 1) {
         // TODO: improve error
@@ -450,7 +451,7 @@ end
 
 mata
 // From levelsof functions
-real scalar multiplicity(real scalar s, real scalar n) {
+real scalar multiplicity(`REAL' s, `REAL' n) {
         return(1/(1 - (s/n)^(1/(n - 1))))
 }
 end

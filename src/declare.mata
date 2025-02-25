@@ -1,41 +1,87 @@
+//////////////////////////////////////////////////////////////////// Local types
+
+local T              transmorphic      matrix
+local POINTER        pointer           scalar
+local POINTERS       pointer           vector
+local REAL           real              scalar
+local STRING         string            scalar
+local STRINGS        string            vector
+
+local PATTERN        real              matrix
+
+local EMPTY          real              rowvector
+local WILD           real              matrix
+local CONSTANT       real              rowvector
+local RANGE          real              rowvector
+local OR             real              matrix
+
+local EMPTY_TYPE     0
+local WILD_TYPE      1
+local CONSTANT_TYPE  2
+local RANGE_TYPE     3
+local OR_TYPE        4
+
+local INT_TYPE       1
+local FLOAT_TYPE     2
+local DOUBLE_TYPE    3
+local STRING_TYPE    4
+
+local TUPLEEMPTY     struct TupleEmpty scalar
+local TUPLEOR        struct TupleOr    scalar
+local TUPLE          struct Tuple      scalar
+local TUPLEWILD      struct TupleWild  scalar
+
+local VARIABLE       class Variable    scalar
+local VARIABLES      class Variable    vector
+
+local ARM            class Arm         scalar
+local ARMS           class Arm         vector
+
 mata
 mata set matastrict on
 
 //////////////////////////////////////////////////////////////////////// Pattern
 
 // Empty pattern
-struct PEmpty { }
+// Simple vector with 4 columns
+// (0, 0, 0, 0)
 
 // Wild card '_'
-struct PWild {
-    // Members
-    struct POr scalar values                                                     // The union of all possible levels                                                            // Add new value to the patterns
-}
+// Matrix with first row for type
+// Following rows for levels patterns similar to POr
+// (1, number_values, 0, 0)
+// (...)
 
 // Constant
-struct PConstant {
-    real scalar value                                                           // The value (real or string index)
-}
+// Simple vector with 4 columns
+// (2, value, value, variable_type)
 
 // Real or Float Range
-struct PRange {
-    real scalar min                                                             // Minimum value
-    real scalar max                                                             // Maximum value
-    real scalar type_nb                                                         // 1 int, 2 float, 3 double
-}
+// Simple vector with 4 columns
+// (3, min, max, variable_type)
 
-// Or pattern, which is a list of pointers to patterns
-struct POr {
-    // Members
-    pointer vector patterns                                           // A dynamic array of patterns
-    real scalar length
-}
+// Or pattern
+// Matrix with first row for type and number of patterns
+// Following rows for patterns patterns similar to POr
+// (4, number_values, 0, 0)
+// (...)
+
+struct TupleEmpty { }
+
+struct TupleWild { }
 
 struct Tuple {
     // Members
     real scalar arm_id                                                          // The corresponding arm #
-    pointer vector patterns                                                     // An array of patterns
+    pointer(`PATTERN') vector patterns                                          // An array of patterns
 }
+
+struct TupleOr {
+    // Members
+    pointer(struct Tuple vector) scalar list                                    // A dynamic array of patterns
+    real scalar length
+}
+
 
 /////////////////////////////////////////////////////////////////////// Variable
 
@@ -84,9 +130,11 @@ struct Htable {
     transmorphic rowvector keys
     real         rowvector status
 }
+
 //////////////////////////////////////////////////////////////////////////// Arm
 
 // The condition part of the Arm
+
 struct LHS {
     real scalar arm_id                                                          // The arm #
     pointer scalar pattern                                                      // The corresponding patterns
@@ -106,6 +154,7 @@ class Arm {
 ///////////////////////////////////////////////////////////////////// Usefulness
 
 // The result after checking if an arm is useful
+
 class Usefulness {
     real scalar useful                                                          // 1 if the pattern is useful, 0 otherwize
     real scalar has_wildcard                                                    // 1 if the arm includes wild_cards, 0 otherwize
@@ -121,6 +170,7 @@ class Usefulness {
 }
 
 // The result of all the checks
+
 class Match_report {
     class Usefulness vector usefulness                                          // The usefulness of each arm
     pointer scalar missings                                                     // The missing patterns
@@ -131,4 +181,5 @@ class Match_report {
     string vector to_string_por()
     void print()
 }
+
 end

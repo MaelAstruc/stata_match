@@ -1,17 +1,15 @@
+
 mata
 
 ////////////////////////////////////////////////////////////////// Main function
 
-void function check_match( ///
-        class Arm vector arms, ///
-        class Variable vector variables ///
-    ) {
+void function check_match(`ARMS' arms, `VARIABLES' variables) {
     class Match_report scalar report
     class Usefulness scalar usefulness
-    pointer scalar missings
-    class Arm scalar arm
-    class Arm vector useful_arms
-    real scalar i
+    `POINTER' missings
+    `ARM' arm
+    `ARMS' useful_arms
+    `REAL' i
 
     // bench_on("- usefulness")
     report.usefulness = check_useful(arms)
@@ -45,12 +43,12 @@ void function check_match( ///
 
 /////////////////////////////////////////////////////////////// Check usefulness
 
-function check_useful(class Arm vector arms) {
-    class Arm vector useful_arms
-    class Arm scalar new_arm
+class Usefulness vector check_useful(`ARMS' arms) {
+    `ARMS' useful_arms
+    `ARM' new_arm
     class Usefulness scalar usefulness
     class Usefulness vector usefulness_vec
-    real scalar i, n_arms
+    `REAL' i, n_arms
 
     useful_arms = Arm(0)
 
@@ -78,17 +76,16 @@ function check_useful(class Arm vector arms) {
     return(usefulness_vec)
 }
 
-class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vector useful_arms) {
-    pointer scalar tuple, differences
+class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
+    `POINTER' tuple, differences, overlap_i
     struct LHS vector overlaps
     struct LHS scalar lhs_empty
     class Usefulness scalar result
-    class Arm scalar ref_arm
-    pointer scalar overlap_i
-    real scalar i, k
-
-    lhs_empty.pattern = &(PEmpty())
-
+    `ARM' ref_arm
+    `REAL' i, k
+    
+    lhs_empty.pattern = &new_pempty()
+    
     overlaps = LHS(length(useful_arms))
     
     tuple = arm.lhs.pattern
@@ -116,12 +113,12 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
         overlap_i = &overlap(*tuple, *ref_arm.lhs.pattern)
         // bench_off("+ Overlap()")
         
-        if (structname(*overlap_i) != "PEmpty") {
+        if ((*overlap_i)[1, 1] != `EMPTY_TYPE' & structname(*overlap_i) != "TupleEmpty") {
             k++
             overlaps[k].pattern = overlap_i
             overlaps[k].arm_id = ref_arm.id
             // bench_on("+ Difference()")
-            differences = difference(*differences, *overlap_i)
+            differences = &difference(*differences, *overlap_i)
             // bench_off("+ Difference()")
         }
     }
@@ -140,7 +137,7 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
         // Ensure that differences are compressed to remove this
         differences = &compress(*differences)
         
-        if (structname(*differences) == "PEmpty") {
+        if ((*differences)[1, 1] == `EMPTY_TYPE' | structname(*differences) == "TupleEmpty") {
             // If no pattern remains, the pattern is not useful
             result.useful = 0
             result.any_overlap = 1
@@ -159,36 +156,34 @@ class Usefulness scalar function is_useful(class Arm scalar arm, class Arm vecto
     return(result)
 }
 
-function get_and_compress(struct LHS vector overlaps, i) {
+`T' get_and_compress(struct LHS vector overlaps, i) {
     return(&compress(*overlaps[i].pattern))
 }
 
 ///////////////////////////////////////////////////////////// Check completeness
 
-class Tuple vector function check_exhaustiveness( ///
-        class Arm vector arms, ///
-        class Variable vector variables ///
-    ) {
-    class Arm scalar wild_arm
-    struct PWild vector pwilds
-    struct Tuple scalar tuple
+`T' check_exhaustiveness(`ARMS' arms, `VARIABLES' variables ) {
+    `ARM' wild_arm
+    pointer(`WILD') vector pwilds
+    `TUPLE' tuple
     class Usefulness scalar usefulness
-    real scalar i
-
-    pwilds = PWild(length(variables))
+    `REAL' i
+    
+    pwilds = J(length(variables), 1, NULL)
 
     for (i = 1; i <= length(variables); i++) {
-        define_pwild(pwilds[i], variables[i])
+        pwilds[i] = &new_pwild(variables[i])
+        (*pwilds[i])[1, 1] = `OR_TYPE'
     }
 
     if (length(variables) == 1) {
-        wild_arm.lhs.pattern = &pwilds[1].values
+        wild_arm.lhs.pattern = pwilds[1]
     }
     else {
         tuple.patterns = J(1, length(variables), NULL)
 
         for (i = 1; i <= length(variables); i++) {
-            tuple.patterns[i] = &pwilds[i].values
+            tuple.patterns[i] = pwilds[i]
         }
 
         wild_arm.lhs.pattern = &tuple
@@ -197,7 +192,7 @@ class Tuple vector function check_exhaustiveness( ///
     // bench_on("  - is_useful() 2")
     usefulness = is_useful(wild_arm, arms)
     // bench_off("  - is_useful() 2")
-
+    
     return(*usefulness.differences)
 }
 

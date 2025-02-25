@@ -7,8 +7,8 @@ clear all
 
 **#********************************************************************** Locals
 
-local pkg_version    = "0.0.15"
-local distrib_date   = "06 Oct 2024"
+local pkg_version    = "0.0.16"
+local distrib_date   = "25 Feb 2025"
 local stata_version  = "`c(version)'"
 local date_fmt       = string(date("`distrib_date'", "DMY"), "%tdDD/NN/CCYY")
 local pwd            = ustrregexra("`c(pwd)'", "\\", "/") + "/"
@@ -16,7 +16,10 @@ local pwd            = ustrregexra("`c(pwd)'", "\\", "/") + "/"
 mata
     files = (
         "src/declare.mata",
+        "src/utils.mata",
+        "src/interface.mata",
         "src/pattern.mata",
+        "src/tuples.mata",
         "src/htable.mata",
         "src/variable.mata",
         "src/arm.mata",
@@ -66,7 +69,7 @@ sthlp2pdf_dir "pkg"
 **#*********************************************************** Reinstall command
 
 capture net uninstall pmatch
-net install pmatch, from("`c(pwd)'/pkg")
+net install pmatch, replace from("`c(pwd)'/pkg")
 
 **#******************************************************************* Run tests
 
@@ -80,7 +83,7 @@ forvalues test_version = 8/`stata_version' {
     }
     
     do "dev/test/test.do" `add_log'
-
+    
     mata: exit_if_errors()
 }
 

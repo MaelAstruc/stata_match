@@ -18,14 +18,19 @@ string vector Match_report::to_string() {
         return(strings)
     }
 
-    if (structname(*this.missings) == "PEmpty") {
+    if ((*this.missings)[1, 1] == `EMPTY_TYPE' | structname(*this.missings) == "TupleEmpty") {
         return(strings)
     }
 
     strings = strings, "Warning : Missing cases"
 
-    if (structname(*this.missings) == "POr") {
-        strings = strings, to_string_por(*this.missings)
+    if (eltype(*this.missings) == "real") {
+        if ((*this.missings)[1, 1] == `OR_TYPE') {
+            strings = strings, to_string_por(*this.missings)
+        }
+        else {
+            strings = strings, to_string_pattern((*this.missings)[1, .])
+        }
     }
     else {
         strings = strings, to_string_pattern(*this.missings)
@@ -34,20 +39,22 @@ string vector Match_report::to_string() {
     return(strings)
 }
 
-string scalar Match_report::to_string_pattern(transmorphic scalar pattern) {
+string scalar Match_report::to_string_pattern(`T' pattern) {
     return(sprintf("    %s", ::to_string(pattern)))
 }
 
-string vector Match_report::to_string_por(struct POr scalar por) {
+string vector Match_report::to_string_por(`POR' por) {
     string vector strings
-    real scalar i
+    `REAL' i, n_pat
+    
+    n_pat = por[1, 2]
 
-    strings = J(1, por.length, "")
-    
-    for (i = 1; i <= por.length; i++) {
-        strings[i] = this.to_string_pattern(*por.patterns[i])
+    strings = J(1, n_pat, "")
+
+    for (i = 1; i <= n_pat; i++) {
+        strings[i] = this.to_string_pattern(por[i + 1, .])
     }
-    
+
     return(strings)
 }
 

@@ -147,8 +147,8 @@ function write_pkg(
     fput(fh_out, "d Distribution-Date: " + date_fmt)
     fput(fh_out, "")
     fput(fh_out, "f pmatch.ado")
-    fput(fh_out, "f ../docs/pmatch.sthlp")
-    fput(fh_out, "f ../docs/pmatch.pdf")
+    fput(fh_out, "f pmatch.sthlp")
+    fput(fh_out, "f pmatch.pdf")
     
     fclose(fh_out)
 }

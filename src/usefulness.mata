@@ -33,10 +33,7 @@ string vector Usefulness::to_string() {
             lhs = (*this.overlaps)[i]
             overlap = lhs.pattern
             
-            if (structname(*overlap) != "PEmpty") {
-                str = str,
-                    sprintf("    Arm %f: %s", lhs.arm_id, ::to_string(*overlap))
-            }
+            str = str, sprintf("    Arm %f: %s", lhs.arm_id, ::to_string(*overlap))
         }
     }
     

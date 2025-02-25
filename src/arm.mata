@@ -17,16 +17,16 @@ void Arm::print() {
 }
 
 void function eval_arms(
-    string scalar varname,
-    class Arm vector arms,
-    class Variable vector variables,
-    real   scalar gen_first,
-    string scalar dtype
+    `STRING' varname,
+    `ARMS' arms,
+    `VARIABLES' variables,
+    `REAL' gen_first,
+    `STRING' dtype
 ) {
-    class Arm scalar arm
-    pointer scalar pattern
-    string scalar command, condition, statement
-    real scalar i, n, _rc
+    `ARM' arm
+    `POINTER' pattern
+    `STRING' command, condition, statement
+    `REAL' i, n, _rc
 
     n = length(arms)
     

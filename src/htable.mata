@@ -17,7 +17,7 @@ struct Htable scalar htable_create(transmorphic scalar default_key, |real scalar
         capacity = `CAPACITY'
     }
     
-    H = Htable()
+    H          = Htable()
     H.capacity = capacity
     H.N        = 0
     H.dkey     = default_key 
@@ -90,4 +90,5 @@ void htable_expand(struct Htable H) {
 transmorphic colvector htable_keys(struct Htable H) {
     return(sort(select(H.keys, H.status)', 1))
 }
+
 end

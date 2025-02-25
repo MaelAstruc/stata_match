@@ -2,16 +2,16 @@
 // The // bench_on() and // bench_off() functions are not used in the online code)
 
 mata
-function pmatch(
-    string scalar newvar,
-    string scalar vars_exp,
-    string scalar body,
-    real   scalar check,
-    real   scalar gen_first,
-    string scalar dtype
+void pmatch(
+    `STRING' newvar,
+    `STRING' vars_exp,
+    `STRING' body,
+    `REAL'   check,
+    `REAL'   gen_first,
+    `STRING' dtype
 ) {
-    class Variable vector variables
-    class Arm vector arms, useful_arms
+    `VARIABLES' variables
+    `ARMS' arms, useful_arms
 
     // bench_on("total")
     

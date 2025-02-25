@@ -1,12 +1,8 @@
 mata
 
-class Arm vector function parse_string(
-        string scalar str,
-        class Variable vector variables,
-        real scalar check
-) {
-    class Arm vector arms
-    pointer scalar t
+`ARMS' parse_string(`STRING' str, `VARIABLES' variables, `REAL' check) {
+    `ARMS' arms
+    `POINTER' t
 
     t = tokenize(str)
 
@@ -19,20 +15,21 @@ class Arm vector function parse_string(
     return(arms)
 }
 
-class Arm vector function parse_arms (
-        pointer t,
-        class Variable vector variables
-) {
-    class Arm scalar arm
-    class Arm vector arms
-    real scalar i
+`ARMS' parse_arms(`POINTER' t, `VARIABLES' variables) {
+    `ARM' arm
+    `ARMS' arms
+    `REAL' i
 
     arms = Arm(0)
     i = 0
 
     while (tokenpeek(t) != "") {
         arm = parse_arm(t, ++i, variables)
-        if (structname(*arm.lhs.pattern) == "PEmpty") {
+        
+        if (structname(*arm.lhs.pattern) == "TupleEmpty") {
+            errprintf("Arm %f is considered empty\n", i)
+        }
+        else if (isreal(*arm.lhs.pattern) & (*arm.lhs.pattern)[1, 1] == `EMPTY_TYPE') {
             errprintf("Arm %f is considered empty\n", i)
         }
         else {
@@ -43,12 +40,8 @@ class Arm vector function parse_arms (
     return(arms)
 }
 
-class Arm scalar function parse_arm(
-        pointer t,
-        real scalar arm_id,
-        class Variable vector variables
-    ) {
-    class Arm scalar arm
+`ARM' parse_arm(`POINTER' t, `REAL' arm_id, `VARIABLES' variables) {
+    `ARM' arm
 
     arm.id = arm_id
     arm.lhs.arm_id = arm_id
@@ -57,7 +50,7 @@ class Arm scalar function parse_arm(
         arm.lhs.pattern = &parse_or(t, variables[1], arm_id)
     }
     else {
-        arm.lhs.pattern = &parse_tuples(t, variables, arm_id)
+        arm.lhs.pattern = &parse_tupleor(t, variables, arm_id)
     }
 
     check_next(t, "=", arm_id)
@@ -69,13 +62,9 @@ class Arm scalar function parse_arm(
     return(arm)
 }
 
-transmorphic scalar function parse_pattern(
-    pointer t,
-    class Variable scalar variable,
-    real scalar arm_id
-) {
-    string scalar tok, var_label
-    real scalar number
+`PATTERN' parse_pattern(`POINTER' t, `VARIABLE' variable, `REAL' arm_id) {
+    `STRING' tok, var_label
+    `REAL' number
 
     tok = tokenget(t)
 
@@ -87,10 +76,10 @@ transmorphic scalar function parse_pattern(
             number = variable.get_level_index(tok)
             if (number == 0) {
                 errprintf("Unknown level : %s\n", tok)
-                return(PEmpty())
+                return(new_pempty())
             }
             else {
-                return(parse_constant(number))
+                return(parse_constant(number, variable))
             }
         }
         else {
@@ -157,52 +146,49 @@ transmorphic scalar function parse_pattern(
     }
 }
 
-transmorphic scalar function parse_number(
-    pointer t,
-    real scalar number,
-    real scalar arm_id,
-    class Variable scalar variable
+`PATTERN' parse_number(
+    `POINTER' t,
+    `REAL' number,
+    `REAL' arm_id,
+    `VARIABLE' variable
 ) {
-    string scalar next
+    `STRING' next
 
     next = tokenpeek(t)
+    
     if (israngesym(next)) {
         (void) tokenget(t)
         return(parse_range(t, next, number, arm_id, variable))
     }
     else {
-        return(parse_constant(number))
+        return(parse_constant(number, variable))
     }
 }
 
 ///////////////////////////////////////////////////////////////// Parse patterns
 
-struct PWild scalar function parse_wild(class Variable scalar variable) {
-    struct PWild scalar pwild
-    define_pwild(pwild, variable)
-    return(pwild)
+`EMPTY' parse_empty(`VARIABLE' variable) {
+    return(new_pempty())
 }
 
-struct PEmpty scalar function parse_empty() {
-    return(PEmpty())
+`WILD' parse_wild(`VARIABLE' variable) {
+    return(new_pwild(variable))
 }
 
-struct PConstant scalar function parse_constant(transmorphic scalar value) {
-    class PConstant scalar pconstant
-    define_pconstant(pconstant, value)
-    return(pconstant)
+`CONSTANT' parse_constant(`REAL' value, `VARIABLE' variable) {
+    return(new_pconstant(value, variable.get_type_nb()))
 }
 
-struct PRange scalar function parse_range(
-    pointer scalar t,
-    string scalar symbole,
-    real scalar min,
-    real scalar arm_id,
-    class Variable scalar variable
+`RANGE' parse_range(
+    `POINTER' t,
+    `STRING' symbole,
+    `REAL' min,
+    `REAL' arm_id,
+    `VARIABLE' variable
 ) {
-    struct PRange scalar prange
-    string scalar next
-    real scalar max, epsilon
+    `RANGE' prange
+    `STRING' next
+    `REAL' max, epsilon, var_type
     
     next = tokenget(t)
     
@@ -220,36 +206,37 @@ struct PRange scalar function parse_range(
         }
     }
     
+    var_type = variable.get_type_nb()
+    
     if (symbole == "/") {
     }
     else if (symbole == "!/") {
-        min = min + get_epsilon(min, variable.get_type_nb())
+        min = min + get_epsilon(min, var_type)
     }
     else if (symbole == "/!") {
-        max = max - get_epsilon(max, variable.get_type_nb())
+        max = max - get_epsilon(max, var_type)
     }
     else if (symbole == "!!") {
-        min = min + get_epsilon(min, variable.get_type_nb())
-        max = max - get_epsilon(max, variable.get_type_nb())
+        min = min + get_epsilon(min, var_type)
+        max = max - get_epsilon(max, var_type)
     }
     else {
-        "Unexpected symbole: " + symbole
+        errprintf("Unexpected symbole: %s\n", symbole)
+        exit(_error(3498))
     }
 
-    define_prange(prange, min, max, variable.get_type_nb())
-
-    return(prange)
+    return(new_prange(min, max, var_type))
 }
 
 // We to shift the epsilon depending on the precision of x in base 2
-real scalar get_epsilon(real scalar x, real scalar type_nb) {
-    real scalar epsilon, epsilon0, x_log2, epsilon_log2, epsilon0_log2
+`REAL' get_epsilon(`REAL' x, `REAL' type_nb) {
+    `REAL' epsilon, epsilon0, x_log2, epsilon_log2, epsilon0_log2
     
     // We define epsilon and epsilon0 depending on the type
     //    epsilon  is the smallest 'e' such that x != x + e
     //    epsilon0 is the smallest 'e' such that 0 != 0 + e
     
-    if (type_nb == 1) {
+    if (type_nb == 1 | type_nb == 4) {
         return(1)
     }
     else if (type_nb == 2) {
@@ -261,8 +248,7 @@ real scalar get_epsilon(real scalar x, real scalar type_nb) {
         epsilon0 = 1.0000000000000X-3fe
     }
     else {
-        // TODO: improve error
-        errprintf("Expected a variable type 1, 2 or 3, found %f", type_nb)
+        errprintf("Expected a variable type 1, 2, 3 or 4, found %f", type_nb)
         exit(_error(3250))
     }
     
@@ -280,33 +266,37 @@ real scalar get_epsilon(real scalar x, real scalar type_nb) {
     }
 }
 
-struct POr scalar function parse_or(
-    pointer t,
-    class Variable scalar variable,
-    real scalar arm_id
-) {
-    struct POr scalar por
+`OR' parse_or(`POINTER' t, `VARIABLE' variable, `REAL' arm_id) {
+    `OR' por
+    `PATTERN' pat
 
-    init_por(por)
+    por = new_por()
     
     do {
-        push_por(por, parse_pattern(t, variable, arm_id))
+        pat = parse_pattern(t, variable, arm_id)
+        
+        if (pat[1, 1] == `WILD_TYPE') {
+            return(pat)
+        }
+        else {
+            push_por(por, pat)
+        }
     } while (match_next(t, "|"))
 
     return(compress_por(por))
 }
 
-struct Tuple scalar function parse_tuple(
-    pointer t,
-    class Variable vector variables,
-    real scalar arm_id
-) {
-    struct Tuple scalar tuple
-    real scalar i
+`TUPLE' parse_tuple(`POINTER' t, `VARIABLES' variables, `REAL' arm_id) {
+    `TUPLE' tuple
+    `REAL' i
 
     tuple.patterns = J(1, length(variables), NULL)
 
     i = 0
+    
+    if (tokenpeek(t) == "_") {
+        return(TupleWild())
+    }
     
     check_next(t, "(", arm_id)
 
@@ -336,35 +326,28 @@ struct Tuple scalar function parse_tuple(
     return(tuple)
 }
 
-struct POr scalar function parse_tuples(
-    pointer t,
-    class Variable vector variables,
-    real scalar arm_id
-) {
-    struct POr scalar por
+`TUPLEOR' parse_tupleor(`POINTER' t, `VARIABLES' variables, `REAL' arm_id) {
+    `TUPLEOR' tuples
     
-    init_por(por)
+    tuples = new_tupleor()
 
     do {
-        push_por(por, parse_tuple(t, variables, arm_id))
+        push_tupleor(tuples, parse_tuple(t, variables, arm_id))
     } while (match_next(t, "|"))
     
-    return(compress_por(por))
+    return(compress_tupleor(tuples))
 }
 
 //////////////////////////////////////////////////////////////////// Parse Value
 
-string scalar function parse_value(pointer t) {
-    string scalar value
-
-    value = consume(t, ",")
-    return(value)
+`STRING' parse_value(`POINTER' t) {
+    return(consume(t, ","))
 }
 
 ////////////////////////////////////////////////////////////////////////// Utils
 
-pointer scalar function tokenize(string scalar str) {
-    pointer scalar t
+`POINTER' tokenize(`STRING' str) {
+    `POINTER' t
     
     t = tokeninitstata()
     tokenpchars(t, ("=", ",", "/", "!/", "/!", "!!", "(", ")", "|"))
@@ -373,8 +356,8 @@ pointer scalar function tokenize(string scalar str) {
     return(t)
 }
 
-string scalar function consume(pointer t, string scalar str) {
-    string scalar tok, inside, value
+`STRING' consume(`POINTER' t, `STRING' str) {
+    `STRING' tok, inside, value
 
     value = ""
     while (tokenpeek(t) != str & tokenpeek(t) != "") {
@@ -388,8 +371,8 @@ string scalar function consume(pointer t, string scalar str) {
     return(value)
 }
 
-real scalar function match_next(pointer t, string scalar str) {
-    string scalar next
+`REAL' match_next(`POINTER' t, `STRING' str) {
+    `STRING' next
     
     next = tokenpeek(t)
     
@@ -402,8 +385,8 @@ real scalar function match_next(pointer t, string scalar str) {
     }
 }
 
-void function check_next(pointer t, string scalar str, real scalar arm_id) {
-    string scalar next
+void check_next(`POINTER' t, `STRING' str, `REAL' arm_id) {
+    `STRING' next
 
     next = tokenget(t)
     
@@ -413,55 +396,67 @@ void function check_next(pointer t, string scalar str, real scalar arm_id) {
     }
 }
 
-real scalar function isnumber(string scalar str) {
+`REAL' isnumber(`STRING' str) {
     return(str == "." | strtoreal(str) != .)
 }
 
-real scalar function isquoted(string scalar str) {
+`REAL' isquoted(`STRING' str) {
     return(strmatch(str, `""*""'))
 }
 
-string scalar function unquote(string scalar str) {
+`STRING' unquote(`STRING' str) {
     return(ustrregexra(str, `"(^"|"$)"', ""))
 }
 
-real scalar function israngesym(str) {
+`REAL' israngesym(`STRING' str) {
     return(str == "/" | str == "!/" | str == "/!" | str == "!!")
 }
 
-real scalar function check_wildcard(transmorphic scalar pattern) {
+`REAL' check_wildcard(`T' pattern) {
     if (eltype(pattern) == "pointer") {
         return(check_wildcard(*pattern))
     }
-    else if (structname(pattern) == "PEmpty") {
-        return(0)
+    else if (eltype(pattern) == "real") {
+        if (pattern[1, 1] == `EMPTY_TYPE') {
+            return(0)
+        }
+        else if (pattern[1, 1] == `WILD_TYPE') {
+            return(1)
+        }
+        else if (pattern[1, 1] == `CONSTANT_TYPE') {
+            return(0)
+        }
+        else if (pattern[1, 1] == `RANGE_TYPE') {
+            return(0)
+        }
+        else if (pattern[1, 1] == `OR_TYPE') {
+            return(check_wildcard_por(pattern))
+        }
     }
-    else if (structname(pattern) == "PWild") {
-        return(1)
+    else if (eltype(pattern) == "struct") {
+        if (structname(pattern) == "Tuple") {
+            return(check_wildcard_tuple(pattern))
+        }
+        else if (structname(pattern) == "TupleEmpty") {
+            return(0)
+        }
+        else if (structname(pattern) == "TupleWild") {
+            return(1)
+        }
+        else if (structname(pattern) == "TupleOr") {
+            return(check_wildcard_tupleor(pattern))
+        }
     }
-    else if (structname(pattern) == "PConstant") {
-        return(0)
-    }
-    else if (structname(pattern) == "PRange") {
-        return(0)
-    }
-    else if (structname(pattern) == "POr") {
-        return(check_wildcard_por(pattern))
-    }
-    else if (structname(pattern) == "Tuple") {
-        return(check_wildcard_tuple(pattern))
-    }
-    else {
-        // From pattern.mata
-        unknown_pattern(pattern)
-    }
+    
+    // If no early return
+    unknown_pattern(pattern)
 }
 
-real scalar function check_wildcard_por(struct POr scalar por) {
-    real scalar i
+`REAL' check_wildcard_por(`OR' por) {
+    `REAL' i
     
-    for (i = 1; i <= por.length; i++) {
-        if (check_wildcard(*por.patterns[i]) == 1) {
+    for (i = 1; i <= por[1, 2]; i++) {
+        if (check_wildcard(por[i + 1, 1]) == 1) {
             return(1)
         }
     }
@@ -469,8 +464,8 @@ real scalar function check_wildcard_por(struct POr scalar por) {
     return(0)
 }
 
-real scalar function check_wildcard_tuple(struct Tuple scalar tuple) {
-    real scalar i
+`REAL' check_wildcard_tuple(`TUPLE' tuple) {
+    `REAL' i
     
     for (i = 1; i <= length(tuple.patterns); i++) {
         if (check_wildcard(*tuple.patterns[i]) == 1) {
@@ -481,11 +476,20 @@ real scalar function check_wildcard_tuple(struct Tuple scalar tuple) {
     return(0)
 }
 
-void function reorder_levels(
-    class Arm vector arms,
-    class Variable vector variables
-) {
-    real scalar i
+`REAL' check_wildcard_tupleor(`TUPLEOR' tuples) {
+    `REAL' i
+    
+    for (i = 1; i <= tuples.length; i++) {
+        if (check_wildcard(*tuples.list[i]) == 1) {
+            return(1)
+        }
+    }
+    
+    return(0)
+}
+
+void reorder_levels(`ARMS' arms, `VARIABLES' variables) {
+    `REAL' i
     pointer(real colvector) vector tables
     
     tables = J(1, length(variables), NULL)
@@ -502,100 +506,146 @@ void function reorder_levels(
     }
 }
 
-void function reindex_levels_arms(
-    class Arm vector arms,
+void reindex_levels_arms(
+    `ARMS' arms,
     pointer(real colvector) vector tables
 ) {
-    real scalar i
+    `REAL' i
     
     // Get a list of vector to recast indices
-    for (i = 1; i < length(arms); i++) {
+    for (i = 1; i <= length(arms); i++) {
         reindex_levels_arm(arms[i], tables)
     }
 }
 
-void function reindex_levels_arm(
-    class Arm scalar arm,
+void reindex_levels_arm(
+    `ARM' arm,
     pointer(real colvector) vector tables
 ) {
-    reindex_levels_pattern(*arm.lhs.pattern, tables)
+    reindex_levels_pattern(*arm.lhs.pattern, 1, tables)
 }
 
-void function reindex_levels_pattern(
-    transmorphic scalar pattern,
+void reindex_levels_pattern(
+    `T' pattern,
+    `REAL' index,
     pointer(real colvector) vector tables
 ) {
-    if (structname(pattern) == "PEmpty") {
-        // Nothing
+    if (eltype(pattern) == "real") {
+        if (pattern[1, 1] == `EMPTY_TYPE') {
+            // Nothing
+        }
+        else if (pattern[index, 1] == `WILD_TYPE') {
+            reindex_levels_pwild(pattern, index, tables)
+        }
+        else if (pattern[index, 1] == `CONSTANT_TYPE') {
+            reindex_levels_pconstant(pattern, index, tables)
+        }
+        else if (pattern[index, 1] == `RANGE_TYPE') {
+            reindex_levels_prange(pattern, index, tables)
+        }
+        else if (pattern[index, 1] == `OR_TYPE') {
+            reindex_levels_por(pattern, index, tables)
+        }
+        else {
+            unknown_pattern(pattern)
+        }
     }
-    else if (structname(pattern) == "PWild") {
-        reindex_levels_pwild(pattern, tables)
-    }
-    else if (structname(pattern) == "PConstant") {
-        reindex_levels_pconstant(pattern, tables)
-    }
-    else if (structname(pattern) == "PRange") {
-        reindex_levels_prange(pattern, tables)
-    }
-    else if (structname(pattern) == "POr") {
-        reindex_levels_por(pattern, tables)
-    }
-    else if (structname(pattern) == "Tuple") {
-        reindex_levels_tuple(pattern, tables)
+    else if (eltype(pattern) == "struct") {
+        if (structname(pattern) == "Tuple") {
+            reindex_levels_tuple(pattern, tables)
+        }
+        else if (structname(pattern) == "TupleEmpty") {
+            // Nothing
+        }
+        else if (structname(pattern) == "TupleWild") {
+            // TODO: Implement it
+            // reindex_levels_tuplewild(pattern, tables)
+            errprintf("Wild card for tuples is not implemented yet")
+            exit(9999)
+        }
+        else if (structname(pattern) == "TupleOr") {
+            reindex_levels_tupleor(pattern, tables)
+        }
+        else {
+            unknown_pattern(pattern)
+        }
     }
     else {
-        // TODO: improve error
         unknown_pattern(pattern)
     }
 }
 
-void function reindex_levels_pwild(
-    struct PWild scalar pwild,
+void reindex_levels_pwild(
+    `PATTERN' pwild,
+    `REAL' index,
     pointer(real colvector) vector tables
 ) {
-    reindex_levels_por(pwild.values, tables)
-}
-
-void function reindex_levels_pconstant(
-    struct PConstant scalar pconstant,
-    pointer(real colvector) scalar tables
-) {
-    if (tables != NULL) {
-        pconstant.value = (*tables)[pconstant.value]
-    }
-}
-
-void function reindex_levels_prange(
-    struct PRange scalar prange,
-    pointer(real colvector) scalar tables
-) {
-    if (tables != NULL) {
-        prange.min = (*tables)[prange.min]
-        prange.max = (*tables)[prange.max]
-    }
-}
-
-void function reindex_levels_por(
-    struct POr scalar por,
-    pointer(real colvector) vector tables
-) {
-    real scalar i
+    // Rebuild the wild pattern
     
-    for (i = 1; i <= por.length; i++) {
-        reindex_levels_pattern(*por.patterns[i], tables)
+    pwild = (`WILD_TYPE' \ J(length(*tables), 1, `CONSTANT_TYPE')) ,
+            (length(*tables) \ *tables),
+            (0 \ *tables),
+            J(length(*tables) + 1, 1, pwild[1, 4])
+}
+
+void reindex_levels_pconstant(
+    `PATTERN' pconstant,
+    `REAL' index,
+    pointer(real colvector) scalar tables
+) {
+    `REAL' value
+    
+    if (tables != NULL) {
+        value = (*tables)[pconstant[index, 2]]
+        pconstant[index, 2] = value
+        pconstant[index, 3] = value
     }
 }
 
-void function reindex_levels_tuple(
-    struct Tuple scalar tuple,
+void reindex_levels_prange(
+    `PATTERN' prange,
+    `REAL' index,
+    pointer(real colvector) scalar tables
+) {
+    if (tables != NULL) {
+        prange[index, 2] = (*tables)[prange[index, 2]]
+        prange[index, 3] = (*tables)[prange[index, 3]]
+    }
+}
+
+void reindex_levels_por(
+    `PATTERN' por,
+    `REAL' index,
     pointer(real colvector) vector tables
 ) {
-    real scalar i
+    `REAL' i
+    
+    for (i = 1; i <= por[1, 2]; i++) {
+        reindex_levels_pattern(por, i + 1, tables)
+    }
+}
+
+void reindex_levels_tuple(
+    `TUPLE' tuple,
+    pointer(real colvector) vector tables
+) {
+    `REAL' i
     
     for (i = 1; i <= length(tuple.patterns); i++) {
         if (tables[i] != NULL) {
-            reindex_levels_pattern(tuple.patterns[i], tables[i])
+            reindex_levels_pattern(*tuple.patterns[i], 1, tables[i])
         }
+    }
+}
+
+void reindex_levels_tupleor(
+    `TUPLEOR' tuples,
+    pointer(real colvector) vector tables
+) {
+    `REAL' i
+    
+    for (i = 1; i <= tuples.length; i++) {
+        reindex_levels_pattern(*tuples.list[i], 1, tables)
     }
 }
 end
