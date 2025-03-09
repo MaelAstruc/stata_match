@@ -7,8 +7,8 @@ clear all
 
 **#********************************************************************** Locals
 
-local pkg_version    = "0.0.16"
-local distrib_date   = "25 Feb 2025"
+local pkg_version    = "0.0.17"
+local distrib_date   = "09 Mar 2025"
 local stata_version  = "`c(version)'"
 local date_fmt       = string(date("`distrib_date'", "DMY"), "%tdDD/NN/CCYY")
 local pwd            = ustrregexra("`c(pwd)'", "\\", "/") + "/"
@@ -57,8 +57,9 @@ mata: rm_tabs_dir("dev/test")
 
 // Build main files
 
-mata: combine_files(files, "pkg/pmatch.ado", st_local("pkg_version"), st_local("distrib_date"), 0)
-mata: combine_files(files, "dev/benchmark/pmatch_bench.ado", st_local("pkg_version"), st_local("distrib_date"), 1)
+mata: combine_files(files, "pkg/pmatch.ado", st_local("pkg_version"), st_local("distrib_date"), "")
+mata: combine_files(files, "dev/benchmark/pmatch_bench.ado", st_local("pkg_version"), st_local("distrib_date"), "bench")
+mata: combine_files(files, "dev/profiler/pmatch_profiler.ado", st_local("pkg_version"), st_local("distrib_date"), "profiler")
 mata: write_pkg("pkg/pmatch.pkg", st_local("distrib_date"))
 mata: write_sthlp_dir("docs", "pkg", st_local("pkg_version"), st_local("distrib_date"))
 
@@ -93,3 +94,7 @@ version `stata_version'
 
 do "dev/benchmark/class_count.do"
 do "dev/benchmark/bench_e2e.do"
+
+**#*************************************************************** Run profilers
+
+do "dev/profiler/profile_end_to_end.do"

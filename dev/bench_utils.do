@@ -26,10 +26,10 @@ BENCH_NAMES = (
 )
 
 struct Bench {
-    real matrix results
+    real matrix   results
     string vector names
-    transmorphic names_index
-    real scalar iter
+    real vector   status
+    real scalar   iter
 }
 
 struct Bench scalar function bench_init(real scalar N) {
@@ -43,15 +43,23 @@ struct Bench scalar function bench_init(real scalar N) {
     
     bench = Bench()
     bench.results = J(N, K, .)
-    bench.names = names
-    bench.names_index = asarray_create()
-    bench.iter = 0
-    
-    for (k = 1; k <= K; k++) {
-        asarray(bench.names_index, bench.names[k], k)
-    }
+    bench.names   = names
+    bench.status  = J(length(bench.names), 1, 0)
+    bench.iter    = 0
     
     return(bench)
+}
+
+real scalar bench_get_index(pointer(struct Bench scalar) scalar bench, string scalar name) {
+    real scalar i
+    
+    for (i = 1; i <= length(bench->names); i++) {
+        if (bench->names[i] == name) {
+            return(i)
+        }
+    }
+    
+    return(0)
 }
 
 real vector bench_summary(real vector values) {
@@ -63,13 +71,13 @@ real vector bench_summary(real vector values) {
     	return(J(1, 7, .))
     }
     
-    val_total = sum(values)
-    val_N = nonmissing(values)
-    val_min = values[1]
-    val_mean = mean(values)
+    val_total  = sum(values)
+    val_N      = nonmissing(values)
+    val_min    = values[1]
+    val_mean   = mean(values)
     val_median = values[ceil(val_N / 2)]
-    val_max = values[val_N]
-    val_sd = sqrt(variance(values))
+    val_max    = values[val_N]
+    val_sd     = sqrt(variance(values))
     
     return((val_total, val_N, val_min, val_mean, val_median, val_max, val_sd))
 }
@@ -84,8 +92,7 @@ void function bench_print(struct Bench scalar bench) {
     results = J(K, n_stats, .)
     
     for (i = 1; i <= K; i++) {
-        index = asarray(bench.names_index, bench.names[i])
-        results[i, 1..7] = bench_summary(bench.results[., index])
+        results[i, 1..7] = bench_summary(bench.results[., i])
     }
     
     for (i = 1; i <= K; i++) {
@@ -138,13 +145,19 @@ void function bench_on(string scalar name) {
     
     bench = findexternal("BENCH")
     
-    index = asarray(bench->names_index, name)
+    index = bench_get_index(bench, name)
+    
+    if (bench->status[index] >= 1) {
+        bench->status[index] = bench->status[index] + 1
+        return
+    }
     
     if (name == "build data") {
         bench->iter = bench->iter + 1
         timer_clear()
     }
     
+    bench->status[index] = 1
     timer_on(index)
 }
 
@@ -153,8 +166,16 @@ void function bench_off(string scalar name) {
     real scalar index
     
     bench = findexternal("BENCH")
-    index = asarray(bench->names_index, name)
     
+    index = bench_get_index(bench, name)
+    
+    bench->status[index] = bench->status[index] - 1
+    
+    if (bench->status[index] >= 1) {
+        return
+    }
+    
+    bench->status[index] = 0
     timer_off(index)
     
     bench->results[bench->iter, index] = timer_value(index)[1]
@@ -261,11 +282,11 @@ program compare_str
     assert y_base == y
 end
 
-**#********************************************************** Automate profiling
+**#******************************************************* Automate benchmarking
 
-capture program drop profile_obs_integer profile_obs_float profile_obs_string
+capture program drop bench_obs_integer bench_obs_float bench_obs_string
 
-program profile_obs_integer
+program bench_obs_integer
     syntax, OBS(integer) LEVELS(integer) REP(integer) [NOCHECK NOBENCH]
     
     if ("`nobench'" == "") mata: BENCH = bench_init(`rep')
@@ -277,7 +298,7 @@ program profile_obs_integer
     if ("`nobench'" == "") mata: bench_print(BENCH)
 end
 
-program profile_obs_float
+program bench_obs_float
     syntax, OBS(integer) LEVELS(integer) REP(integer) [NOCHECK]
     
     if ("`nobench'" == "") mata: BENCH = bench_init(`rep')
@@ -289,7 +310,7 @@ program profile_obs_float
     if ("`nobench'" == "") mata: bench_print(BENCH)
 end
 
-program profile_obs_string
+program bench_obs_string
     syntax, OBS(integer) LEVELS(integer) REP(integer) [NOCHECK]
     
     if ("`nobench'" == "") mata: BENCH = bench_init(`rep')

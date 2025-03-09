@@ -1,0 +1,547 @@
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/profile.log
+  log type:  text
+ opened on:   9 Mar 2025, 15:39:05
+
+. 
+. mata: PROFILER = new_profiler()
+
+. 
+. bench_obs_integer, obs(100000)     levels(500) rep(1) nobench
+
+. 
+. dis "`c(current_time)'"
+15:39:21
+
+. 
+. mata: profiler_print(PROFILER, 10)
+PROFILER 15377ms
+ └─ pmatch 15377ms
+    ├─ init_variables 15ms
+    │  └─ Variable::init 14ms
+    │     └─ Variable::init_levels 14ms
+    │        └─ Variable::init_levels_int 14ms
+    │           └─ Variable::init_levels_int_base 13ms
+    ├─ parse_string 55ms
+    │  └─ parse_arms 54ms
+    ├─ check_match 14033ms
+    │  ├─ check_useful 4533ms
+    │  │  ├─ is_useful 18ms
+    │  │  ├─ is_useful 16ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 15ms
+    │  │  ├─ is_useful 16ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 42ms
+    │  │  │  ├─ overlap_por 19ms
+    │  │  │  │  ├─ overlap_pconstant 18ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 24ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 23ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 29ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 26ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 27ms
+    │  │  ├─ is_useful 16ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 34ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 33ms
+    │  │  ├─ is_useful 16ms
+    │  │  ├─ is_useful 29ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 31ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 33ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 33ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 34ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 35ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 43ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 37ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 38ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 38ms
+    │  │  ├─ is_useful 20ms
+    │  │  └─ is_useful 2784ms
+    │  │     ├─ difference_pwild 24ms
+    │  │     │  └─ difference_por 24ms
+    │  │     ├─ difference_por 48ms
+    │  │     ├─ difference_por 24ms
+    │  │     ├─ difference_por 22ms
+    │  │     ├─ difference_por 47ms
+    │  │     ├─ difference_por 23ms
+    │  │     ├─ difference_por 23ms
+    │  │     ├─ difference_por 59ms
+    │  │     │  ├─ difference_pwild 11ms
+    │  │     │  │  └─ includes_por_pconstant 11ms
+    │  │     ├─ difference_por 22ms
+    │  │     ├─ difference_por 26ms
+    │  │     ├─ difference_por 50ms
+    │  │     ├─ difference_por 23ms
+    │  │     ├─ difference_por 24ms
+    │  │     ├─ difference_por 47ms
+    │  │     ├─ difference_por 23ms
+    │  │     ├─ difference_por 22ms
+    │  │     ├─ difference_por 45ms
+    │  │     ├─ difference_por 23ms
+    │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 44ms
+    │  │     ├─ difference_por 22ms
+    │  │     ├─ difference_por 22ms
+    │  │     ├─ difference_por 62ms
+    │  │     ├─ difference_por 27ms
+    │  │     ├─ difference_por 20ms
+    │  │     ├─ difference_por 40ms
+    │  │     ├─ difference_por 20ms
+    │  │     ├─ difference_por 20ms
+    │  │     ├─ difference_por 38ms
+    │  │     ├─ difference_por 18ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 39ms
+    │  │     ├─ difference_por 18ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 39ms
+    │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 20ms
+    │  │     ├─ difference_por 39ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 38ms
+    │  │     ├─ difference_por 39ms
+    │  │     ├─ difference_por 24ms
+    │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 41ms
+    │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 40ms
+    │  │     ├─ difference_por 26ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 32ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 35ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 32ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 29ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 30ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 29ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 27ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 28ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 25ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 27ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 26ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 27ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 25ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 25ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 23ms
+    │  │     ├─ difference_por 10ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 20ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 22ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 10ms
+    │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 10ms
+    │  └─ check_exhaustiveness 9473ms
+    │     └─ is_useful 9473ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 26ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 52ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 52ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 26ms
+    │        ├─ overlap_por 53ms
+    │        ├─ difference_por 53ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 53ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 25ms
+    │        ├─ overlap_por 53ms
+    │        ├─ difference_por 53ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 53ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 25ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 48ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 51ms
+    │        ├─ overlap_por 25ms
+    │        ├─ difference_por 25ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 50ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 50ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 25ms
+    │        ├─ overlap_por 51ms
+    │        ├─ difference_por 49ms
+    │        ├─ overlap_por 30ms
+    │        ├─ difference_por 49ms
+    │        ├─ overlap_por 30ms
+    │        ├─ difference_por 23ms
+    │        ├─ overlap_por 53ms
+    │        ├─ difference_por 48ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 53ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 23ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 46ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 46ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 23ms
+    │        ├─ overlap_por 53ms
+    │        ├─ difference_por 64ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 47ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 23ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 46ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 47ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 22ms
+    │        ├─ overlap_por 52ms
+    │        ├─ difference_por 43ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 44ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 22ms
+    │        ├─ overlap_por 53ms
+    │        ├─ difference_por 44ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 43ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 20ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 42ms
+    │        ├─ overlap_por 29ms
+    │        ├─ difference_por 43ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 21ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 40ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 40ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 20ms
+    │        ├─ overlap_por 52ms
+    │        ├─ difference_por 39ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 42ms
+    │        ├─ overlap_por 25ms
+    │        ├─ difference_por 19ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 39ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 40ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 19ms
+    │        ├─ overlap_por 53ms
+    │        ├─ difference_por 39ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 40ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 19ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 37ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 39ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 19ms
+    │        ├─ overlap_por 52ms
+    │        ├─ difference_por 37ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 38ms
+    │        ├─ overlap_por 25ms
+    │        ├─ difference_por 19ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 35ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 37ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 16ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 34ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 34ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 17ms
+    │        ├─ overlap_por 52ms
+    │        ├─ difference_por 33ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 34ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 17ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 34ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 35ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 16ms
+    │        ├─ overlap_por 56ms
+    │        ├─ difference_por 32ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 32ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 16ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 32ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 32ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 15ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 30ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 30ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 15ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 28ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 29ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 14ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 29ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 28ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 13ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 26ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 27ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 13ms
+    │        ├─ overlap_por 56ms
+    │        ├─ difference_por 26ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 27ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 13ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 26ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 24ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 11ms
+    │        ├─ overlap_por 56ms
+    │        ├─ difference_por 25ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 23ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 12ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 23ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 23ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 11ms
+    │        ├─ overlap_por 53ms
+    │        ├─ difference_por 21ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 22ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 11ms
+    │        ├─ overlap_por 53ms
+    │        ├─ difference_por 21ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 22ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 11ms
+    │        ├─ overlap_por 53ms
+    │        ├─ difference_por 19ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 20ms
+    │        ├─ overlap_por 28ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 20ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 20ms
+    │        ├─ overlap_por 28ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 18ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 19ms
+    │        ├─ overlap_por 27ms
+    │        ├─ overlap_por 53ms
+    │        ├─ difference_por 18ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 18ms
+    │        ├─ overlap_por 27ms
+    │        ├─ overlap_por 56ms
+    │        ├─ difference_por 17ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 16ms
+    │        ├─ overlap_por 28ms
+    │        ├─ overlap_por 54ms
+    │        ├─ difference_por 16ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 15ms
+    │        ├─ overlap_por 27ms
+    │        ├─ overlap_por 56ms
+    │        ├─ difference_por 14ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 15ms
+    │        ├─ overlap_por 29ms
+    │        ├─ overlap_por 57ms
+    │        ├─ difference_por 14ms
+    │        ├─ overlap_por 28ms
+    │        ├─ difference_por 13ms
+    │        ├─ overlap_por 28ms
+    │        ├─ overlap_por 56ms
+    │        ├─ difference_por 12ms
+    │        ├─ overlap_por 26ms
+    │        ├─ difference_por 12ms
+    │        ├─ overlap_por 28ms
+    │        ├─ overlap_por 55ms
+    │        ├─ difference_por 12ms
+    │        ├─ overlap_por 27ms
+    │        ├─ difference_por 11ms
+    │        ├─ overlap_por 27ms
+    │        ├─ overlap_por 56ms
+    │        ├─ difference_por 11ms
+    │        ├─ overlap_por 27ms
+    │        ├─ overlap_por 26ms
+    │        ├─ overlap_por 55ms
+    │        ├─ overlap_por 28ms
+    │        ├─ overlap_por 28ms
+    │        ├─ overlap_por 56ms
+    │        ├─ overlap_por 28ms
+    │        ├─ overlap_por 28ms
+    │        ├─ overlap_por 56ms
+    │        ├─ overlap_por 28ms
+    │        ├─ overlap_por 60ms
+    │        ├─ overlap_por 56ms
+    │        ├─ overlap_por 27ms
+    │        ├─ overlap_por 26ms
+    │        ├─ overlap_por 56ms
+    │        ├─ overlap_por 27ms
+    │        ├─ overlap_por 85ms
+    └─ eval_arms 1273ms
+
+. 
+. dis "`c(current_time)'"
+15:39:43
+
+. 
+. mata: profiler_summarize(PROFILER)
+pmatch                              1x     15377ms
+check_match                         1x     14033ms
+is_useful                         155x     13958ms
+check_exhaustiveness                1x      9473ms
+overlap_por                      5356x      6646ms
+difference_por                    304x      6589ms
+overlap_pconstant              101684x      4661ms
+check_useful                        1x      4533ms
+difference_pwild                83551x      4393ms
+includes_por_pconstant          73579x      2169ms
+eval_arms                           1x      1273ms
+parse_string                        1x        55ms
+parse_arms                          1x        54ms
+overlap_prange_prange            1275x        27ms
+parse_arm                         154x        21ms
+parse_or                          154x        16ms
+init_variables                      1x        15ms
+Variable::init_levels_int           1x        14ms
+Variable::init                      1x        14ms
+Variable::init_levels               1x        14ms
+Variable::init_levels_int_base      1x        13ms
+compress_por                      154x        10ms
+parse_pattern                     256x         8ms
+parse_number                      255x         3ms
+consume                           154x         2ms
+check_wildcard_por                 51x         1ms
+Variable::should_tab                1x         1ms
+includes_por_default               51x         1ms
+parse_range                        51x         0ms
+difference_list                    51x         0ms
+Variable::init_type                 1x         0ms
+new_pwild                           2x         0ms
+
+. 
+. dis "`c(current_time)'"
+15:39:44
+
+. 
+. mata: profiler_graph(PROFILER, 10)
+
+. graph export "dev/logs/profile.png", replace
+(file dev/logs/profile.png not found)
+file dev/logs/profile.png saved as PNG format
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/profile.log
+  log type:  text
+ closed on:   9 Mar 2025, 15:48:34
+----------------------------------------------------------------------------------------------------------------------------------------------------------

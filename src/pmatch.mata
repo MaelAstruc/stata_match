@@ -13,6 +13,8 @@ void pmatch(
     `VARIABLES' variables
     `ARMS' arms, useful_arms
 
+    // profiler_on("pmatch")
+    
     // bench_on("total")
     
     // bench_on("init")
@@ -34,5 +36,7 @@ void pmatch(
     // bench_off("eval")
 
     // bench_off("total")
+    
+    // profiler_off()
 }
 end

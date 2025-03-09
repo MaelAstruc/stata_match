@@ -87,7 +87,7 @@ function combine_files(
     string scalar file_out,
     string scalar version_str,
     string scalar distrib_date,
-    real scalar use_bench
+    string scalar keep_function
 ) {
     real scalar fh_in, fh_out, i
     string scalar file_name, head_line, line
@@ -107,8 +107,11 @@ function combine_files(
         fput(fh_out, "")
         
         while ((line = fget(fh_in)) != J(0, 0, "")) {
-            if (use_bench == 1) {
+            if (keep_function == "bench") {
                 line = regexr(line, "// bench_", "bench_")
+            }
+            else if (keep_function == "profiler") {
+                line = regexr(line, "// profiler_", "profiler_")
             }
             fput(fh_out, line)
         }

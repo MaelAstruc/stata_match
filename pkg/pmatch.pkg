@@ -2,7 +2,7 @@ v 3
 
 d {bf:PMATCH}: Pattern matching in Stata.
 d
-d Distribution-Date: 25/02/2025
+d Distribution-Date: 09/03/2025
 
 f pmatch.ado
 f pmatch.sthlp

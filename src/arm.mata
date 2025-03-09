@@ -28,6 +28,8 @@ void function eval_arms(
     `STRING' command, condition, statement
     `REAL' i, n, _rc
 
+    // profiler_on("eval_arms")
+    
     n = length(arms)
     
     displayas("text")
@@ -68,6 +70,8 @@ void function eval_arms(
             exit(error(_rc))
         }
     }
+    
+    // profiler_off()
 }
 
 end

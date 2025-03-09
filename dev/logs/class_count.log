@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/class_count.log
   log type:  text
- opened on:  25 Feb 2025, 15:18:46
+ opened on:   9 Mar 2025, 15:11:57
 
 . 
 . mata: print_class_count()
@@ -27,5 +27,5 @@ CLASS NAME         INSTANCES
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/class_count.log
   log type:  text
- closed on:  25 Feb 2025, 15:18:46
+ closed on:   9 Mar 2025, 15:11:57
 ----------------------------------------------------------------------------------------------------------------------------------------------------------

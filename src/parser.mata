@@ -4,6 +4,8 @@ mata
     `ARMS' arms
     `POINTER' t
 
+    // profiler_on("parse_string")
+    
     t = tokenize(str)
 
     arms = parse_arms(t, variables)
@@ -12,6 +14,7 @@ mata
         reorder_levels(arms, variables)
     }
     
+    // profiler_off()
     return(arms)
 }
 
@@ -20,6 +23,8 @@ mata
     `ARMS' arms
     `REAL' i
 
+    // profiler_on("parse_arms")
+    
     arms = Arm(0)
     i = 0
 
@@ -37,12 +42,15 @@ mata
         }
     }
 
+    // profiler_off()
     return(arms)
 }
 
 `ARM' parse_arm(`POINTER' t, `REAL' arm_id, `VARIABLES' variables) {
     `ARM' arm
 
+    // profiler_on("parse_arm")
+    
     arm.id = arm_id
     arm.lhs.arm_id = arm_id
 
@@ -59,27 +67,31 @@ mata
     
     arm.has_wildcard = check_wildcard(arm.lhs.pattern)
 
+    // profiler_off()
     return(arm)
 }
 
 `PATTERN' parse_pattern(`POINTER' t, `VARIABLE' variable, `REAL' arm_id) {
     `STRING' tok, var_label
     `REAL' number
+    `PATTERN' res
 
+    // profiler_on("parse_pattern")
+    
     tok = tokenget(t)
 
     if (variable.type == "string") {
         if (tok == "_") {
-            return(parse_wild(variable))
+            res = parse_wild(variable)
         }
         else if (isquoted(tok)) {
             number = variable.get_level_index(tok)
             if (number == 0) {
                 errprintf("Unknown level : %s\n", tok)
-                return(new_pempty())
+                res = new_pempty()
             }
             else {
-                return(parse_constant(number, variable))
+                res = parse_constant(number, variable)
             }
         }
         else {
@@ -92,19 +104,19 @@ mata
     }
     else if (variable.type == "int" | variable.type == "float" | variable.type == "double") {
         if (tok == "_") {
-            return(parse_wild(variable))
+            res = parse_wild(variable)
         }
         else if (tok == "min") {
             number =  variable.get_min()
-            return(parse_number(t, number, arm_id, variable))
+            res = parse_number(t, number, arm_id, variable)
         }
         else if (tok == "max") {
             number = variable.get_max()
-            return(parse_number(t, number, arm_id, variable))
+            res = parse_number(t, number, arm_id, variable)
         }
         else if (isnumber(tok)) {
             number = strtoreal(tok)
-            return(parse_number(t, number, arm_id, variable))
+            res = parse_number(t, number, arm_id, variable)
         }
         else if (isquoted(tok)) {
             var_label = st_varvaluelabel(variable.name)
@@ -118,8 +130,9 @@ mata
             }
             
             number = st_vlsearch(var_label, unquote(tok))
+            
             if (number != .) {
-                return(parse_number(t, number, arm_id, variable))
+                res = parse_number(t, number, arm_id, variable)
             }
             else {
                 errprintf(
@@ -144,6 +157,9 @@ mata
         )
         exit(_error(3250))
     }
+    
+    // profiler_off()
+    return(res)
 }
 
 `PATTERN' parse_number(
@@ -153,16 +169,22 @@ mata
     `VARIABLE' variable
 ) {
     `STRING' next
+    `PATTERN' res
 
+    // profiler_on("parse_number")
+    
     next = tokenpeek(t)
     
     if (israngesym(next)) {
         (void) tokenget(t)
-        return(parse_range(t, next, number, arm_id, variable))
+        res = parse_range(t, next, number, arm_id, variable)
     }
     else {
-        return(parse_constant(number, variable))
+        res = parse_constant(number, variable)
     }
+    
+    // profiler_off()
+    return(res)
 }
 
 ///////////////////////////////////////////////////////////////// Parse patterns
@@ -189,6 +211,8 @@ mata
     `RANGE' prange
     `STRING' next
     `REAL' max, epsilon, var_type
+    
+    // profiler_on("parse_range")
     
     next = tokenget(t)
     
@@ -225,6 +249,7 @@ mata
         exit(_error(3498))
     }
 
+    // profiler_off()
     return(new_prange(min, max, var_type))
 }
 
@@ -270,12 +295,15 @@ mata
     `OR' por
     `PATTERN' pat
 
+    // profiler_on("parse_or")
+    
     por = new_por()
     
     do {
         pat = parse_pattern(t, variable, arm_id)
         
         if (pat[1, 1] == `WILD_TYPE') {
+            // profiler_off()
             return(pat)
         }
         else {
@@ -283,18 +311,24 @@ mata
         }
     } while (match_next(t, "|"))
 
-    return(compress_por(por))
+    por = compress_por(por)
+    
+    // profiler_off()
+    return(por)
 }
 
 `TUPLE' parse_tuple(`POINTER' t, `VARIABLES' variables, `REAL' arm_id) {
     `TUPLE' tuple
     `REAL' i
 
+    // profiler_on("parse_tuple")
+    
     tuple.patterns = J(1, length(variables), NULL)
 
     i = 0
     
     if (tokenpeek(t) == "_") {
+        // profiler_off()
         return(TupleWild())
     }
     
@@ -323,11 +357,14 @@ mata
         exit(_error(3300))
     }
 
+    // profiler_off()
     return(tuple)
 }
 
 `TUPLEOR' parse_tupleor(`POINTER' t, `VARIABLES' variables, `REAL' arm_id) {
     `TUPLEOR' tuples
+    
+    // profiler_on("parse_tupleor")
     
     tuples = new_tupleor()
 
@@ -335,7 +372,10 @@ mata
         push_tupleor(tuples, parse_tuple(t, variables, arm_id))
     } while (match_next(t, "|"))
     
-    return(compress_tupleor(tuples))
+    tuples = compress_tupleor(tuples)
+    
+    // profiler_off()
+    return(tuples)
 }
 
 //////////////////////////////////////////////////////////////////// Parse Value
@@ -359,6 +399,8 @@ mata
 `STRING' consume(`POINTER' t, `STRING' str) {
     `STRING' tok, inside, value
 
+    // profiler_on("consume")
+    
     value = ""
     while (tokenpeek(t) != str & tokenpeek(t) != "") {
         tok = tokenget(t)
@@ -368,6 +410,8 @@ mata
         value = value + tok + inside
     }
     (void) tokenget(t)
+    
+    // profiler_off()
     return(value)
 }
 
@@ -455,42 +499,56 @@ void check_next(`POINTER' t, `STRING' str, `REAL' arm_id) {
 `REAL' check_wildcard_por(`OR' por) {
     `REAL' i
     
+    // profiler_on("check_wildcard_por")
+    
     for (i = 1; i <= por[1, 2]; i++) {
         if (check_wildcard(por[i + 1, 1]) == 1) {
+            // profiler_off()
             return(1)
         }
     }
     
+    // profiler_off()
     return(0)
 }
 
 `REAL' check_wildcard_tuple(`TUPLE' tuple) {
     `REAL' i
     
+    // profiler_on("check_wildcard_tuple")
+    
     for (i = 1; i <= length(tuple.patterns); i++) {
         if (check_wildcard(*tuple.patterns[i]) == 1) {
+            // profiler_off()
             return(1)
         }
     }
     
+    // profiler_off()
     return(0)
 }
 
 `REAL' check_wildcard_tupleor(`TUPLEOR' tuples) {
     `REAL' i
     
+    // profiler_on("check_wildcard_tuplepor")
+    
     for (i = 1; i <= tuples.length; i++) {
         if (check_wildcard(*tuples.list[i]) == 1) {
+            // profiler_off()
             return(1)
         }
     }
     
+    // profiler_off()
     return(0)
 }
 
 void reorder_levels(`ARMS' arms, `VARIABLES' variables) {
     `REAL' i
     pointer(real colvector) vector tables
+    
+    // profiler_on("reorder_levels")
     
     tables = J(1, length(variables), NULL)
     
@@ -504,6 +562,8 @@ void reorder_levels(`ARMS' arms, `VARIABLES' variables) {
     if (tables != J(1, length(variables), NULL)) {
         reindex_levels_arms(arms, tables)
     }
+    
+    // profiler_off()
 }
 
 void reindex_levels_arms(
@@ -512,17 +572,25 @@ void reindex_levels_arms(
 ) {
     `REAL' i
     
+    // profiler_on("reindex_levels_arms")
+    
     // Get a list of vector to recast indices
     for (i = 1; i <= length(arms); i++) {
         reindex_levels_arm(arms[i], tables)
     }
+    
+    // profiler_off()
 }
 
 void reindex_levels_arm(
     `ARM' arm,
     pointer(real colvector) vector tables
 ) {
+    // profiler_on("reindex_levels_arm")
+    
     reindex_levels_pattern(*arm.lhs.pattern, 1, tables)
+    
+    // profiler_off()
 }
 
 void reindex_levels_pattern(
@@ -530,6 +598,8 @@ void reindex_levels_pattern(
     `REAL' index,
     pointer(real colvector) vector tables
 ) {
+    // profiler_on("reindex_levels_pattern")
+    
     if (eltype(pattern) == "real") {
         if (pattern[1, 1] == `EMPTY_TYPE') {
             // Nothing
@@ -573,6 +643,8 @@ void reindex_levels_pattern(
     else {
         unknown_pattern(pattern)
     }
+    
+    // profiler_off()
 }
 
 void reindex_levels_pwild(
@@ -580,12 +652,16 @@ void reindex_levels_pwild(
     `REAL' index,
     pointer(real colvector) vector tables
 ) {
+    // profiler_on("reindex_levels_pwild")
+    
     // Rebuild the wild pattern
     
     pwild = (`WILD_TYPE' \ J(length(*tables), 1, `CONSTANT_TYPE')) ,
             (length(*tables) \ *tables),
             (0 \ *tables),
             J(length(*tables) + 1, 1, pwild[1, 4])
+    
+    // profiler_off()
 }
 
 void reindex_levels_pconstant(
@@ -595,11 +671,15 @@ void reindex_levels_pconstant(
 ) {
     `REAL' value
     
+    // profiler_on("reindex_levels_pconstant")
+    
     if (tables != NULL) {
         value = (*tables)[pconstant[index, 2]]
         pconstant[index, 2] = value
         pconstant[index, 3] = value
     }
+    
+    // profiler_off()
 }
 
 void reindex_levels_prange(
@@ -607,10 +687,14 @@ void reindex_levels_prange(
     `REAL' index,
     pointer(real colvector) scalar tables
 ) {
+    // profiler_on("reindex_levels_prange")
+    
     if (tables != NULL) {
         prange[index, 2] = (*tables)[prange[index, 2]]
         prange[index, 3] = (*tables)[prange[index, 3]]
     }
+    
+    // profiler_off()
 }
 
 void reindex_levels_por(
@@ -620,9 +704,13 @@ void reindex_levels_por(
 ) {
     `REAL' i
     
+    // profiler_on("reindex_levels_por")
+    
     for (i = 1; i <= por[1, 2]; i++) {
         reindex_levels_pattern(por, i + 1, tables)
     }
+    
+    // profiler_off()
 }
 
 void reindex_levels_tuple(
@@ -631,11 +719,15 @@ void reindex_levels_tuple(
 ) {
     `REAL' i
     
+    // profiler_on("reindex_levels_tuple")
+    
     for (i = 1; i <= length(tuple.patterns); i++) {
         if (tables[i] != NULL) {
             reindex_levels_pattern(*tuple.patterns[i], 1, tables[i])
         }
     }
+    
+    // profiler_off()
 }
 
 void reindex_levels_tupleor(
@@ -644,8 +736,12 @@ void reindex_levels_tupleor(
 ) {
     `REAL' i
     
+    // profiler_on("reindex_levels_tupleor")
+    
     for (i = 1; i <= tuples.length; i++) {
         reindex_levels_pattern(*tuples.list[i], 1, tables)
     }
+    
+    // profiler_off()
 }
 end

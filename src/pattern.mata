@@ -11,6 +11,8 @@ mata
     `CONSTANT' pconstant
     `REAL' i, n_pat, variable_type
     
+    // profiler_on("new_pwild")
+    
     variable_type = variable.get_type_nb()
     
     check_var_type(variable_type)
@@ -50,6 +52,8 @@ mata
         )
         exit(_error(3256))
     }
+    
+    // profiler_off()
     
     return(pwild)
 }
@@ -207,6 +211,8 @@ mata
     `PATTERN' pattern_compressed
     `REAL' i, n_pat
     
+    // profiler_on("compress_por")
+    
     por_compressed = new_por()
     
     n_pat = por[1, 2]
@@ -217,6 +223,7 @@ mata
             continue
         }
         else if (pattern_compressed[1, 1] == `WILD_TYPE') {
+            // profiler_off()
             return(pattern_compressed)
         }
         else {
@@ -225,6 +232,8 @@ mata
             }
         }
     }
+    
+    // profiler_off()
     
     if (por_compressed[1, 2] == 0) {
         return(new_pempty())
@@ -248,50 +257,80 @@ mata
 }
 
 `PATTERN' overlap_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
+    `PATTERN' res
+    
+    // profiler_on("overlap_pconstant")
+    
     if (includes(pattern, pconstant)) {
-        return(pconstant)
+        res = pconstant
     }
     else {
-        return(new_pempty())
+        res = new_pempty()
     }
+    
+    // profiler_off()
+    return(res)
 }
 
 `PATTERN' overlap_prange(`RANGE' prange, `PATTERN' pattern) {
+    `PATTERN' res
+    
+    // profiler_on("overlap_pconstant")
+    
     if (pattern[1, 1] == `EMPTY_TYPE') {
-        return(new_pempty())
+        res = new_pempty()
     }
     else if (pattern[1, 1] == `WILD_TYPE') {
-        return(prange)
+        res = prange
     }
     else if (pattern[1, 1] == `CONSTANT_TYPE') {
-        return(overlap_prange_pconstant(prange, pattern))
+        res = overlap_prange_pconstant(prange, pattern)
     }
     else if (pattern[1, 1] == `RANGE_TYPE') {
-        return(overlap_prange_prange(prange, pattern))
+        res = overlap_prange_prange(prange, pattern)
     }
     else if (pattern[1, 1] == `OR_TYPE') {
-        return(overlap_por(pattern, prange))
+        res = overlap_por(pattern, prange)
     }
     else {
         unknown_pattern(pattern)
     }
+    
+    // profiler_off()
+    return(res)
 }
 
 `PATTERN' overlap_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
+    `PATTERN' res
+    
+    // profiler_on("overlap_pconstant")
+    
     if (includes_prange_pconstant(prange, pconstant)) {
-        return(pconstant)
+        res = pconstant
     }
     else {
-        return(new_pempty())
+        res = new_pempty()
     }
+    
+    // profiler_off()
+    return(res)
 }
 
 `PATTERN' overlap_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
     `RANGE' inter_range
     `REAL' min, max
+    `PATTERN' res
     
-    if (prange_1[1, 2] > prange_2[1, 3]) return(new_pempty())
-    if (prange_1[1, 3] < prange_2[1, 2]) return(new_pempty())
+    // profiler_on("overlap_prange_prange")
+    
+    if (prange_1[1, 2] > prange_2[1, 3]) {
+        // profiler_off()
+        return(new_pempty())
+    }
+    if (prange_1[1, 3] < prange_2[1, 2]) {
+        // profiler_off()
+        return(new_pempty())
+    }
 
     // Determine the minimum
     min = max((prange_1[1, 2], prange_2[1, 2]))
@@ -300,7 +339,10 @@ mata
     inter_range = new_prange(min, max, prange_1[1, 4])
     
     // Return the compressed version
-    return(compress_prange(inter_range))
+    res = compress_prange(inter_range)
+    
+    // profiler_off()
+    return(res)
 }
 
 // The outcome is compressed, but need to check if the pattern is included
@@ -319,6 +361,8 @@ mata
     `PATTERN' overlap
     `REAL' i
     
+    // profiler_on("overlap_por")
+    
     por_overlap = new_por()
 
     for (i = 1; i <= por[1, 2]; i++) {
@@ -328,6 +372,7 @@ mata
             continue
         }
         else if (overlap[1, 1] == `WILD_TYPE') {
+            // profiler_off()
             return(overlap)
         }
         else {
@@ -337,6 +382,7 @@ mata
         }
     }
     
+    // profiler_off()
     if (por_overlap[1, 2] == 0) {
         return(new_pempty())
     }
@@ -393,13 +439,16 @@ mata
 
 `REAL' includes_pconstant_por(`CONSTANT' pconstant, `OR' por) {
     `REAL' i
+    // profiler_on("includes_pconstant_por")
     
     for (i = 1; i <= por[1, 2]; i++) {
         if (!includes_pconstant(pconstant, por[i + 1, .])) {
+            // profiler_off()
             return(0)
         }
     }
     
+    // profiler_off()
     return(1)
 }
 
@@ -439,12 +488,16 @@ mata
 `REAL' includes_prange_por(`RANGE' prange, `OR' por) {
     `REAL' i
     
+    // profiler_on("includes_prange_por")
+    
     for (i = 1; i <= por[1, 2]; i++) {
         if (!includes_prange(prange, por[i + 1, .])) {
+            // profiler_off()
             return(0)
         }
     }
     
+    // profiler_off()
     return(1)
 }
 
@@ -463,12 +516,16 @@ mata
 `REAL' includes_por_pconstant(`OR' por, `CONSTANT' pconstant) {
     `REAL' i
     
+    // profiler_on("includes_por_pconstant")
+    
     for (i = 1; i <= por[1, 2]; i++) {
         if (includes(por[i + 1, .], pconstant)) {
+            // profiler_off()
             return(1)
         }
     }
     
+    // profiler_off()
     return(0)
 }
 
@@ -476,17 +533,22 @@ mata
     `POINTERS' difference
     `REAL' i, n_pat
     
+    // profiler_on("includes_por_default")
+    
     difference = difference_list(pattern, por)
     
     if (difference[1, 1] == `EMPTY_TYPE') {
+        // profiler_off()
         return(1)
     }
     else if (difference[1, 1] == `OR_TYPE' & difference[1, 2] == 0) {
+        // profiler_off()
         return(1)
     }
     else {
         // difference_list() removes all the empty patterns
         // So if there is anything, there are patterns not in por
+        // profiler_off()
         return(0)
     }
 }
@@ -499,48 +561,72 @@ mata
 }
 
 `PATTERN' difference_pwild(`WILD' pwild, `PATTERN' pattern) {
-    return(difference_por(pwild, pattern))
+    `PATTERN' res
+    
+    // profiler_on("difference_pwild")
+    res = difference_por(pwild, pattern)
+    
+    // profiler_off()
+    return(res)
 }
 
 // The result is compressed
 `PATTERN' difference_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
+    `PATTERN' res
+    
+    // profiler_on("difference_pwild")
+    
     if (includes(pattern, pconstant)) {
-        return(new_pempty())
+        res = new_pempty()
     }
     else {
-        return(pconstant)
+        res = pconstant
     }
+    
+    // profiler_off()
+    return(res)
 }
 
 `PATTERN' difference_prange(`RANGE' prange, `PATTERN' pattern) {
+    `PATTERN' res
+    
+    // profiler_on("difference_prange")
+    
     if (pattern[1, 1] == `EMPTY_TYPE') {
-        return(prange)
+        res = prange
     }
     else if (pattern[1, 1] == `WILD_TYPE') {
-        return(new_pempty())
+        res = new_pempty()
     }
     else if (pattern[1, 1] == `CONSTANT_TYPE') {
-        return(difference_prange_pconstant(prange, pattern))
+        res = difference_prange_pconstant(prange, pattern)
     }
     else if (pattern[1, 1] == `RANGE_TYPE') {
-        return(difference_prange_prange(prange, pattern))
+        res = difference_prange_prange(prange, pattern)
     }
     else if (pattern[1, 1] == `OR_TYPE') {
-        return(difference_prange_por(prange, pattern))
+        res = difference_prange_por(prange, pattern)
     }
     else {
         unknown_pattern(pattern)
     }
+    
+    // profiler_off()
+    return(res)
 }
 
 // The result is compressed
 `PATTERN' difference_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
     `RANGE' prange_low, prange_high
     `OR' pranges
+    `PATTERN' res
+    
+    // profiler_on("difference_prange_pconstant")
     
     pranges = new_por()
     
     if (pconstant[1, 2] < prange[1, 2] | pconstant[1, 2] > prange[1, 3]) {
+        // profiler_off()
         return(prange)
     }
     
@@ -562,17 +648,24 @@ mata
         push_por(pranges, prange_high)
     }
     
-    return(compress(pranges))
+    res = compress(pranges)
+    
+    // profiler_off()
+    return(res)
 }
 
 // The result is compressed
 `PATTERN' difference_prange_prange(`RANGE' prange_1, `RANGE' prange_2) {
     `RANGE' prange_low, prange_high
     `OR' pranges
+    `PATTERN' res
+    
+    // profiler_on("difference_prange_prange")
     
     pranges = new_por()
     
     if (prange_2[1, 3] < prange_1[1, 2] | prange_2[1, 2] > prange_1[1, 3]) {
+        // profiler_off()
         return(prange_1)
     }
     
@@ -602,16 +695,22 @@ mata
         push_por(pranges, prange_high)
     }
     
-    return(compress(pranges))
+    res = compress(pranges)
+    
+    // profiler_off()
+    return(res)
 }
 
 `PATTERN' difference_prange_por(`RANGE' prange, `OR' por) {
     `OR' por_differences
     
+    // profiler_on("difference_prange_por")
+    
     por_differences = new_por()
 
     append_por(por_differences, difference_list(prange, por))
     
+    // profiler_off()
     return(por_differences)
 }
 
@@ -620,6 +719,7 @@ mata
     `OR' por_differences
     `REAL' i
     
+    // profiler_on("difference_por")
     por_differences = new_por()
 
     // Loop over all patterns in Or and compute the difference
@@ -627,6 +727,7 @@ mata
         push_por(por_differences, difference(por[i + 1, .], pattern))
     }
     
+    // profiler_off()
     if (por_differences[1, 2] == 0) {
         return(new_pempty())
     }
@@ -639,10 +740,12 @@ mata
     `OR' differences, new_differences
     `REAL' i, j
     
+    // profiler_on("difference_list")
     differences = new_por()
     push_por(differences, pattern)
 
     if (por[1, 2] == 0) {
+        // profiler_off()
         return(differences)
     }
     
@@ -667,11 +770,14 @@ mata
     
     drop_empty_patterns(differences)
     
+    // profiler_off()
     return(differences)
 }
 
 void drop_empty_patterns(`OR' por) {
     `REAL' i
+    
+    // profiler_on("drop_empty_patterns")
     
     // TODO: matrix version
     for (i = 1; i <= por[1, 2]; i++) {
@@ -682,6 +788,8 @@ void drop_empty_patterns(`OR' por) {
             i--
         }
     }
+    
+    // profiler_off()
 }
 
 ////////////////////////////////////////////////////////////////////////// Utils

@@ -5,6 +5,8 @@ mata
     `REAL'      i, n_vars
     `STRINGS'   vars_str
     
+    // profiler_on("init_variables")
+    
     t = tokeninit()
     tokenset(t, vars_exp)
     
@@ -18,6 +20,8 @@ mata
         variables[i].init(vars_str[i], check)
     }
     
+    // profiler_off()
+    
     return(variables)
 }
 
@@ -25,8 +29,11 @@ void Variable::new() {}
 
 `STRING' Variable::to_string() {
     string rowvector levels_str
+    `STRING' res
     `REAL' i
 
+    // profiler_on("Variable::to_string()")
+    
     levels_str = J(1, length(this.levels), "")
 
     if (this.type == "string") {
@@ -36,14 +43,16 @@ void Variable::new() {}
         levels_str = strofreal(this.levels)'
     }
     
-    return(
-        sprintf(
-            "'%s' (%s): (%s)",
-            this.name,
-            this.type,
-            invtokens(levels_str)
-        )
+    res = sprintf(
+        "'%s' (%s): (%s)",
+        this.name,
+        this.type,
+        invtokens(levels_str)
     )
+    
+    // profiler_off()
+    
+    return(res)
 }
 
 void Variable::print() {
@@ -51,6 +60,8 @@ void Variable::print() {
 }
 
 void Variable::init(`STRING' variable, `REAL' check) {
+    // profiler_on("Variable::init")
+    
     this.name = variable
     this.levels_len = 0
     this.min = .a
@@ -60,11 +71,15 @@ void Variable::init(`STRING' variable, `REAL' check) {
     
     this.init_type()
     this.init_levels()
+    
+    // profiler_off()
 }
 
 void Variable::init_type() {
     `STRING' var_type
-
+    
+    // profiler_on("Variable::init_type")
+    
     var_type = st_vartype(this.name)
     this.stata_type = var_type
 
@@ -81,12 +96,15 @@ void Variable::init_type() {
         this.type = "string"
     }
     else {
+        // profiler_off()
         errprintf(
             "Unexpected variable type for variable %s: %s\n",
             this.name, this.stata_type
         )
         exit(_error(3256))
     }
+    
+    // profiler_off()
 }
 end
 
@@ -98,7 +116,10 @@ local N_MATA_HASH 100000
 
 mata
 void Variable::init_levels() {
+    // profiler_on("Variable::init_levels")
+    
     if (this.check == 0) {
+        // profiler_off()
         return
     }
     
@@ -120,9 +141,13 @@ void Variable::init_levels() {
     }
     
     this.levels_len = length(this.levels)
+    
+    // profiler_off()
 }
 
 void Variable::init_levels_int() {
+    // profiler_on("Variable::init_levels_int")
+    
     if (st_nobs() < `N_MATA_SORT') {
         this.init_levels_int_base()
     }
@@ -132,9 +157,13 @@ void Variable::init_levels_int() {
     else {
         this.init_levels_int_base()
     }
+    
+    // profiler_off()
 }
 
 void Variable::init_levels_float() {
+    // profiler_on("Variable::init_levels_float")
+    
     if (st_nobs() < `N_MATA_SORT') {
         this.init_levels_float_base()
     }
@@ -147,9 +176,13 @@ void Variable::init_levels_float() {
     else {
         this.init_levels_float_base()
     }
+    
+    // profiler_off()
 }
 
 void Variable::init_levels_string() {
+    // profiler_on("Variable::init_levels_string")
+    
     if (this.stata_type == "strL") {
         this.init_levels_strL()
     }
@@ -161,22 +194,32 @@ void Variable::init_levels_string() {
     }
     
     this.quote_levels()
+    
+    // profiler_off()
 }
 
 void Variable::init_levels_int_base() {
+    // profiler_on("Variable::init_levels_int_base")
+    
     real colvector x
     
     st_view(x = ., ., this.name)
     
     this.levels = uniqrowsofinteger(x)
+    
+    // profiler_off()
 }
 
 void Variable::init_levels_float_base() {
     real colvector x
     
+    // profiler_on("Variable::init_levels_float_base")
+    
     st_view(x = ., ., this.name)
     
     this.levels = uniqrowssort(x)
+    
+    // profiler_off()
 }
 
 // Similar to the `levelsof` command internals
@@ -185,6 +228,8 @@ void Variable::init_levels_float_base() {
 void Variable::init_levels_strL() {
     `STRING' n_init, indices
     real matrix cond, i, w
+    
+    // profiler_on("Variable::init_levels_strL")
     
     n_init = st_tempname()
     indices = st_tempname()
@@ -198,23 +243,33 @@ void Variable::init_levels_strL() {
     this.levels = st_sdata(i, this.name)
     
     stata("sort " + n_init)
+    
+    // profiler_off()
 }
 
 void Variable::init_levels_strN() {
     string colvector x
     
+    // profiler_on("Variable::init_levels_strN")
+    
     st_sview(x = "", ., this.name)
 
     this.levels = uniqrowssort(x)
+    
+    // profiler_off()
 }
 
 void Variable::init_levels_tab() {
     `STRING' matname
     
+    // profiler_on("Variable::init_levels_tab")
+    
     matname = st_tempname()
     
     stata("quietly tab " + this.name + ", missing matrow(" + matname + ")")
     this.levels = st_matrix(matname)
+    
+    // profiler_off()
 }
 
 void Variable::init_levels_hash() {
@@ -222,6 +277,8 @@ void Variable::init_levels_hash() {
     transmorphic scalar key
     struct Htable scalar levels
     real scalar n, h, res, i
+    
+    // profiler_on("Variable::init_levels_hash")
 
     if (this.type == "string") {
         st_sview(x="", ., this.name)
@@ -258,6 +315,8 @@ void Variable::init_levels_hash() {
     }
 
     this.levels = htable_keys(levels)
+    
+    // profiler_off()
 }
 
 real scalar Variable::should_tab() {
@@ -265,6 +324,8 @@ real scalar Variable::should_tab() {
     `STRING'        state
     real colvector  x, y
     real matrix     t
+    
+    // profiler_on("Variable::should_tab")
     
     // Create a view
     st_view(x, ., this.name)
@@ -281,6 +342,7 @@ real scalar Variable::should_tab() {
 
     // If too many unique values in sample, return
     if (n >= `N_USE_TAB') {
+        // profiler_off()
         return(0)
     }
 
@@ -289,19 +351,27 @@ real scalar Variable::should_tab() {
     
     // Estimate multiplicity in the sample
     multi = multiplicity(sum(t[., 2] :== 1), rows(t))
+    
+    // profiler_off()
     return(multi <= `N_USE_TAB')
 }
 
 void Variable::quote_levels() {
     `REAL' i
     
+    // profiler_on("Variable::quote_levels")
+    
     for (i = 1; i <= length(this.levels); i++) {
         this.levels[i] = `"""' + this.levels[i] + `"""'
     }
+    
+    // profiler_off()
 }
 
 real scalar Variable::get_level_index(transmorphic scalar level) {
     `REAL' index
+    
+    // profiler_on("Variable::get_level_index")
     
     if (this.sorted == 1) {
         index = binary_search(&this.levels, this.levels_len, level)
@@ -320,12 +390,15 @@ real scalar Variable::get_level_index(transmorphic scalar level) {
         index = this.levels_len
     }
     
+    // profiler_off()
     return(index)
 }
 
 real scalar binary_search(pointer(transmorphic vector) vec, `REAL' length, transmorphic scalar value) {
     `REAL' left, right, i
     transmorphic scalar val
+    
+    // profiler_on("binary_search")
     
     left = 1
     right = length
@@ -335,6 +408,7 @@ real scalar binary_search(pointer(transmorphic vector) vec, `REAL' length, trans
         val = (*vec)[i]
         
         if (value == val) {
+            // profiler_off()
             return(i)
         }
         else if (value < val) {
@@ -345,11 +419,15 @@ real scalar binary_search(pointer(transmorphic vector) vec, `REAL' length, trans
         }
     }
     
+    // profiler_off()
+    
     return(0)
 }
 
 void Variable::set_minmax() {
     real vector x_num, minmax
+    
+    // profiler_on("Variable::set_minmax")
     
     minmax = minmax(x_num)
     
@@ -363,21 +441,28 @@ void Variable::set_minmax() {
     
     this.min = minmax[1]
     this.max = minmax[2]
+    // profiler_off()
 }
 
 real scalar Variable::get_min() {
+    // profiler_on("Variable::get_min")
+    
     if (this.min == .a) {
         this.set_minmax()
     }
     
+    // profiler_off()
     return(this.min)
 }
 
 real scalar Variable::get_max() {
+    // profiler_on("Variable::get_max")
+    
     if (this.max == .a) {
         this.set_minmax()
     }
     
+    // profiler_off()
     return(this.max)
 }
 
@@ -409,8 +494,11 @@ real colvector Variable::reorder_levels() {
     transmorphic matrix table
     `REAL' i, k
     
+    // profiler_on("Variable::reorder_levels")
+    
     if (this.type != "string" | this.check == 1) {
         // TODO: improve error
+        // profiler_off()
         exit(1)
     }
     
@@ -443,6 +531,7 @@ real colvector Variable::reorder_levels() {
     table = sort(table, 1)
     
     // Return a vector of new indices
+    // profiler_off()
     return(table[., 2])
 }
 end
@@ -452,6 +541,6 @@ end
 mata
 // From levelsof functions
 real scalar multiplicity(`REAL' s, `REAL' n) {
-        return(1/(1 - (s/n)^(1/(n - 1))))
+    return(1/(1 - (s/n)^(1/(n - 1))))
 }
 end

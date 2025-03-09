@@ -61,6 +61,8 @@ void htable_expand(struct Htable H) {
     real scalar h, res, i
     transmorphic scalar key
     
+    // profiler_on("htable_expand")
+    
     newH = htable_create(H.dkey, H.capacity * `RATIO')
     
     for (i = 1; i <= H.capacity; i++) {
@@ -85,6 +87,9 @@ void htable_expand(struct Htable H) {
     }
     
     swap(H, newH)
+    
+    
+    // profiler_off()
 }
 
 transmorphic colvector htable_keys(struct Htable H) {

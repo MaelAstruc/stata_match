@@ -150,16 +150,21 @@ mata
     `TUPLE' tuple_compressed
     `REAL' i
 
+    // profiler_on("compress_tuple")
+    
     tuple_compressed.arm_id = tuple.arm_id
     tuple_compressed.patterns = J(length(tuple.patterns), 1, NULL)
     
     for (i = 1; i <= length(tuple.patterns); i++) {
         tuple_compressed.patterns[i] = &compress(*tuple.patterns[i])
         if ((*tuple_compressed.patterns[i])[1, 1] == `EMPTY_TYPE') {
+            // profiler_off()
             return(TupleEmpty())
         }
     }
 
+    // profiler_off()
+    
     return(tuple_compressed)
 }
 
@@ -167,6 +172,8 @@ mata
     `TUPLEOR' tuples_compressed
     `POINTER' pattern_compressed
     `REAL' i
+    
+    // profiler_on("compress_tupleor")
     
     tuples_compressed = new_tupleor()
     
@@ -176,6 +183,7 @@ mata
             continue
         }
         else if (structname(*pattern_compressed) == "TupleWild") {
+            // profiler_off()
             return(*pattern_compressed)
         }
         else {
@@ -185,6 +193,7 @@ mata
         }
     }
     
+    // profiler_off()
     if (tuples_compressed.length == 0) {
         return(TupleEmpty())
     }
@@ -232,6 +241,8 @@ mata
     `TUPLE' tuple_overlap
     `REAL' i
     
+    // profiler_on("overlap_tuple_tuple")
+    
     check_tuples(tuple_1, tuple_2)
     
     tuple_overlap.patterns = J(1, length(tuple_1.patterns), NULL)
@@ -243,16 +254,21 @@ mata
             *tuple_2.patterns[i]
         )
         if ((*tuple_overlap.patterns[i])[1, 1] == 0) {
+            // profiler_off()
             return(TupleEmpty())
         }
     }
 
+    // profiler_off()
     return(tuple_overlap)
 }
 
 `T' overlap_tuple_tupleor(`TUPLE' tuple, `TUPLEOR' tuples) {
     `TUPLEOR' tuples_overlap
     `REAL' i
+    `T' res
+    
+    // profiler_on("overlap_tuple_tupleor")
     
     tuples_overlap = new_tupleor()
     
@@ -262,7 +278,10 @@ mata
         push_tupleor(tuples_overlap, overlap_tuple_tuple(tuple, *tuples.list[i]))
     }
     
-    return(compress(tuples_overlap))
+    res = compress(tuples_overlap)
+    
+    // profiler_off()
+    return(res)
 }
 
 `T' overlap_tupleor(`TUPLEOR' tuples, `T' pattern) {
@@ -270,10 +289,14 @@ mata
     `POINTER' overlap
     `REAL' i
     
+    // profiler_on("overlap_tupleor")
+    
     if (structname(pattern) == "TupleEmpty") {
+        // profiler_off()
         return(TupleEmpty())
     }
     if (structname(pattern) == "TupleWild") {
+        // profiler_off()
         return(tuples)
     }
     
@@ -285,6 +308,7 @@ mata
             continue
         }
         else if (structname(*overlap) == "TupleWild") {
+            // profiler_off()
             return(*overlap)
         }
         else {
@@ -294,6 +318,7 @@ mata
         }
     }
     
+    // profiler_off()
     if (tuples_overlap.length == 0) {
         return(TupleEmpty())
     }
@@ -333,26 +358,34 @@ mata
 `REAL' includes_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
     `REAL' i
     
+    // profiler_on("includes_tuple_tuple")
+    
     check_tuples(tuple_1, tuple_2)
     
     for (i = 1; i <= length(tuple_1.patterns); i++) {
         if (!includes(*tuple_1.patterns[i], *tuple_2.patterns[i])) {
+            // profiler_off()
             return(0)
         }
     }
 
+    // profiler_off()
     return(1)
 }
 
 `REAL' includes_tuple_tupleor(`TUPLE' tuple, `TUPLEOR' tuples) {
     `REAL' i
     
+    // profiler_on("includes_tuple_tupleor")
+    
     for (i = 1; i <= tuples.length; i++) {
         if (!includes_tuple(tuple, *tuples.list[i])) {
+            // profiler_off()
             return(0)
         }
     }
 
+    // profiler_off()
     return(1)
 }
 
@@ -377,6 +410,8 @@ mata
     `POINTERS' difference
     `REAL' i, n_pat
     
+    // profiler_on("includes_tuples_tuple")
+    
     difference = difference_list_tupleor(tuple, tuples)
     
     n_pat = 0
@@ -386,6 +421,7 @@ mata
         n_pat++
     }
     
+    // profiler_off()
     if (n_pat == 0) {
         return(1)
     }
@@ -447,6 +483,8 @@ We recursively build the difference of all the fields up to the first one.
     `POINTERS' field_diff
     `TUPLE' new_main, new_other, new_diff_i
     `REAL' i
+    
+    // profiler_on("difference_tuple_tuple")
     
     check_tuples(tuple_1, tuple_2)
     
@@ -524,7 +562,8 @@ We recursively build the difference of all the fields up to the first one.
     
     push_tupleor(result, res_inter)
     push_tupleor(result, res_diff)
-
+    
+    // profiler_off()
     return(compress(result))
 }
 
@@ -538,12 +577,18 @@ We recursively build the difference of all the fields up to the first one.
 
 `T' difference_tuple_tupleor(`TUPLE' tuple, `TUPLEOR' tuples) {
     `TUPLEOR' tuples_result
+    `T' res
+    
+    // profiler_on("difference_tuple_tupleor")
     
     tuples_result = new_tupleor()
     
     append_tupleor(tuples_result, difference_list_tupleor(tuple, tuples))
     
-    return(compress(tuples_result))
+    res = compress(tuples_result)
+    
+    // profiler_off()
+    return(res)
 }
 
 // The result is NOT compressed
@@ -569,6 +614,8 @@ We recursively build the difference of all the fields up to the first one.
     `TUPLEOR' tuples_differences
     `REAL' i
     
+    // profiler_on("difference_tupleor_tuple")
+    
     tuples_differences = new_tupleor()
     
     // Loop over all patterns in Or and compute the difference
@@ -576,6 +623,7 @@ We recursively build the difference of all the fields up to the first one.
         push_tupleor(tuples_differences, difference(*tuples.list[i], tuple))
     }
     
+    // profiler_off()
     if (tuples_differences.length == 0) {
         return((TupleEmpty()))
     }
@@ -588,6 +636,8 @@ We recursively build the difference of all the fields up to the first one.
 `POINTERS' difference_list_tupleor(`T' pattern, `TUPLEOR' tuples) {
     `TUPLEOR' differences, new_differences
     `REAL' i, j
+    
+    // profiler_on("difference_list_tupleor")
     
     differences = new_tupleor()
     
@@ -614,6 +664,7 @@ We recursively build the difference of all the fields up to the first one.
         }
     }
     
+    // profiler_off()
     return(differences.list)
 }
 

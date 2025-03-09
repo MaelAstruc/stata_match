@@ -482,7 +482,7 @@ mata
     `CONSTANT' pconstant
     `REAL' i, n_pat, variable_type
     
-    // profiler_on("new_pwild")
+    profiler_on("new_pwild")
     
     variable_type = variable.get_type_nb()
     
@@ -524,7 +524,7 @@ mata
         exit(_error(3256))
     }
     
-    // profiler_off()
+    profiler_off()
     
     return(pwild)
 }
@@ -682,7 +682,7 @@ mata
     `PATTERN' pattern_compressed
     `REAL' i, n_pat
     
-    // profiler_on("compress_por")
+    profiler_on("compress_por")
     
     por_compressed = new_por()
     
@@ -694,7 +694,7 @@ mata
             continue
         }
         else if (pattern_compressed[1, 1] == `WILD_TYPE') {
-            // profiler_off()
+            profiler_off()
             return(pattern_compressed)
         }
         else {
@@ -704,7 +704,7 @@ mata
         }
     }
     
-    // profiler_off()
+    profiler_off()
     
     if (por_compressed[1, 2] == 0) {
         return(new_pempty())
@@ -730,7 +730,7 @@ mata
 `PATTERN' overlap_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
     `PATTERN' res
     
-    // profiler_on("overlap_pconstant")
+    profiler_on("overlap_pconstant")
     
     if (includes(pattern, pconstant)) {
         res = pconstant
@@ -739,14 +739,14 @@ mata
         res = new_pempty()
     }
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
 `PATTERN' overlap_prange(`RANGE' prange, `PATTERN' pattern) {
     `PATTERN' res
     
-    // profiler_on("overlap_pconstant")
+    profiler_on("overlap_pconstant")
     
     if (pattern[1, 1] == `EMPTY_TYPE') {
         res = new_pempty()
@@ -767,14 +767,14 @@ mata
         unknown_pattern(pattern)
     }
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
 `PATTERN' overlap_prange_pconstant(`RANGE' prange, `CONSTANT' pconstant) {
     `PATTERN' res
     
-    // profiler_on("overlap_pconstant")
+    profiler_on("overlap_pconstant")
     
     if (includes_prange_pconstant(prange, pconstant)) {
         res = pconstant
@@ -783,7 +783,7 @@ mata
         res = new_pempty()
     }
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
@@ -792,14 +792,14 @@ mata
     `REAL' min, max
     `PATTERN' res
     
-    // profiler_on("overlap_prange_prange")
+    profiler_on("overlap_prange_prange")
     
     if (prange_1[1, 2] > prange_2[1, 3]) {
-        // profiler_off()
+        profiler_off()
         return(new_pempty())
     }
     if (prange_1[1, 3] < prange_2[1, 2]) {
-        // profiler_off()
+        profiler_off()
         return(new_pempty())
     }
 
@@ -812,7 +812,7 @@ mata
     // Return the compressed version
     res = compress_prange(inter_range)
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
@@ -832,7 +832,7 @@ mata
     `PATTERN' overlap
     `REAL' i
     
-    // profiler_on("overlap_por")
+    profiler_on("overlap_por")
     
     por_overlap = new_por()
 
@@ -843,7 +843,7 @@ mata
             continue
         }
         else if (overlap[1, 1] == `WILD_TYPE') {
-            // profiler_off()
+            profiler_off()
             return(overlap)
         }
         else {
@@ -853,7 +853,7 @@ mata
         }
     }
     
-    // profiler_off()
+    profiler_off()
     if (por_overlap[1, 2] == 0) {
         return(new_pempty())
     }
@@ -910,16 +910,16 @@ mata
 
 `REAL' includes_pconstant_por(`CONSTANT' pconstant, `OR' por) {
     `REAL' i
-    // profiler_on("includes_pconstant_por")
+    profiler_on("includes_pconstant_por")
     
     for (i = 1; i <= por[1, 2]; i++) {
         if (!includes_pconstant(pconstant, por[i + 1, .])) {
-            // profiler_off()
+            profiler_off()
             return(0)
         }
     }
     
-    // profiler_off()
+    profiler_off()
     return(1)
 }
 
@@ -959,16 +959,16 @@ mata
 `REAL' includes_prange_por(`RANGE' prange, `OR' por) {
     `REAL' i
     
-    // profiler_on("includes_prange_por")
+    profiler_on("includes_prange_por")
     
     for (i = 1; i <= por[1, 2]; i++) {
         if (!includes_prange(prange, por[i + 1, .])) {
-            // profiler_off()
+            profiler_off()
             return(0)
         }
     }
     
-    // profiler_off()
+    profiler_off()
     return(1)
 }
 
@@ -987,16 +987,16 @@ mata
 `REAL' includes_por_pconstant(`OR' por, `CONSTANT' pconstant) {
     `REAL' i
     
-    // profiler_on("includes_por_pconstant")
+    profiler_on("includes_por_pconstant")
     
     for (i = 1; i <= por[1, 2]; i++) {
         if (includes(por[i + 1, .], pconstant)) {
-            // profiler_off()
+            profiler_off()
             return(1)
         }
     }
     
-    // profiler_off()
+    profiler_off()
     return(0)
 }
 
@@ -1004,22 +1004,22 @@ mata
     `POINTERS' difference
     `REAL' i, n_pat
     
-    // profiler_on("includes_por_default")
+    profiler_on("includes_por_default")
     
     difference = difference_list(pattern, por)
     
     if (difference[1, 1] == `EMPTY_TYPE') {
-        // profiler_off()
+        profiler_off()
         return(1)
     }
     else if (difference[1, 1] == `OR_TYPE' & difference[1, 2] == 0) {
-        // profiler_off()
+        profiler_off()
         return(1)
     }
     else {
         // difference_list() removes all the empty patterns
         // So if there is anything, there are patterns not in por
-        // profiler_off()
+        profiler_off()
         return(0)
     }
 }
@@ -1034,10 +1034,10 @@ mata
 `PATTERN' difference_pwild(`WILD' pwild, `PATTERN' pattern) {
     `PATTERN' res
     
-    // profiler_on("difference_pwild")
+    profiler_on("difference_pwild")
     res = difference_por(pwild, pattern)
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
@@ -1045,7 +1045,7 @@ mata
 `PATTERN' difference_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
     `PATTERN' res
     
-    // profiler_on("difference_pwild")
+    profiler_on("difference_pwild")
     
     if (includes(pattern, pconstant)) {
         res = new_pempty()
@@ -1054,14 +1054,14 @@ mata
         res = pconstant
     }
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
 `PATTERN' difference_prange(`RANGE' prange, `PATTERN' pattern) {
     `PATTERN' res
     
-    // profiler_on("difference_prange")
+    profiler_on("difference_prange")
     
     if (pattern[1, 1] == `EMPTY_TYPE') {
         res = prange
@@ -1082,7 +1082,7 @@ mata
         unknown_pattern(pattern)
     }
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
@@ -1092,12 +1092,12 @@ mata
     `OR' pranges
     `PATTERN' res
     
-    // profiler_on("difference_prange_pconstant")
+    profiler_on("difference_prange_pconstant")
     
     pranges = new_por()
     
     if (pconstant[1, 2] < prange[1, 2] | pconstant[1, 2] > prange[1, 3]) {
-        // profiler_off()
+        profiler_off()
         return(prange)
     }
     
@@ -1121,7 +1121,7 @@ mata
     
     res = compress(pranges)
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
@@ -1131,12 +1131,12 @@ mata
     `OR' pranges
     `PATTERN' res
     
-    // profiler_on("difference_prange_prange")
+    profiler_on("difference_prange_prange")
     
     pranges = new_por()
     
     if (prange_2[1, 3] < prange_1[1, 2] | prange_2[1, 2] > prange_1[1, 3]) {
-        // profiler_off()
+        profiler_off()
         return(prange_1)
     }
     
@@ -1168,20 +1168,20 @@ mata
     
     res = compress(pranges)
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
 `PATTERN' difference_prange_por(`RANGE' prange, `OR' por) {
     `OR' por_differences
     
-    // profiler_on("difference_prange_por")
+    profiler_on("difference_prange_por")
     
     por_differences = new_por()
 
     append_por(por_differences, difference_list(prange, por))
     
-    // profiler_off()
+    profiler_off()
     return(por_differences)
 }
 
@@ -1190,7 +1190,7 @@ mata
     `OR' por_differences
     `REAL' i
     
-    // profiler_on("difference_por")
+    profiler_on("difference_por")
     por_differences = new_por()
 
     // Loop over all patterns in Or and compute the difference
@@ -1198,7 +1198,7 @@ mata
         push_por(por_differences, difference(por[i + 1, .], pattern))
     }
     
-    // profiler_off()
+    profiler_off()
     if (por_differences[1, 2] == 0) {
         return(new_pempty())
     }
@@ -1211,12 +1211,12 @@ mata
     `OR' differences, new_differences
     `REAL' i, j
     
-    // profiler_on("difference_list")
+    profiler_on("difference_list")
     differences = new_por()
     push_por(differences, pattern)
 
     if (por[1, 2] == 0) {
-        // profiler_off()
+        profiler_off()
         return(differences)
     }
     
@@ -1241,14 +1241,14 @@ mata
     
     drop_empty_patterns(differences)
     
-    // profiler_off()
+    profiler_off()
     return(differences)
 }
 
 void drop_empty_patterns(`OR' por) {
     `REAL' i
     
-    // profiler_on("drop_empty_patterns")
+    profiler_on("drop_empty_patterns")
     
     // TODO: matrix version
     for (i = 1; i <= por[1, 2]; i++) {
@@ -1260,7 +1260,7 @@ void drop_empty_patterns(`OR' por) {
         }
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 ////////////////////////////////////////////////////////////////////////// Utils
@@ -1516,7 +1516,7 @@ mata
     `TUPLE' tuple_compressed
     `REAL' i
 
-    // profiler_on("compress_tuple")
+    profiler_on("compress_tuple")
     
     tuple_compressed.arm_id = tuple.arm_id
     tuple_compressed.patterns = J(length(tuple.patterns), 1, NULL)
@@ -1524,12 +1524,12 @@ mata
     for (i = 1; i <= length(tuple.patterns); i++) {
         tuple_compressed.patterns[i] = &compress(*tuple.patterns[i])
         if ((*tuple_compressed.patterns[i])[1, 1] == `EMPTY_TYPE') {
-            // profiler_off()
+            profiler_off()
             return(TupleEmpty())
         }
     }
 
-    // profiler_off()
+    profiler_off()
     
     return(tuple_compressed)
 }
@@ -1539,7 +1539,7 @@ mata
     `POINTER' pattern_compressed
     `REAL' i
     
-    // profiler_on("compress_tupleor")
+    profiler_on("compress_tupleor")
     
     tuples_compressed = new_tupleor()
     
@@ -1549,7 +1549,7 @@ mata
             continue
         }
         else if (structname(*pattern_compressed) == "TupleWild") {
-            // profiler_off()
+            profiler_off()
             return(*pattern_compressed)
         }
         else {
@@ -1559,7 +1559,7 @@ mata
         }
     }
     
-    // profiler_off()
+    profiler_off()
     if (tuples_compressed.length == 0) {
         return(TupleEmpty())
     }
@@ -1607,7 +1607,7 @@ mata
     `TUPLE' tuple_overlap
     `REAL' i
     
-    // profiler_on("overlap_tuple_tuple")
+    profiler_on("overlap_tuple_tuple")
     
     check_tuples(tuple_1, tuple_2)
     
@@ -1620,12 +1620,12 @@ mata
             *tuple_2.patterns[i]
         )
         if ((*tuple_overlap.patterns[i])[1, 1] == 0) {
-            // profiler_off()
+            profiler_off()
             return(TupleEmpty())
         }
     }
 
-    // profiler_off()
+    profiler_off()
     return(tuple_overlap)
 }
 
@@ -1634,7 +1634,7 @@ mata
     `REAL' i
     `T' res
     
-    // profiler_on("overlap_tuple_tupleor")
+    profiler_on("overlap_tuple_tupleor")
     
     tuples_overlap = new_tupleor()
     
@@ -1646,7 +1646,7 @@ mata
     
     res = compress(tuples_overlap)
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
@@ -1655,14 +1655,14 @@ mata
     `POINTER' overlap
     `REAL' i
     
-    // profiler_on("overlap_tupleor")
+    profiler_on("overlap_tupleor")
     
     if (structname(pattern) == "TupleEmpty") {
-        // profiler_off()
+        profiler_off()
         return(TupleEmpty())
     }
     if (structname(pattern) == "TupleWild") {
-        // profiler_off()
+        profiler_off()
         return(tuples)
     }
     
@@ -1674,7 +1674,7 @@ mata
             continue
         }
         else if (structname(*overlap) == "TupleWild") {
-            // profiler_off()
+            profiler_off()
             return(*overlap)
         }
         else {
@@ -1684,7 +1684,7 @@ mata
         }
     }
     
-    // profiler_off()
+    profiler_off()
     if (tuples_overlap.length == 0) {
         return(TupleEmpty())
     }
@@ -1724,34 +1724,34 @@ mata
 `REAL' includes_tuple_tuple(`TUPLE' tuple_1, `TUPLE' tuple_2) {
     `REAL' i
     
-    // profiler_on("includes_tuple_tuple")
+    profiler_on("includes_tuple_tuple")
     
     check_tuples(tuple_1, tuple_2)
     
     for (i = 1; i <= length(tuple_1.patterns); i++) {
         if (!includes(*tuple_1.patterns[i], *tuple_2.patterns[i])) {
-            // profiler_off()
+            profiler_off()
             return(0)
         }
     }
 
-    // profiler_off()
+    profiler_off()
     return(1)
 }
 
 `REAL' includes_tuple_tupleor(`TUPLE' tuple, `TUPLEOR' tuples) {
     `REAL' i
     
-    // profiler_on("includes_tuple_tupleor")
+    profiler_on("includes_tuple_tupleor")
     
     for (i = 1; i <= tuples.length; i++) {
         if (!includes_tuple(tuple, *tuples.list[i])) {
-            // profiler_off()
+            profiler_off()
             return(0)
         }
     }
 
-    // profiler_off()
+    profiler_off()
     return(1)
 }
 
@@ -1776,7 +1776,7 @@ mata
     `POINTERS' difference
     `REAL' i, n_pat
     
-    // profiler_on("includes_tuples_tuple")
+    profiler_on("includes_tuples_tuple")
     
     difference = difference_list_tupleor(tuple, tuples)
     
@@ -1787,7 +1787,7 @@ mata
         n_pat++
     }
     
-    // profiler_off()
+    profiler_off()
     if (n_pat == 0) {
         return(1)
     }
@@ -1850,7 +1850,7 @@ We recursively build the difference of all the fields up to the first one.
     `TUPLE' new_main, new_other, new_diff_i
     `REAL' i
     
-    // profiler_on("difference_tuple_tuple")
+    profiler_on("difference_tuple_tuple")
     
     check_tuples(tuple_1, tuple_2)
     
@@ -1929,7 +1929,7 @@ We recursively build the difference of all the fields up to the first one.
     push_tupleor(result, res_inter)
     push_tupleor(result, res_diff)
     
-    // profiler_off()
+    profiler_off()
     return(compress(result))
 }
 
@@ -1945,7 +1945,7 @@ We recursively build the difference of all the fields up to the first one.
     `TUPLEOR' tuples_result
     `T' res
     
-    // profiler_on("difference_tuple_tupleor")
+    profiler_on("difference_tuple_tupleor")
     
     tuples_result = new_tupleor()
     
@@ -1953,7 +1953,7 @@ We recursively build the difference of all the fields up to the first one.
     
     res = compress(tuples_result)
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
@@ -1980,7 +1980,7 @@ We recursively build the difference of all the fields up to the first one.
     `TUPLEOR' tuples_differences
     `REAL' i
     
-    // profiler_on("difference_tupleor_tuple")
+    profiler_on("difference_tupleor_tuple")
     
     tuples_differences = new_tupleor()
     
@@ -1989,7 +1989,7 @@ We recursively build the difference of all the fields up to the first one.
         push_tupleor(tuples_differences, difference(*tuples.list[i], tuple))
     }
     
-    // profiler_off()
+    profiler_off()
     if (tuples_differences.length == 0) {
         return((TupleEmpty()))
     }
@@ -2003,7 +2003,7 @@ We recursively build the difference of all the fields up to the first one.
     `TUPLEOR' differences, new_differences
     `REAL' i, j
     
-    // profiler_on("difference_list_tupleor")
+    profiler_on("difference_list_tupleor")
     
     differences = new_tupleor()
     
@@ -2030,7 +2030,7 @@ We recursively build the difference of all the fields up to the first one.
         }
     }
     
-    // profiler_off()
+    profiler_off()
     return(differences.list)
 }
 
@@ -2222,7 +2222,7 @@ void htable_expand(struct Htable H) {
     real scalar h, res, i
     transmorphic scalar key
     
-    // profiler_on("htable_expand")
+    profiler_on("htable_expand")
     
     newH = htable_create(H.dkey, H.capacity * `RATIO')
     
@@ -2250,7 +2250,7 @@ void htable_expand(struct Htable H) {
     swap(H, newH)
     
     
-    // profiler_off()
+    profiler_off()
 }
 
 transmorphic colvector htable_keys(struct Htable H) {
@@ -2269,7 +2269,7 @@ mata
     `REAL'      i, n_vars
     `STRINGS'   vars_str
     
-    // profiler_on("init_variables")
+    profiler_on("init_variables")
     
     t = tokeninit()
     tokenset(t, vars_exp)
@@ -2284,7 +2284,7 @@ mata
         variables[i].init(vars_str[i], check)
     }
     
-    // profiler_off()
+    profiler_off()
     
     return(variables)
 }
@@ -2296,7 +2296,7 @@ void Variable::new() {}
     `STRING' res
     `REAL' i
 
-    // profiler_on("Variable::to_string()")
+    profiler_on("Variable::to_string()")
     
     levels_str = J(1, length(this.levels), "")
 
@@ -2314,7 +2314,7 @@ void Variable::new() {}
         invtokens(levels_str)
     )
     
-    // profiler_off()
+    profiler_off()
     
     return(res)
 }
@@ -2324,7 +2324,7 @@ void Variable::print() {
 }
 
 void Variable::init(`STRING' variable, `REAL' check) {
-    // profiler_on("Variable::init")
+    profiler_on("Variable::init")
     
     this.name = variable
     this.levels_len = 0
@@ -2336,13 +2336,13 @@ void Variable::init(`STRING' variable, `REAL' check) {
     this.init_type()
     this.init_levels()
     
-    // profiler_off()
+    profiler_off()
 }
 
 void Variable::init_type() {
     `STRING' var_type
     
-    // profiler_on("Variable::init_type")
+    profiler_on("Variable::init_type")
     
     var_type = st_vartype(this.name)
     this.stata_type = var_type
@@ -2360,7 +2360,7 @@ void Variable::init_type() {
         this.type = "string"
     }
     else {
-        // profiler_off()
+        profiler_off()
         errprintf(
             "Unexpected variable type for variable %s: %s\n",
             this.name, this.stata_type
@@ -2368,7 +2368,7 @@ void Variable::init_type() {
         exit(_error(3256))
     }
     
-    // profiler_off()
+    profiler_off()
 }
 end
 
@@ -2380,10 +2380,10 @@ local N_MATA_HASH 100000
 
 mata
 void Variable::init_levels() {
-    // profiler_on("Variable::init_levels")
+    profiler_on("Variable::init_levels")
     
     if (this.check == 0) {
-        // profiler_off()
+        profiler_off()
         return
     }
     
@@ -2406,11 +2406,11 @@ void Variable::init_levels() {
     
     this.levels_len = length(this.levels)
     
-    // profiler_off()
+    profiler_off()
 }
 
 void Variable::init_levels_int() {
-    // profiler_on("Variable::init_levels_int")
+    profiler_on("Variable::init_levels_int")
     
     if (st_nobs() < `N_MATA_SORT') {
         this.init_levels_int_base()
@@ -2422,11 +2422,11 @@ void Variable::init_levels_int() {
         this.init_levels_int_base()
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 void Variable::init_levels_float() {
-    // profiler_on("Variable::init_levels_float")
+    profiler_on("Variable::init_levels_float")
     
     if (st_nobs() < `N_MATA_SORT') {
         this.init_levels_float_base()
@@ -2441,11 +2441,11 @@ void Variable::init_levels_float() {
         this.init_levels_float_base()
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 void Variable::init_levels_string() {
-    // profiler_on("Variable::init_levels_string")
+    profiler_on("Variable::init_levels_string")
     
     if (this.stata_type == "strL") {
         this.init_levels_strL()
@@ -2459,11 +2459,11 @@ void Variable::init_levels_string() {
     
     this.quote_levels()
     
-    // profiler_off()
+    profiler_off()
 }
 
 void Variable::init_levels_int_base() {
-    // profiler_on("Variable::init_levels_int_base")
+    profiler_on("Variable::init_levels_int_base")
     
     real colvector x
     
@@ -2471,19 +2471,19 @@ void Variable::init_levels_int_base() {
     
     this.levels = uniqrowsofinteger(x)
     
-    // profiler_off()
+    profiler_off()
 }
 
 void Variable::init_levels_float_base() {
     real colvector x
     
-    // profiler_on("Variable::init_levels_float_base")
+    profiler_on("Variable::init_levels_float_base")
     
     st_view(x = ., ., this.name)
     
     this.levels = uniqrowssort(x)
     
-    // profiler_off()
+    profiler_off()
 }
 
 // Similar to the `levelsof` command internals
@@ -2493,7 +2493,7 @@ void Variable::init_levels_strL() {
     `STRING' n_init, indices
     real matrix cond, i, w
     
-    // profiler_on("Variable::init_levels_strL")
+    profiler_on("Variable::init_levels_strL")
     
     n_init = st_tempname()
     indices = st_tempname()
@@ -2508,32 +2508,32 @@ void Variable::init_levels_strL() {
     
     stata("sort " + n_init)
     
-    // profiler_off()
+    profiler_off()
 }
 
 void Variable::init_levels_strN() {
     string colvector x
     
-    // profiler_on("Variable::init_levels_strN")
+    profiler_on("Variable::init_levels_strN")
     
     st_sview(x = "", ., this.name)
 
     this.levels = uniqrowssort(x)
     
-    // profiler_off()
+    profiler_off()
 }
 
 void Variable::init_levels_tab() {
     `STRING' matname
     
-    // profiler_on("Variable::init_levels_tab")
+    profiler_on("Variable::init_levels_tab")
     
     matname = st_tempname()
     
     stata("quietly tab " + this.name + ", missing matrow(" + matname + ")")
     this.levels = st_matrix(matname)
     
-    // profiler_off()
+    profiler_off()
 }
 
 void Variable::init_levels_hash() {
@@ -2542,7 +2542,7 @@ void Variable::init_levels_hash() {
     struct Htable scalar levels
     real scalar n, h, res, i
     
-    // profiler_on("Variable::init_levels_hash")
+    profiler_on("Variable::init_levels_hash")
 
     if (this.type == "string") {
         st_sview(x="", ., this.name)
@@ -2580,7 +2580,7 @@ void Variable::init_levels_hash() {
 
     this.levels = htable_keys(levels)
     
-    // profiler_off()
+    profiler_off()
 }
 
 real scalar Variable::should_tab() {
@@ -2589,7 +2589,7 @@ real scalar Variable::should_tab() {
     real colvector  x, y
     real matrix     t
     
-    // profiler_on("Variable::should_tab")
+    profiler_on("Variable::should_tab")
     
     // Create a view
     st_view(x, ., this.name)
@@ -2606,7 +2606,7 @@ real scalar Variable::should_tab() {
 
     // If too many unique values in sample, return
     if (n >= `N_USE_TAB') {
-        // profiler_off()
+        profiler_off()
         return(0)
     }
 
@@ -2616,26 +2616,26 @@ real scalar Variable::should_tab() {
     // Estimate multiplicity in the sample
     multi = multiplicity(sum(t[., 2] :== 1), rows(t))
     
-    // profiler_off()
+    profiler_off()
     return(multi <= `N_USE_TAB')
 }
 
 void Variable::quote_levels() {
     `REAL' i
     
-    // profiler_on("Variable::quote_levels")
+    profiler_on("Variable::quote_levels")
     
     for (i = 1; i <= length(this.levels); i++) {
         this.levels[i] = `"""' + this.levels[i] + `"""'
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 real scalar Variable::get_level_index(transmorphic scalar level) {
     `REAL' index
     
-    // profiler_on("Variable::get_level_index")
+    profiler_on("Variable::get_level_index")
     
     if (this.sorted == 1) {
         index = binary_search(&this.levels, this.levels_len, level)
@@ -2654,7 +2654,7 @@ real scalar Variable::get_level_index(transmorphic scalar level) {
         index = this.levels_len
     }
     
-    // profiler_off()
+    profiler_off()
     return(index)
 }
 
@@ -2662,7 +2662,7 @@ real scalar binary_search(pointer(transmorphic vector) vec, `REAL' length, trans
     `REAL' left, right, i
     transmorphic scalar val
     
-    // profiler_on("binary_search")
+    profiler_on("binary_search")
     
     left = 1
     right = length
@@ -2672,7 +2672,7 @@ real scalar binary_search(pointer(transmorphic vector) vec, `REAL' length, trans
         val = (*vec)[i]
         
         if (value == val) {
-            // profiler_off()
+            profiler_off()
             return(i)
         }
         else if (value < val) {
@@ -2683,7 +2683,7 @@ real scalar binary_search(pointer(transmorphic vector) vec, `REAL' length, trans
         }
     }
     
-    // profiler_off()
+    profiler_off()
     
     return(0)
 }
@@ -2691,7 +2691,7 @@ real scalar binary_search(pointer(transmorphic vector) vec, `REAL' length, trans
 void Variable::set_minmax() {
     real vector x_num, minmax
     
-    // profiler_on("Variable::set_minmax")
+    profiler_on("Variable::set_minmax")
     
     minmax = minmax(x_num)
     
@@ -2705,28 +2705,28 @@ void Variable::set_minmax() {
     
     this.min = minmax[1]
     this.max = minmax[2]
-    // profiler_off()
+    profiler_off()
 }
 
 real scalar Variable::get_min() {
-    // profiler_on("Variable::get_min")
+    profiler_on("Variable::get_min")
     
     if (this.min == .a) {
         this.set_minmax()
     }
     
-    // profiler_off()
+    profiler_off()
     return(this.min)
 }
 
 real scalar Variable::get_max() {
-    // profiler_on("Variable::get_max")
+    profiler_on("Variable::get_max")
     
     if (this.max == .a) {
         this.set_minmax()
     }
     
-    // profiler_off()
+    profiler_off()
     return(this.max)
 }
 
@@ -2758,11 +2758,11 @@ real colvector Variable::reorder_levels() {
     transmorphic matrix table
     `REAL' i, k
     
-    // profiler_on("Variable::reorder_levels")
+    profiler_on("Variable::reorder_levels")
     
     if (this.type != "string" | this.check == 1) {
         // TODO: improve error
-        // profiler_off()
+        profiler_off()
         exit(1)
     }
     
@@ -2795,7 +2795,7 @@ real colvector Variable::reorder_levels() {
     table = sort(table, 1)
     
     // Return a vector of new indices
-    // profiler_off()
+    profiler_off()
     return(table[., 2])
 }
 end
@@ -2842,7 +2842,7 @@ void function eval_arms(
     `STRING' command, condition, statement
     `REAL' i, n, _rc
 
-    // profiler_on("eval_arms")
+    profiler_on("eval_arms")
     
     n = length(arms)
     
@@ -2885,7 +2885,7 @@ void function eval_arms(
         }
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 end
@@ -2899,7 +2899,7 @@ mata
     `ARMS' arms
     `POINTER' t
 
-    // profiler_on("parse_string")
+    profiler_on("parse_string")
     
     t = tokenize(str)
 
@@ -2909,7 +2909,7 @@ mata
         reorder_levels(arms, variables)
     }
     
-    // profiler_off()
+    profiler_off()
     return(arms)
 }
 
@@ -2918,7 +2918,7 @@ mata
     `ARMS' arms
     `REAL' i
 
-    // profiler_on("parse_arms")
+    profiler_on("parse_arms")
     
     arms = Arm(0)
     i = 0
@@ -2937,14 +2937,14 @@ mata
         }
     }
 
-    // profiler_off()
+    profiler_off()
     return(arms)
 }
 
 `ARM' parse_arm(`POINTER' t, `REAL' arm_id, `VARIABLES' variables) {
     `ARM' arm
 
-    // profiler_on("parse_arm")
+    profiler_on("parse_arm")
     
     arm.id = arm_id
     arm.lhs.arm_id = arm_id
@@ -2962,7 +2962,7 @@ mata
     
     arm.has_wildcard = check_wildcard(arm.lhs.pattern)
 
-    // profiler_off()
+    profiler_off()
     return(arm)
 }
 
@@ -2971,7 +2971,7 @@ mata
     `REAL' number
     `PATTERN' res
 
-    // profiler_on("parse_pattern")
+    profiler_on("parse_pattern")
     
     tok = tokenget(t)
 
@@ -3053,7 +3053,7 @@ mata
         exit(_error(3250))
     }
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
@@ -3066,7 +3066,7 @@ mata
     `STRING' next
     `PATTERN' res
 
-    // profiler_on("parse_number")
+    profiler_on("parse_number")
     
     next = tokenpeek(t)
     
@@ -3078,7 +3078,7 @@ mata
         res = parse_constant(number, variable)
     }
     
-    // profiler_off()
+    profiler_off()
     return(res)
 }
 
@@ -3107,7 +3107,7 @@ mata
     `STRING' next
     `REAL' max, epsilon, var_type
     
-    // profiler_on("parse_range")
+    profiler_on("parse_range")
     
     next = tokenget(t)
     
@@ -3144,7 +3144,7 @@ mata
         exit(_error(3498))
     }
 
-    // profiler_off()
+    profiler_off()
     return(new_prange(min, max, var_type))
 }
 
@@ -3190,7 +3190,7 @@ mata
     `OR' por
     `PATTERN' pat
 
-    // profiler_on("parse_or")
+    profiler_on("parse_or")
     
     por = new_por()
     
@@ -3198,7 +3198,7 @@ mata
         pat = parse_pattern(t, variable, arm_id)
         
         if (pat[1, 1] == `WILD_TYPE') {
-            // profiler_off()
+            profiler_off()
             return(pat)
         }
         else {
@@ -3208,7 +3208,7 @@ mata
 
     por = compress_por(por)
     
-    // profiler_off()
+    profiler_off()
     return(por)
 }
 
@@ -3216,14 +3216,14 @@ mata
     `TUPLE' tuple
     `REAL' i
 
-    // profiler_on("parse_tuple")
+    profiler_on("parse_tuple")
     
     tuple.patterns = J(1, length(variables), NULL)
 
     i = 0
     
     if (tokenpeek(t) == "_") {
-        // profiler_off()
+        profiler_off()
         return(TupleWild())
     }
     
@@ -3252,14 +3252,14 @@ mata
         exit(_error(3300))
     }
 
-    // profiler_off()
+    profiler_off()
     return(tuple)
 }
 
 `TUPLEOR' parse_tupleor(`POINTER' t, `VARIABLES' variables, `REAL' arm_id) {
     `TUPLEOR' tuples
     
-    // profiler_on("parse_tupleor")
+    profiler_on("parse_tupleor")
     
     tuples = new_tupleor()
 
@@ -3269,7 +3269,7 @@ mata
     
     tuples = compress_tupleor(tuples)
     
-    // profiler_off()
+    profiler_off()
     return(tuples)
 }
 
@@ -3294,7 +3294,7 @@ mata
 `STRING' consume(`POINTER' t, `STRING' str) {
     `STRING' tok, inside, value
 
-    // profiler_on("consume")
+    profiler_on("consume")
     
     value = ""
     while (tokenpeek(t) != str & tokenpeek(t) != "") {
@@ -3306,7 +3306,7 @@ mata
     }
     (void) tokenget(t)
     
-    // profiler_off()
+    profiler_off()
     return(value)
 }
 
@@ -3394,48 +3394,48 @@ void check_next(`POINTER' t, `STRING' str, `REAL' arm_id) {
 `REAL' check_wildcard_por(`OR' por) {
     `REAL' i
     
-    // profiler_on("check_wildcard_por")
+    profiler_on("check_wildcard_por")
     
     for (i = 1; i <= por[1, 2]; i++) {
         if (check_wildcard(por[i + 1, 1]) == 1) {
-            // profiler_off()
+            profiler_off()
             return(1)
         }
     }
     
-    // profiler_off()
+    profiler_off()
     return(0)
 }
 
 `REAL' check_wildcard_tuple(`TUPLE' tuple) {
     `REAL' i
     
-    // profiler_on("check_wildcard_tuple")
+    profiler_on("check_wildcard_tuple")
     
     for (i = 1; i <= length(tuple.patterns); i++) {
         if (check_wildcard(*tuple.patterns[i]) == 1) {
-            // profiler_off()
+            profiler_off()
             return(1)
         }
     }
     
-    // profiler_off()
+    profiler_off()
     return(0)
 }
 
 `REAL' check_wildcard_tupleor(`TUPLEOR' tuples) {
     `REAL' i
     
-    // profiler_on("check_wildcard_tuplepor")
+    profiler_on("check_wildcard_tuplepor")
     
     for (i = 1; i <= tuples.length; i++) {
         if (check_wildcard(*tuples.list[i]) == 1) {
-            // profiler_off()
+            profiler_off()
             return(1)
         }
     }
     
-    // profiler_off()
+    profiler_off()
     return(0)
 }
 
@@ -3443,7 +3443,7 @@ void reorder_levels(`ARMS' arms, `VARIABLES' variables) {
     `REAL' i
     pointer(real colvector) vector tables
     
-    // profiler_on("reorder_levels")
+    profiler_on("reorder_levels")
     
     tables = J(1, length(variables), NULL)
     
@@ -3458,7 +3458,7 @@ void reorder_levels(`ARMS' arms, `VARIABLES' variables) {
         reindex_levels_arms(arms, tables)
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 void reindex_levels_arms(
@@ -3467,25 +3467,25 @@ void reindex_levels_arms(
 ) {
     `REAL' i
     
-    // profiler_on("reindex_levels_arms")
+    profiler_on("reindex_levels_arms")
     
     // Get a list of vector to recast indices
     for (i = 1; i <= length(arms); i++) {
         reindex_levels_arm(arms[i], tables)
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 void reindex_levels_arm(
     `ARM' arm,
     pointer(real colvector) vector tables
 ) {
-    // profiler_on("reindex_levels_arm")
+    profiler_on("reindex_levels_arm")
     
     reindex_levels_pattern(*arm.lhs.pattern, 1, tables)
     
-    // profiler_off()
+    profiler_off()
 }
 
 void reindex_levels_pattern(
@@ -3493,7 +3493,7 @@ void reindex_levels_pattern(
     `REAL' index,
     pointer(real colvector) vector tables
 ) {
-    // profiler_on("reindex_levels_pattern")
+    profiler_on("reindex_levels_pattern")
     
     if (eltype(pattern) == "real") {
         if (pattern[1, 1] == `EMPTY_TYPE') {
@@ -3539,7 +3539,7 @@ void reindex_levels_pattern(
         unknown_pattern(pattern)
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 void reindex_levels_pwild(
@@ -3547,7 +3547,7 @@ void reindex_levels_pwild(
     `REAL' index,
     pointer(real colvector) vector tables
 ) {
-    // profiler_on("reindex_levels_pwild")
+    profiler_on("reindex_levels_pwild")
     
     // Rebuild the wild pattern
     
@@ -3556,7 +3556,7 @@ void reindex_levels_pwild(
             (0 \ *tables),
             J(length(*tables) + 1, 1, pwild[1, 4])
     
-    // profiler_off()
+    profiler_off()
 }
 
 void reindex_levels_pconstant(
@@ -3566,7 +3566,7 @@ void reindex_levels_pconstant(
 ) {
     `REAL' value
     
-    // profiler_on("reindex_levels_pconstant")
+    profiler_on("reindex_levels_pconstant")
     
     if (tables != NULL) {
         value = (*tables)[pconstant[index, 2]]
@@ -3574,7 +3574,7 @@ void reindex_levels_pconstant(
         pconstant[index, 3] = value
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 void reindex_levels_prange(
@@ -3582,14 +3582,14 @@ void reindex_levels_prange(
     `REAL' index,
     pointer(real colvector) scalar tables
 ) {
-    // profiler_on("reindex_levels_prange")
+    profiler_on("reindex_levels_prange")
     
     if (tables != NULL) {
         prange[index, 2] = (*tables)[prange[index, 2]]
         prange[index, 3] = (*tables)[prange[index, 3]]
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 void reindex_levels_por(
@@ -3599,13 +3599,13 @@ void reindex_levels_por(
 ) {
     `REAL' i
     
-    // profiler_on("reindex_levels_por")
+    profiler_on("reindex_levels_por")
     
     for (i = 1; i <= por[1, 2]; i++) {
         reindex_levels_pattern(por, i + 1, tables)
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 void reindex_levels_tuple(
@@ -3614,7 +3614,7 @@ void reindex_levels_tuple(
 ) {
     `REAL' i
     
-    // profiler_on("reindex_levels_tuple")
+    profiler_on("reindex_levels_tuple")
     
     for (i = 1; i <= length(tuple.patterns); i++) {
         if (tables[i] != NULL) {
@@ -3622,7 +3622,7 @@ void reindex_levels_tuple(
         }
     }
     
-    // profiler_off()
+    profiler_off()
 }
 
 void reindex_levels_tupleor(
@@ -3631,13 +3631,13 @@ void reindex_levels_tupleor(
 ) {
     `REAL' i
     
-    // profiler_on("reindex_levels_tupleor")
+    profiler_on("reindex_levels_tupleor")
     
     for (i = 1; i <= tuples.length; i++) {
         reindex_levels_pattern(*tuples.list[i], 1, tables)
     }
     
-    // profiler_off()
+    profiler_off()
 }
 end
 
@@ -3795,7 +3795,7 @@ void function check_match(`ARMS' arms, `VARIABLES' variables) {
     `ARMS' useful_arms
     `REAL' i
 
-    // profiler_on("check_match")
+    profiler_on("check_match")
     
     // bench_on("- usefulness")
     report.usefulness = check_useful(arms)
@@ -3826,7 +3826,7 @@ void function check_match(`ARMS' arms, `VARIABLES' variables) {
     report.print()
     // bench_off("- print")
     
-    // profiler_off()
+    profiler_off()
 }
 
 /////////////////////////////////////////////////////////////// Check usefulness
@@ -3838,7 +3838,7 @@ class Usefulness vector check_useful(`ARMS' arms) {
     class Usefulness vector usefulness_vec
     `REAL' i, n_arms
 
-    // profiler_on("check_useful")
+    profiler_on("check_useful")
     
     useful_arms = Arm(0)
 
@@ -3863,7 +3863,7 @@ class Usefulness vector check_useful(`ARMS' arms) {
         usefulness_vec[i].define(usefulness)
     }
     
-    // profiler_off()
+    profiler_off()
     return(usefulness_vec)
 }
 
@@ -3875,7 +3875,7 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
     `ARM' ref_arm
     `REAL' i, k
     
-    // profiler_on("is_useful")
+    profiler_on("is_useful")
     
     lhs_empty.pattern = &new_pempty()
     
@@ -3892,7 +3892,7 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
         result.overlaps = &lhs_empty
         result.differences = differences
 
-        // profiler_off()
+        profiler_off()
         return(result)
     }
 
@@ -3947,7 +3947,7 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
         }
     }
 
-    // profiler_off()
+    profiler_off()
     return(result)
 }
 
@@ -3964,7 +3964,7 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
     class Usefulness scalar usefulness
     `REAL' i
     
-    // profiler_on("check_exhaustiveness")
+    profiler_on("check_exhaustiveness")
     
     pwilds = J(length(variables), 1, NULL)
 
@@ -3990,7 +3990,7 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
     usefulness = is_useful(wild_arm, arms)
     // bench_off("  - is_useful() 2")
     
-    // profiler_off()
+    profiler_off()
     return(*usefulness.differences)
 }
 
@@ -4014,7 +4014,7 @@ void pmatch(
     `VARIABLES' variables
     `ARMS' arms, useful_arms
 
-    // profiler_on("pmatch")
+    profiler_on("pmatch")
     
     // bench_on("total")
     
@@ -4038,7 +4038,7 @@ void pmatch(
 
     // bench_off("total")
     
-    // profiler_off()
+    profiler_off()
 }
 end
 

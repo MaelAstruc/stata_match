@@ -11,6 +11,8 @@ void function check_match(`ARMS' arms, `VARIABLES' variables) {
     `ARMS' useful_arms
     `REAL' i
 
+    // profiler_on("check_match")
+    
     // bench_on("- usefulness")
     report.usefulness = check_useful(arms)
     // bench_off("- usefulness")
@@ -39,6 +41,8 @@ void function check_match(`ARMS' arms, `VARIABLES' variables) {
     // bench_on("- print")
     report.print()
     // bench_off("- print")
+    
+    // profiler_off()
 }
 
 /////////////////////////////////////////////////////////////// Check usefulness
@@ -50,6 +54,8 @@ class Usefulness vector check_useful(`ARMS' arms) {
     class Usefulness vector usefulness_vec
     `REAL' i, n_arms
 
+    // profiler_on("check_useful")
+    
     useful_arms = Arm(0)
 
     n_arms = length(arms)
@@ -73,6 +79,7 @@ class Usefulness vector check_useful(`ARMS' arms) {
         usefulness_vec[i].define(usefulness)
     }
     
+    // profiler_off()
     return(usefulness_vec)
 }
 
@@ -83,6 +90,8 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
     class Usefulness scalar result
     `ARM' ref_arm
     `REAL' i, k
+    
+    // profiler_on("is_useful")
     
     lhs_empty.pattern = &new_pempty()
     
@@ -99,6 +108,7 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
         result.overlaps = &lhs_empty
         result.differences = differences
 
+        // profiler_off()
         return(result)
     }
 
@@ -153,6 +163,7 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
         }
     }
 
+    // profiler_off()
     return(result)
 }
 
@@ -168,6 +179,8 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
     `TUPLE' tuple
     class Usefulness scalar usefulness
     `REAL' i
+    
+    // profiler_on("check_exhaustiveness")
     
     pwilds = J(length(variables), 1, NULL)
 
@@ -193,6 +206,7 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
     usefulness = is_useful(wild_arm, arms)
     // bench_off("  - is_useful() 2")
     
+    // profiler_off()
     return(*usefulness.differences)
 }
 
