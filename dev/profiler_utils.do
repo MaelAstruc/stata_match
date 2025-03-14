@@ -132,9 +132,11 @@ struct ProfilerNode {
     real scalar depth
 }
 
-struct ProfilerNode vector build_profiler_tree(`PROFILER' profiler) {
+struct ProfilerNode vector build_profiler_tree(`PROFILER' profiler, real scalar min_time) {
 	struct ProfilerNode vector nodes
-    real scalar current, i, index
+    real matrix filter, times, depths
+    string vector names
+    real scalar current, n, i, index
     
     nodes = ProfilerNode(profiler.length + 1)
     nodes[1].name = "PROFILER"
@@ -145,14 +147,23 @@ struct ProfilerNode vector build_profiler_tree(`PROFILER' profiler) {
     
     current = 1
     
-	for (i = 1; i <= profiler.length; i++) {
+    filter = (profiler.times[., 2] :- profiler.times[., 1]) :> min_time
+    filter = filter :& ((1..rows(profiler.times))' :<= profiler.length)
+    
+    times  = select(profiler.times, filter)
+    depths = select(profiler.depths, filter)
+    names  = select(profiler.names, filter)
+    
+    n = rows(times)
+    
+	for (i = 1; i <= n; i++) {
     	index = i + 1
         
-        nodes[index].name = profiler.names[i]
+        nodes[index].name = names[i]
         nodes[index].parent = current
         nodes[index].children = J(0, 1, .)
-        nodes[index].time = profiler.times[i, 2] - profiler.times[i, 1]
-        nodes[index].depth = profiler.depths[i]
+        nodes[index].time = times[i, 2] - times[i, 1]
+        nodes[index].depth = depths[i]
         
         if (nodes[index].depth == 1) {
         	nodes[1].time = nodes[1].time + nodes[index].time
@@ -224,7 +235,7 @@ void profiler_print(`PROFILER' profiler, | real scalar min_time) {
     	min_time = `PROFILER_MIN_TIME'
     }
     
-    tree = build_profiler_tree(profiler)
+    tree = build_profiler_tree(profiler, min_time)
     
     profiler_print_node(tree, 1, "", " ", "", min_time)
 }
@@ -265,27 +276,49 @@ void profiler_summarize(`PROFILER' profiler) {
 }
 
 void profiler_graph(`PROFILER' profiler, | real scalar min_time) {
-	string scalar cmd, color
+	string scalar cmd, color, name
+    real matrix filter, times, depths, data, condition_depth, condition_function, gaps
+    string matrix names, functions
     pointer(real matrix) scalar bar_mat
     pointer scalar colors
-    real scalar i
+    real scalar i, j, max_depth
     
     if (args() == 1) {
     	min_time = 0
     }
     
+    // Hashmap to store colors
     colors = asarray_create()
     asarray_notfound(colors, "")
     
+    // Build matrix for area graphs
+    filter = (profiler.times[., 2] :- profiler.times[., 1]) :> min_time
+    filter = filter :& ((1..rows(profiler.times))' :<= profiler.length)
+    
+    times = select(profiler.times, filter)
+    times = times, J(rows(times), 1, .)
+    times = colshape(times, 1)
+    
+    depths = select(profiler.depths, filter)
+    depths = depths, depths, J(rows(depths), 1, .)
+    depths = colshape(depths, 1)    
+    
+    names = select(profiler.names, filter)
+    names = names, names, J(rows(names), 1, "")
+    names = colshape(names, 1)
+    
+    data = depths, times
+    
+    max_depth = max(depths)
+    functions = uniqrows(names)
+    
+    gaps = depths :== .
+    
     rmexternal("PROFILER_BAR_MAT")
     bar_mat = crexternal("PROFILER_BAR_MAT")
-    
-	for (i = 1; i <= profiler.length; i++) {
-    	*bar_mat = (profiler.depths[i], profiler.times[i, 1]) \ (profiler.depths[i], profiler.times[i, 2])
-        
-        if (profiler.times[i, 2] - profiler.times[i, 1] <= min_time) {
-        	continue
-        }
+
+	for (i = 1; i <= max_depth; i++) {
+    	condition_depth = (depths :== i) :| gaps
         
     	if (i == 1) {
         	cmd = "twoway"
@@ -294,25 +327,36 @@ void profiler_graph(`PROFILER' profiler, | real scalar min_time) {
         	cmd = "addplot:"
         }
         
-        color = asarray(colors, profiler.names[i])
-        
-        if (color == "") {
-        	color = sprintf(
-                "%f %f %f",
-                runiformint(1, 1, 0, 255),
-                runiformint(1, 1, 0, 255),
-                runiformint(1, 1, 0, 255)
-            )
+        for (j = 1; j <= length(functions); j++) {
+        	name = functions[j]
+        	condition_function = (names :== name) :| gaps
             
-            asarray(colors, profiler.names[i], color)
-        }
+            *bar_mat = select(data, condition_depth :& condition_function)
+            
+            if (nonmissing(*bar_mat) == 0) {
+            	continue
+            }
+            
+            color = asarray(colors, name)
         
-        stata(sprintf(
-            `"%s bar matamatrix(PROFILER_BAR_MAT), bartype(spanning) base(%f) fcolor("%s") lcolor(gs11) lwidth(0.05) legend(off) xtitle("time (ms)") ytitle("Depth")"',
-            cmd,
-            profiler.depths[i] - 1,
-            color
-        ))
+            if (color == "") {
+                color = sprintf(
+                    "%f %f %f",
+                    runiformint(1, 1, 0, 255),
+                    runiformint(1, 1, 0, 255),
+                    runiformint(1, 1, 0, 255)
+                )
+                
+                asarray(colors, name, color)
+            }
+        
+            stata(sprintf(
+                `"%s area matamatrix(PROFILER_BAR_MAT), cmissing(n) base(%f) fcolor("%s") lcolor(gs11) lwidth(0) legend(off) xtitle("Time (ms)") ytitle("Depth")"',
+                cmd,
+                i - 1,
+                color
+            ))
+        }
     }
 }
 
