@@ -5,10 +5,18 @@ Tests the code and runs benchmarks
 
 clear all
 
+**#******************************************************** Check computer state
+
+// Run Stata as high-priority
+shell powershell -Command "(Get-Process -Name 'stataMP-64').PriorityClass = [System.Diagnostics.ProcessPriorityClass]::High"
+
+// Wait for computer to use less that 5% of processor
+shell powershell -Command "while ((Get-Counter).CounterSamples.CookedValue[1] -gt 0.05) {Start-Sleep -Seconds 1}"
+
 **#********************************************************************** Locals
 
-local pkg_version    = "0.0.17"
-local distrib_date   = "09 Mar 2025"
+local pkg_version    = "0.0.18"
+local distrib_date   = "06 Jul 2025"
 local stata_version  = "`c(version)'"
 local date_fmt       = string(date("`distrib_date'", "DMY"), "%tdDD/NN/CCYY")
 local pwd            = ustrregexra("`c(pwd)'", "\\", "/") + "/"
@@ -94,6 +102,8 @@ version `stata_version'
 
 do "dev/benchmark/class_count.do"
 do "dev/benchmark/bench_e2e.do"
+
+// shell powershell -Command "(Start-Process 'C:/Users/malsouder/Documents/Stata 17/StataMP-64.exe' -ArgumentList '/e do C:/Users/malsouder/Documents/Projets/stata_match/dev/benchmark/bench_e2e.do' -PassThru).PriorityClass = [System.Diagnostics.ProcessPriorityClass]::High"
 
 **#*************************************************************** Run profilers
 

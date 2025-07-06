@@ -1,5 +1,7 @@
 // Run the different utils functions for development
 
+set linesize 200
+
 // Used to build and test the package
 run "dev/dev_utils.do"
 

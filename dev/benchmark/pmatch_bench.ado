@@ -1,4 +1,4 @@
-*! version 0.0.17  09 Mar 2025
+*! version 0.0.18  06 Jul 2025
 
 **#************************************************************ src/declare.mata
 
@@ -480,7 +480,7 @@ mata
 `WILD' new_pwild(`VARIABLE' variable) {
     `WILD' pwild
     `CONSTANT' pconstant
-    `REAL' i, n_pat, variable_type
+    `REAL' i, n_pat, variable_type, k, level, last_level
     
     // profiler_on("new_pwild")
     
@@ -490,27 +490,46 @@ mata
     
     n_pat = length(variable.levels)
     
-    pwild = (`WILD_TYPE', n_pat, 0, variable_type) \ J(n_pat, 4, 0)
+    if (n_pat == 0) {
+        return((`WILD_TYPE', 0, 0, variable_type) \ new_pempty())
+    }
     
     if (variable.type == "string") {
-        for (i = 1; i <= n_pat; i++) {
-            pconstant = new_pconstant(i, variable_type)
-            pwild[i + 1, .] = pconstant
-        }
+        // Use a range covering all the possible levels
+        pwild = (`WILD_TYPE', 1, 0, variable_type) \ new_prange(1, n_pat, variable_type)
     }
     else if (variable.type == "int") {
-        for (i = 1; i <= n_pat; i++) {
-            pconstant = new_pconstant(variable.levels[i], variable_type)
-            pwild[i + 1, .] = pconstant
+        // Aggregate series of ints are ranges
+        pwild = (`WILD_TYPE', 0, 0, variable_type) \ J(n_pat, 4, 0)
+        
+        k = 1
+        level = variable.levels[1]
+        pwild[2, .] = new_pconstant(level, variable_type)
+        
+        for (i = 2; i <= n_pat; i++) {
+            last_level = level
+            level = variable.levels[i]
+            
+            if (level == last_level + 1) {
+                pwild[k + 1, 1] = `RANGE_TYPE'
+                pwild[k + 1, 3] = level
+            }
+            else {
+                k++
+                pwild[k + 1, .] = new_pconstant(level, variable_type)
+            }
         }
+        pwild[1, 2] = k
     }
     else if (variable.type == "float") {
+        pwild = (`WILD_TYPE', n_pat, 0, variable_type) \ J(n_pat, 4, 0)
         for (i = 1; i <= n_pat; i++) {
             pconstant = new_pconstant(variable.levels[i], variable_type)
             pwild[i + 1, .] = pconstant
         }
     }
     else if (variable.type == "double") {
+        pwild = (`WILD_TYPE', n_pat, 0, variable_type) \ J(n_pat, 4, 0)
         for (i = 1; i <= n_pat; i++) {
             pconstant = new_pconstant(variable.levels[i], variable_type)
             pwild[i + 1, .] = pconstant
@@ -619,10 +638,33 @@ mata
 }
 
 `STRING' to_expr_prange(`RANGE' prange, `VARIABLE' variable) {
-    return(sprintf(
-        "%s >= %21x & %s <= %21x",
-        variable.name, prange[1, 2], variable.name, prange[1, 3]
-    ))
+    string scalar expr
+    string vector exprs
+    real scalar min, max, n_vals
+    
+    min = prange[1, 2]
+    max = prange[1, 3]
+    
+    if (variable.type == "string") {
+        n_vals = max - min + 1
+        if (n_vals == 1) {
+            expr = sprintf("%s == %s", variable.name, variable.levels[min])
+        }
+        else {
+            exprs =
+                J(1, n_vals, "(") +
+                J(1, n_vals, variable.name) +
+                J(1, n_vals, " == ") +
+                variable.levels[min..max]' +
+                J(1, n_vals, ")")
+            expr = invtokens(exprs, " | ")
+        }
+    }
+    else {
+        expr = sprintf("%s >= %21x & %s <= %21x", variable.name, min, variable.name, max)
+    }
+    
+    return(expr)
 }
 
 `STRING' to_expr_por(`OR' por, `VARIABLES' variable) {
@@ -655,7 +697,12 @@ mata
 }
 
 `PATTERN' compress_pwild(`WILD' pwild) {
-    return(pwild)
+    `PATTERN' pwild_compressed
+    
+    pwild_compressed = compress_por(pwild, 0)
+    pwild_compressed[1, 1] = `WILD_TYPE'
+    
+    return(pwild_compressed)
 }
 
 `PATTERN' compress_pconstant(`CONSTANT' pconstant) {
@@ -677,45 +724,185 @@ mata
     }
 }
 
-`PATTERN' compress_por(`OR' por) {
-    `OR' por_compressed
-    `PATTERN' pattern_compressed
-    `REAL' i, n_pat
+`PATTERN' compress_por(`OR' por, | `REAL' downgrade) {
+    `PATTERN' por_compressed
+    `REAL' type_nb, current_max, n_pat
+    real vector new_max, condition, pat_type, min, max
     
     // profiler_on("compress_por")
     
-    por_compressed = new_por()
+    if (args() == 1) {
+        downgrade = 1
+    }
+    
+    // Check if the pattern is empty
     
     n_pat = por[1, 2]
     
-    for (i = 1; i <= n_pat; i++) {
-        pattern_compressed = compress(por[i + 1, .])
-        if (pattern_compressed[1, 1] == `EMPTY_TYPE') {
-            continue
-        }
-        else if (pattern_compressed[1, 1] == `WILD_TYPE') {
-            // profiler_off()
-            return(pattern_compressed)
+    if (n_pat == 0) {
+        // profiler_off()
+        if (downgrade == 1) return(new_pempty())
+        else return(por)
+    }
+    
+    type_nb = por[2, 4]
+    
+    // Select the patterns that are not empty
+    por_compressed = por[2..(n_pat + 1), .]
+    por_compressed = select(
+        por_compressed,
+        (por_compressed[., 1] :== 2) :| (por_compressed[., 1] :== 3)
+    )
+    por_compressed = select(
+        por_compressed,
+        por_compressed[., 2] :<= por_compressed[., 3]
+    )
+    
+    // Sort by min in ascending order and max by descending order
+    _sort(por_compressed, (2, -3))
+    
+    // Identify the rows where max is larger than all previous maxs
+    // We use order and add indices in case of ties to preserve order
+    current_max = por_compressed[., 3], (1..n_pat)'
+    condition = order(current_max, (1, 2)) :>= (1..n_pat)'
+    por_compressed = select(por_compressed, condition)
+    n_pat = rows(por_compressed)
+    
+    // Return if there is only one pattern
+    if (n_pat == 1) {
+        if (por_compressed[1, 2] == por_compressed[1, 3]) {
+            por_compressed[1, 1] = `CONSTANT_TYPE'
         }
         else {
-            if (!includes_por(por_compressed, pattern_compressed)) {
-                push_por(por_compressed, pattern_compressed) 
-            }
+            por_compressed[1, 1] = `RANGE_TYPE'
         }
+        
+        // profiler_off()
+        if (downgrade == 1) return(por_compressed)
+        else return((`OR_TYPE', 1, 0, 0) \ por_compressed)
     }
     
-    // profiler_off()
-    
-    if (por_compressed[1, 2] == 0) {
-        return(new_pempty())
+    if (type_nb == 1 | type_nb == 4) {
+        // Compute the next value for the max
+        new_max = por_compressed[., 3]
+        new_max = new_max :+ 1
+
+        // Keep rows where the min is not equal to the previous max
+        // Or just above
+        condition = por_compressed[2..n_pat, 2] :> new_max[1..(n_pat - 1)]
+
+        // Get the new min and max
+        min = select(por_compressed[., 2], 1 \ condition)
+        max = select(por_compressed[., 3], condition \ 1)
+        
     }
-    else if (por_compressed[1, 2] == 1) {
-        return(por_compressed[2, .])
+    else if (type_nb == 2 | type_nb == 3) {
+        min = por_compressed[., 2]
+        max = por_compressed[., 3]
     }
     else {
+        errprintf("Unexpected variable type: %f\n", type_nb)
+        exit(_error(3256))
+    }
+    
+    n_pat = rows(min)
+
+    // Determine which rows are ranges
+    pat_type = J(n_pat, 1, `CONSTANT_TYPE') :+ (min :< max)
+    
+    // Build patterns
+    por_compressed = pat_type, min, max, J(n_pat, 1, type_nb)
+
+    // profiler_off()
+
+    // Change type if needed
+    if (n_pat == 0 & downgrade == 1) {
+        return(new_pempty())
+    }
+    else if (n_pat == 1 & downgrade == 1) {
+        return(por_compressed[1, .])
+    }
+    else {
+        por_compressed = (`OR_TYPE', n_pat, ., .) \ por_compressed
         return(por_compressed)
     }
 }
+
+// `PATTERN' compress_por(`OR' por, | real scalar downgrade) {
+//     `OR' por_compressed
+//     `PATTERN' patterns
+//     `REAL' i, k, n_pat
+//     real vector constants
+//    
+//     // profiler_on("compress_por")
+//    
+//     if (args() == 1) {
+//         downgrade = 1
+//     }
+//    
+//     n_pat = por[1, 2]
+//    
+//     if (n_pat == 0) {
+//         // profiler_off()
+//         if (downgrade == 1) {
+//             return(new_pempty())
+//         }
+//         else {
+//             return(por)
+//         }
+//     }
+//    
+//     por_compressed = por
+//    
+//     _sort(por_compressed[2..(n_pat + 1), .], (2, -3))
+//    
+//     k = 1
+//     for (i = 2; i <= n_pat + 1; i++) {
+//         // We never push a wildcard pattern in a POr (it replaces it)
+//         // assert(patterns[i, 1] != `WILD_TYPE')
+//         if (por_compressed[i, 1] == `EMPTY_TYPE' | por_compressed[i, 2] > por_compressed[i, 3]) {
+//             continue
+//         }
+//         else if (k == 1) {
+//             k++
+//             por_compressed[k, .] = por_compressed[i, .]
+//         }
+//         else if (por_compressed[i, 4] == 4 & por_compressed[i, 2] > por_compressed[k, 3]) {
+//             k++
+//             por_compressed[k, .] = por_compressed[i, .]
+//         }
+//         else if (por_compressed[i, 4] != 4 & por_compressed[i, 2] > por_compressed[k, 3] + get_epsilon(por_compressed[k, 3], por_compressed[k, 4])) {
+//             k++
+//             por_compressed[k, .] = por_compressed[i, .]
+//         }
+//         else {
+//             por_compressed[k, 3] = max((por_compressed[k, 3], por_compressed[i, 3]))
+//         }
+//        
+//         // Adapt the type between constant or range
+//         // k is always at least 1 at this stage
+//         if (por_compressed[k, 2] == por_compressed[k, 3]) {
+//             por_compressed[k, 1] = `CONSTANT_TYPE'
+//         }
+//         else {
+//             por_compressed[k, 1] = `RANGE_TYPE'
+//         }
+//     }
+//    
+//     // profiler_off()
+//    
+//     // With the POr header, k=1 means no pattern and k=2 means 1 pattern
+//     if (k == 1 & downgrade == 1) {
+//         return(new_pempty())
+//     }
+//     else if (k == 2 & downgrade == 1) {
+//         return(por_compressed[k, .])
+//     }
+//     else {
+//         por_compressed[1, 2] = k - 1
+//         return(por_compressed)
+//     }
+// }
 
 ////////////////////////////////////////////////////////////////////// overlap()
 
@@ -835,7 +1022,8 @@ mata
     // profiler_on("overlap_por")
     
     por_overlap = new_por()
-
+    
+    // TODO: Use matrix if pattern is not por
     for (i = 1; i <= por[1, 2]; i++) {
         overlap = overlap(por[i + 1, .], pattern)
         
@@ -912,6 +1100,7 @@ mata
     `REAL' i
     // profiler_on("includes_pconstant_por")
     
+    // TODO: Use matrix with any
     for (i = 1; i <= por[1, 2]; i++) {
         if (!includes_pconstant(pconstant, por[i + 1, .])) {
             // profiler_off()
@@ -961,6 +1150,7 @@ mata
     
     // profiler_on("includes_prange_por")
     
+    // TODO: Use matrix: prange min is smaller and max is larger
     for (i = 1; i <= por[1, 2]; i++) {
         if (!includes_prange(prange, por[i + 1, .])) {
             // profiler_off()
@@ -989,6 +1179,7 @@ mata
     
     // profiler_on("includes_por_pconstant")
     
+    // TODO: Use matrix
     for (i = 1; i <= por[1, 2]; i++) {
         if (includes(por[i + 1, .], pconstant)) {
             // profiler_off()
@@ -2881,6 +3072,7 @@ void function eval_arms(
         
         if (_rc) {
             errprintf("Stata encountered an error when evaluating arm %f\n", i)
+            errprintf(statement)
             exit(error(_rc))
         }
     }
@@ -3156,7 +3348,7 @@ mata
     //    epsilon  is the smallest 'e' such that x != x + e
     //    epsilon0 is the smallest 'e' such that 0 != 0 + e
     
-    if (type_nb == 1 | type_nb == 4) {
+    if (type_nb == 1) {
         return(1)
     }
     else if (type_nb == 2) {
@@ -3166,6 +3358,9 @@ mata
     else if (type_nb == 3) {
         epsilon = 1.0000000000000X-034
         epsilon0 = 1.0000000000000X-3fe
+    }
+    else if (type_nb == 4) {
+        return(1)
     }
     else {
         errprintf("Expected a variable type 1, 2, 3 or 4, found %f", type_nb)
@@ -3184,6 +3379,46 @@ mata
         // epsilon needs to be shifted based on x value in base 2
         return(epsilon * exp(floor(x_log2) * log(2)))
     }
+}
+
+// Vectorised version
+real vector get_epsilon_vec(real colvector x, real scalar type_nb) {
+    real scalar epsilon, epsilon0, epsilon_log2, epsilon0_log2
+    real colvector x_log2, condition
+    
+    // We define epsilon and epsilon0 depending on the type
+    //    epsilon  is the smallest 'e' such that x != x + e
+    //    epsilon0 is the smallest 'e' such that 0 != 0 + e
+    
+    if (type_nb == 1) {
+        return(J(rows(x), 1, 1))
+    }
+    else if (type_nb == 2) {
+        epsilon = 1.0000000000000X-017
+        epsilon0 = 1.0000000000000X-07f
+    }
+    else if (type_nb == 3) {
+        epsilon = 1.0000000000000X-034
+        epsilon0 = 1.0000000000000X-3fe
+    }
+    else if (type_nb == 4) {
+        return(J(rows(x), 1, 1))
+    }
+    else {
+        errprintf("Expected a variable type 1, 2, 3 or 4, found %f", type_nb)
+        exit(_error(3250))
+    }
+    
+    x_log2 = log(abs(x)) :/ log(2)
+    epsilon_log2 = log(abs(epsilon)) / log(2)
+    epsilon0_log2 = log(abs(epsilon0)) / log(2)
+
+    condition = x_log2 :< (epsilon0_log2 - epsilon_log2)
+    
+    return(
+        (epsilon0 :* condition) :+ 
+        ((epsilon :* exp(floor(x_log2) :* log(2))) :* !condition)
+    )
 }
 
 `OR' parse_or(`POINTER' t, `VARIABLE' variable, `REAL' arm_id) {

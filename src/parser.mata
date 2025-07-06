@@ -261,7 +261,7 @@ mata
     //    epsilon  is the smallest 'e' such that x != x + e
     //    epsilon0 is the smallest 'e' such that 0 != 0 + e
     
-    if (type_nb == 1 | type_nb == 4) {
+    if (type_nb == 1) {
         return(1)
     }
     else if (type_nb == 2) {
@@ -271,6 +271,9 @@ mata
     else if (type_nb == 3) {
         epsilon = 1.0000000000000X-034
         epsilon0 = 1.0000000000000X-3fe
+    }
+    else if (type_nb == 4) {
+        return(1)
     }
     else {
         errprintf("Expected a variable type 1, 2, 3 or 4, found %f", type_nb)
@@ -289,6 +292,46 @@ mata
         // epsilon needs to be shifted based on x value in base 2
         return(epsilon * exp(floor(x_log2) * log(2)))
     }
+}
+
+// Vectorised version
+real vector get_epsilon_vec(real colvector x, real scalar type_nb) {
+    real scalar epsilon, epsilon0, epsilon_log2, epsilon0_log2
+    real colvector x_log2, condition
+    
+    // We define epsilon and epsilon0 depending on the type
+    //    epsilon  is the smallest 'e' such that x != x + e
+    //    epsilon0 is the smallest 'e' such that 0 != 0 + e
+    
+    if (type_nb == 1) {
+        return(J(rows(x), 1, 1))
+    }
+    else if (type_nb == 2) {
+        epsilon = 1.0000000000000X-017
+        epsilon0 = 1.0000000000000X-07f
+    }
+    else if (type_nb == 3) {
+        epsilon = 1.0000000000000X-034
+        epsilon0 = 1.0000000000000X-3fe
+    }
+    else if (type_nb == 4) {
+        return(J(rows(x), 1, 1))
+    }
+    else {
+        errprintf("Expected a variable type 1, 2, 3 or 4, found %f", type_nb)
+        exit(_error(3250))
+    }
+    
+    x_log2 = log(abs(x)) :/ log(2)
+    epsilon_log2 = log(abs(epsilon)) / log(2)
+    epsilon0_log2 = log(abs(epsilon0)) / log(2)
+
+    condition = x_log2 :< (epsilon0_log2 - epsilon_log2)
+    
+    return(
+        (epsilon0 :* condition) :+ 
+        ((epsilon :* exp(floor(x_log2) :* log(2))) :* !condition)
+    )
 }
 
 `OR' parse_or(`POINTER' t, `VARIABLE' variable, `REAL' arm_id) {

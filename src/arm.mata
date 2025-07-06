@@ -67,6 +67,7 @@ void function eval_arms(
         
         if (_rc) {
             errprintf("Stata encountered an error when evaluating arm %f\n", i)
+            errprintf(statement)
             exit(error(_rc))
         }
     }

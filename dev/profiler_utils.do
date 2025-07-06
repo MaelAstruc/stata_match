@@ -23,12 +23,13 @@ To add the end time on the current row, we need to know which one it was
 - we have a stack of the initial positions
 */
 
-local PROFILER_DEPTH    256
-local PROFILER_CAPACITY 1024
+local PROFILER_DEPTH        256
+local PROFILER_CAPACITY    2^20
+local PROFILER_CHILDREN     256
+local PROFILER_MIN_TIME    1000
+local PROFILER_N_OVERHEAD 10000
 
-local PROFILER          struct Profiler scalar
-
-local PROFILER_MIN_TIME 1000
+local PROFILER           struct Profiler scalar
 
 mata
 
@@ -44,10 +45,23 @@ struct Profiler {
     
     real scalar current
     real scalar positions
+    real scalar overhead
+    
+    struct ProfilerNode scalar tree
+}
+
+struct ProfilerNode {
+	string scalar name
+    real scalar parent
+	real vector children
+    real scalar n_children
+    real scalar time
+    real scalar depth
 }
 
 struct Profiler scalar new_profiler() {
     `PROFILER' profiler
+    real scalar i
     
     profiler = Profiler()
     
@@ -62,6 +76,10 @@ struct Profiler scalar new_profiler() {
     
     profiler.current = 0
     profiler.positions = J(`PROFILER_DEPTH', 1, .)
+    
+    profiler.overhead = .
+    
+    profiler.tree = ProfilerNode(0)
     
     timer_clear(1)
     timer_on(1)
@@ -82,7 +100,7 @@ void profiler_on(string scalar name) {
     
     // store the current position (might overflow)
     if (profiler->current > length(profiler->positions)) {
-    	profiler->positions = profiler->positions \ profiler->positions
+        profiler->positions = profiler->positions \ J(profiler->current - 1, 1, .)
     }
     profiler->positions[profiler->current] = profiler->length
     
@@ -95,7 +113,7 @@ void profiler_on(string scalar name) {
         profiler->capacity = profiler->capacity * 2
     }
     
-    // increase depthc
+    // increase depth
     (void) profiler->depth++
     
     // save current information
@@ -124,15 +142,44 @@ void profiler_off() {
     (void) profiler->current--
 }
 
-struct ProfilerNode {
-	string scalar name
-    real scalar parent
-	real vector children
-    real scalar time
-    real scalar depth
+struct ProfilerNode vector get_profiler_overhead(`PROFILER' profiler) {
+	if (profiler.overhead == .) {
+    	calibrate_profiler(profiler)
+    }
+    
+    return(profiler.overhead)
 }
 
-struct ProfilerNode vector build_profiler_tree(`PROFILER' profiler, real scalar min_time) {
+void calibrate_profiler(`PROFILER' profiler) {
+    real scalar i, length_before
+	
+    length_before = profiler.length
+    
+    timer_clear(99)
+    
+    timer_on(99)
+    for (i = 0; i < `PROFILER_N_OVERHEAD'; i++) {
+    	profiler_on("_CALIBRATION")
+        profiler_off()
+    }
+    timer_off(99)
+    
+    profiler.overhead = timer_value(99)[1] * 1000 / `PROFILER_N_OVERHEAD'
+    timer_clear(99)
+    
+    profiler.length = length_before
+}
+
+struct ProfilerNode vector get_profiler_tree(`PROFILER' profiler) {
+	if (length(profiler.tree) == 0) {
+    	profiler.tree = build_profiler_tree(profiler)
+        remove_overhead(profiler)
+    }
+    
+    return(profiler.tree)
+}
+
+struct ProfilerNode vector build_profiler_tree(`PROFILER' profiler) {
 	struct ProfilerNode vector nodes
     real matrix filter, times, depths
     string vector names
@@ -141,44 +188,91 @@ struct ProfilerNode vector build_profiler_tree(`PROFILER' profiler, real scalar 
     nodes = ProfilerNode(profiler.length + 1)
     nodes[1].name = "PROFILER"
     nodes[1].parent = 0
-    nodes[1].children = J(0, 1, .)
-    nodes[1].time = 0
+    nodes[1].children = J(`PROFILER_CHILDREN', 1, .)
+    nodes[1].n_children = 0
+    nodes[1].time = 0.01 // Add 10us to be sure that PROFILER is before pmatch
     nodes[1].depth = 0
     
-    current = 1
-    
-    filter = (profiler.times[., 2] :- profiler.times[., 1]) :> min_time
-    filter = filter :& ((1..rows(profiler.times))' :<= profiler.length)
+    filter = (1..rows(profiler.times))' :<= profiler.length
     
     times  = select(profiler.times, filter)
     depths = select(profiler.depths, filter)
     names  = select(profiler.names, filter)
     
     n = rows(times)
+    current = 1
     
 	for (i = 1; i <= n; i++) {
     	index = i + 1
         
+        // Fill the node with the information
         nodes[index].name = names[i]
-        nodes[index].parent = current
-        nodes[index].children = J(0, 1, .)
+        nodes[index].parent = current // The parent is the last node of higher depth
+        nodes[index].children = J(`PROFILER_CHILDREN', 1, .)
+        nodes[index].n_children = 0
         nodes[index].time = times[i, 2] - times[i, 1]
         nodes[index].depth = depths[i]
         
+        // Manually fill the time of the root node
         if (nodes[index].depth == 1) {
         	nodes[1].time = nodes[1].time + nodes[index].time
         }
         
+        // Climb back the nodes until finding the parent of the node (index)
         while (nodes[current].depth != nodes[index].depth - 1) {
         	current = nodes[current].parent
         }
         
-        nodes[current].children = nodes[current].children \ index
+        // Add node (index) to the parent list of children and grow if needed
+        nodes[current].n_children = nodes[current].n_children + 1
+        if (nodes[current].n_children > length(nodes[current].children)) {
+            nodes[current].children = nodes[current].children \ J(nodes[current].n_children - 1, 1, .)
+        }
+        nodes[current].children[nodes[current].n_children] = index
         
         current = index
     }
     
     return(nodes)
+}
+
+void remove_overhead(`PROFILER' profiler) {
+	struct ProfilerNode vector tree
+	real scalar base_overhead, top, current, i
+    real vector overheads, stack, children, to_check
+    
+    base_overhead = get_profiler_overhead(profiler)
+    tree = get_profiler_tree(profiler)
+    
+    overheads = J(length(tree), 1, .)
+    
+    stack = J(length(tree), 1, .)
+    top = 1
+    stack[top] = 1
+    
+	while (top > 0) {
+    	current = stack[top]
+        if (tree[current].n_children == 0) {
+        	overheads[current] = base_overhead
+            top--
+        }
+        else {
+            children = tree[current].children[1..tree[current].n_children]
+        	to_check = select(children, overheads[children] :== .)
+            if (length(to_check) == 0) {
+            	overheads[current] = sum(overheads[children]) + base_overhead
+                top--
+            }
+            else {
+            	stack[(top + 1)..(top + length(to_check))] = to_check
+                top = top + length(to_check)
+            }
+        }
+    }
+    
+    for (i = 1; i <= length(tree); i++) {
+    	profiler.tree[i].time = tree[i].time - overheads[i]
+    }
 }
 
 void profiler_print_node(
@@ -190,7 +284,7 @@ void profiler_print_node(
     real scalar min_time
 ) {
 	string scalar new_string
-	real scalar i, n_children, new_index
+	real scalar i, new_index
     
     if (tree[index].depth == 0 || tree[index].time > min_time) {
         printf(
@@ -198,16 +292,14 @@ void profiler_print_node(
             beginning,
             indicator,
             tree[index].name,
-            tree[index].time
+            round(tree[index].time)
         )
     }
     
-    n_children = length(tree[index].children)
-    
-	for (i = 1; i <= n_children; i++) {
+	for (i = 1; i <= tree[index].n_children; i++) {
     	new_index = tree[index].children[i]
         
-        if (i == n_children) {
+        if (i == tree[index].n_children) {
             indicator  = "└─ "
             new_string = "   "
         }
@@ -235,26 +327,31 @@ void profiler_print(`PROFILER' profiler, | real scalar min_time) {
     	min_time = `PROFILER_MIN_TIME'
     }
     
-    tree = build_profiler_tree(profiler, min_time)
+    tree = get_profiler_tree(profiler)
     
     profiler_print_node(tree, 1, "", " ", "", min_time)
 }
 
 void profiler_summarize(`PROFILER' profiler) {
+	struct ProfilerNode vector tree
     pointer scalar Table
     real matrix values
     string vector names
 	real scalar i, infos, sorted
+    string scalar name
     
     Table = asarray_create()
     asarray_notfound(Table, (0, 0))
     
-    for (i = 1; i <= profiler.length; i++) {
-    	infos = asarray(Table, profiler.names[i])
+    tree = get_profiler_tree(profiler)
+    
+    for (i = 2; i <= length(tree); i++) {
+        name = sprintf("%-40s depth %-7.0f", tree[i].name, tree[i].depth)
+    	infos = asarray(Table, name)
         asarray(
             Table,
-            profiler.names[i],
-            (infos[1] + profiler.times[i, 2] - profiler.times[i, 1], infos[2] + 1)
+            name,
+            (infos[1] + tree[i].time, infos[2] + 1)
         )
     }
 
@@ -271,10 +368,11 @@ void profiler_summarize(`PROFILER' profiler) {
     _collate(names, sorted)
     
     for (i = 1; i <= length(names); i++) {
-    	printf("%-30s %6.0fx %9.0fms\n", names[i], values[i, 2], values[i, 1])
+    	printf("%s %6.0fx %9.0fms\n", names[i], values[i, 2], values[i, 1])
     }
 }
 
+// TODO: correct graph for overhead and start at 0
 void profiler_graph(`PROFILER' profiler, | real scalar min_time) {
 	string scalar cmd, color, name
     real matrix filter, times, depths, data, condition_depth, condition_function, gaps
@@ -294,6 +392,11 @@ void profiler_graph(`PROFILER' profiler, | real scalar min_time) {
     // Build matrix for area graphs
     filter = (profiler.times[., 2] :- profiler.times[., 1]) :> min_time
     filter = filter :& ((1..rows(profiler.times))' :<= profiler.length)
+    
+    if (!any(filter)) {
+        errprintf("No function call with a time larger than %f\n", min_time)
+        exit(2000)
+    }
     
     times = select(profiler.times, filter)
     times = times, J(rows(times), 1, .)

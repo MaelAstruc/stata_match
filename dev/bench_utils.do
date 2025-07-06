@@ -299,7 +299,7 @@ program bench_obs_integer
 end
 
 program bench_obs_float
-    syntax, OBS(integer) LEVELS(integer) REP(integer) [NOCHECK]
+    syntax, OBS(integer) LEVELS(integer) REP(integer) [NOCHECK NOBENCH]
     
     if ("`nobench'" == "") mata: BENCH = bench_init(`rep')
     
@@ -311,7 +311,7 @@ program bench_obs_float
 end
 
 program bench_obs_string
-    syntax, OBS(integer) LEVELS(integer) REP(integer) [NOCHECK]
+    syntax, OBS(integer) LEVELS(integer) REP(integer) [NOCHECK NOBENCH]
     
     if ("`nobench'" == "") mata: BENCH = bench_init(`rep')
     

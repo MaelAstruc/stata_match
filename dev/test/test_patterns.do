@@ -173,7 +173,7 @@ function test_pwild_define() {
     
     pwild = new_pwild(variable)
 
-    test_result("Test PWild::define()", to_string_pwild(pwild, 1), "1 | 2")
+    test_result("Test PWild::define()", to_string_pwild(pwild, 1), "1/2")
 }
 
 // PConstant
@@ -352,14 +352,14 @@ function test_por_compress() {
     push_por(por, pconstant_2)
     
     compressed = compress(por)
-    test_result("Test POr::compress(): base", to_string(compressed), "1 | 2")
+    test_result("Test POr::compress(): base", to_string(compressed), "1/2")
     
     por = new_por()
     push_por(por, pconstant_1)
     push_por(por, pconstant_2)
     push_por(por, pconstant_3)
     compressed = compress(por)
-    test_result("Test POr::compress(): shrink", to_string(compressed), "1 | 2")
+    test_result("Test POr::compress(): shrink", to_string(compressed), "1/2")
     
     por = new_por()
     push_por(por, pconstant_2)
@@ -371,7 +371,7 @@ function test_por_compress() {
     push_por(por, pconstant_1)
     push_por(por, prange_2)
     compressed = compress(por)
-    test_result("Test POr::compress(): compress each", to_string(compressed), "1 | 2")
+    test_result("Test POr::compress(): compress each", to_string(compressed), "1/2")
     
     por = new_por()
     push_por(por, prange_2)
@@ -1346,7 +1346,7 @@ function test_ptuple_to_expr() {
     variables[2].name = "test_var_2"
     variables[2].type = "int"
     
-    test_result("Test Tuple::to_expr(): wildcard", to_expr(tuple_1, variables), "(test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')")
+    test_result("Test Tuple::to_expr(): wildcard", to_expr(tuple_1, variables), "test_var_1 >= `one_21x' & test_var_1 <= `three_21x'")
 
     // (1 | 1/3, _) | (1, 1/3)
     
@@ -1364,7 +1364,7 @@ function test_ptuple_to_expr() {
     variables[2].name = "test_var_2"
     variables[2].type = "int"
     
-    test_result("Test Tuple::to_expr(): POr of tuples", to_expr(tuples, variables), "((test_var_1 == `one_21x') | (test_var_1 >= `one_21x' & test_var_1 <= `three_21x')) | ((test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x'))")
+    test_result("Test Tuple::to_expr(): POr of tuples", to_expr(tuples, variables), "(test_var_1 >= `one_21x' & test_var_1 <= `three_21x') | ((test_var_1 == `one_21x') & (test_var_2 >= `one_21x' & test_var_2 <= `three_21x'))")
 }
 
 ////////
