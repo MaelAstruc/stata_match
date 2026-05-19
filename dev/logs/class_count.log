@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/class_count.log
+       log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/class_count.log
   log type:  text
- opened on:   6 Jul 2025, 17:01:25
+ opened on:  19 May 2026, 12:54:02
 
 . 
 . mata: print_class_count()
@@ -25,7 +25,7 @@ CLASS NAME         INSTANCES
 . 
 . log close
       name:  <unnamed>
-       log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/class_count.log
+       log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/class_count.log
   log type:  text
- closed on:   6 Jul 2025, 17:01:25
+ closed on:  19 May 2026, 12:54:02
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

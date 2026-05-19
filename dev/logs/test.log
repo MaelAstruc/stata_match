@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
+       log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/test.log
   log type:  text
- opened on:   6 Jul 2025, 17:01:19
+ opened on:  19 May 2026, 12:53:57
 . }
 
 . 
@@ -54,7 +54,7 @@ TEST FAILED:    0
 . if (`add_log' == 1) {
 .     log close
       name:  <unnamed>
-       log:  C:\Users\malsouder\Documents\Projets\stata_match\dev/logs/test.log
+       log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/test.log
   log type:  text
- closed on:   6 Jul 2025, 17:01:25
+ closed on:  19 May 2026, 12:54:02
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
