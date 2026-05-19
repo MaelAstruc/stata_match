@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/profile.log
   log type:  text
- opened on:  19 May 2026, 13:03:57
+ opened on:  19 May 2026, 15:39:07
 
 . 
 . // Profile 100 000 integers with 1000 levels
@@ -16,28 +16,32 @@
 
 . 
 . dis "`c(current_time)'"
-13:04:18
+15:39:24
 
 . 
 . mata: profiler_print(PROFILER, 10)
-PROFILER 19231ms
- └─ pmatch 19231ms
+PROFILER 16374ms
+ └─ pmatch 16374ms
     ├─ init_variables 12ms
     │  └─ Variable::init 11ms
     │     └─ Variable::init_levels 11ms
     │        └─ Variable::init_levels_int 11ms
-    ├─ parse_string 115ms
-    │  └─ parse_arms 115ms
-    ├─ check_match 18351ms
-    │  ├─ check_useful 13900ms
-    │  │  ├─ is_useful 12ms
+    ├─ parse_string 127ms
+    │  └─ parse_arms 126ms
+    ├─ check_match 15417ms
+    │  ├─ check_useful 11464ms
     │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 12ms
-    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 15ms
+    │  │  ├─ is_useful 16ms
     │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 13ms
@@ -45,615 +49,544 @@ PROFILER 19231ms
     │  │  ├─ is_useful 13ms
     │  │  ├─ is_useful 13ms
     │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 15ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 15ms
     │  │  ├─ is_useful 15ms
     │  │  ├─ is_useful 16ms
-    │  │  ├─ is_useful 19ms
-    │  │  ├─ is_useful 15ms
     │  │  ├─ is_useful 16ms
     │  │  ├─ is_useful 17ms
-    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 16ms
+    │  │  ├─ is_useful 18ms
+    │  │  ├─ is_useful 16ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 23ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 18ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 18ms
+    │  │  ├─ is_useful 28ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 19ms
     │  │  ├─ is_useful 19ms
     │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 14ms
-    │  │  ├─ is_useful 16ms
-    │  │  ├─ is_useful 16ms
-    │  │  ├─ is_useful 26ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 13ms
     │  │  ├─ is_useful 24ms
-    │  │  ├─ is_useful 33ms
-    │  │  ├─ is_useful 23ms
-    │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 16ms
-    │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 42ms
-    │  │  ├─ is_useful 33ms
-    │  │  ├─ is_useful 23ms
-    │  │  ├─ is_useful 19ms
-    │  │  ├─ is_useful 37ms
-    │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 30ms
-    │  │  ├─ is_useful 26ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 33ms
-    │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 19ms
-    │  │  ├─ is_useful 27ms
-    │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 32ms
-    │  │  ├─ is_useful 30ms
-    │  │  ├─ is_useful 19ms
-    │  │  ├─ is_useful 31ms
-    │  │  ├─ is_useful 37ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 26ms
-    │  │  ├─ is_useful 36ms
-    │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 26ms
-    │  │  ├─ is_useful 26ms
-    │  │  ├─ is_useful 14ms
-    │  │  ├─ is_useful 28ms
-    │  │  ├─ is_useful 27ms
-    │  │  ├─ is_useful 12ms
-    │  │  ├─ is_useful 28ms
-    │  │  ├─ is_useful 29ms
-    │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 29ms
-    │  │  ├─ is_useful 29ms
-    │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 31ms
-    │  │  ├─ is_useful 55ms
-    │  │  ├─ is_useful 23ms
-    │  │  ├─ is_useful 34ms
-    │  │  ├─ is_useful 31ms
-    │  │  ├─ is_useful 17ms
-    │  │  ├─ is_useful 31ms
-    │  │  ├─ is_useful 40ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 37ms
-    │  │  ├─ is_useful 35ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 35ms
-    │  │  ├─ is_useful 39ms
-    │  │  ├─ is_useful 25ms
-    │  │  ├─ is_useful 36ms
-    │  │  ├─ is_useful 50ms
-    │  │  ├─ is_useful 19ms
-    │  │  ├─ is_useful 40ms
-    │  │  ├─ is_useful 50ms
-    │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 42ms
-    │  │  ├─ is_useful 54ms
     │  │  ├─ is_useful 22ms
-    │  │  ├─ is_useful 62ms
-    │  │  ├─ is_useful 61ms
-    │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 57ms
-    │  │  ├─ is_useful 57ms
+    │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 25ms
-    │  │  ├─ is_useful 60ms
-    │  │  ├─ is_useful 53ms
-    │  │  ├─ is_useful 26ms
-    │  │  ├─ is_useful 55ms
-    │  │  ├─ is_useful 57ms
-    │  │  ├─ is_useful 26ms
-    │  │  ├─ is_useful 55ms
-    │  │  ├─ is_useful 59ms
     │  │  ├─ is_useful 23ms
-    │  │  ├─ is_useful 62ms
-    │  │  ├─ is_useful 54ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 25ms
+    │  │  ├─ is_useful 24ms
+    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 24ms
+    │  │  ├─ is_useful 23ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 24ms
+    │  │  ├─ is_useful 25ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 27ms
+    │  │  ├─ is_useful 25ms
+    │  │  ├─ is_useful 15ms
+    │  │  ├─ is_useful 28ms
+    │  │  ├─ is_useful 34ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 29ms
+    │  │  ├─ is_useful 31ms
+    │  │  ├─ is_useful 18ms
     │  │  ├─ is_useful 35ms
-    │  │  ├─ is_useful 67ms
-    │  │  ├─ is_useful 51ms
+    │  │  ├─ is_useful 30ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 35ms
+    │  │  ├─ is_useful 31ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 37ms
+    │  │  ├─ is_useful 36ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 34ms
+    │  │  ├─ is_useful 35ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 33ms
+    │  │  ├─ is_useful 41ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 39ms
+    │  │  ├─ is_useful 38ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 36ms
+    │  │  ├─ is_useful 44ms
+    │  │  ├─ is_useful 25ms
+    │  │  ├─ is_useful 44ms
+    │  │  ├─ is_useful 43ms
+    │  │  ├─ is_useful 25ms
+    │  │  ├─ is_useful 46ms
+    │  │  ├─ is_useful 45ms
+    │  │  ├─ is_useful 27ms
+    │  │  ├─ is_useful 44ms
+    │  │  ├─ is_useful 40ms
+    │  │  ├─ is_useful 24ms
+    │  │  ├─ is_useful 48ms
+    │  │  ├─ is_useful 49ms
     │  │  ├─ is_useful 26ms
-    │  │  ├─ is_useful 60ms
+    │  │  ├─ is_useful 44ms
+    │  │  ├─ is_useful 51ms
+    │  │  ├─ is_useful 30ms
+    │  │  ├─ is_useful 52ms
     │  │  ├─ is_useful 54ms
     │  │  ├─ is_useful 28ms
-    │  │  ├─ is_useful 55ms
-    │  │  ├─ is_useful 67ms
-    │  │  ├─ is_useful 30ms
-    │  │  ├─ is_useful 66ms
-    │  │  ├─ is_useful 57ms
-    │  │  ├─ is_useful 33ms
-    │  │  ├─ is_useful 59ms
-    │  │  ├─ is_useful 64ms
-    │  │  ├─ is_useful 37ms
-    │  │  ├─ is_useful 65ms
-    │  │  ├─ is_useful 68ms
+    │  │  ├─ is_useful 54ms
+    │  │  ├─ is_useful 58ms
+    │  │  ├─ is_useful 32ms
+    │  │  ├─ is_useful 53ms
+    │  │  ├─ is_useful 54ms
+    │  │  ├─ is_useful 29ms
+    │  │  ├─ is_useful 52ms
+    │  │  ├─ is_useful 58ms
     │  │  ├─ is_useful 31ms
+    │  │  ├─ is_useful 59ms
+    │  │  ├─ is_useful 61ms
+    │  │  ├─ is_useful 30ms
     │  │  ├─ is_useful 65ms
+    │  │  ├─ is_useful 59ms
+    │  │  ├─ is_useful 37ms
     │  │  ├─ is_useful 71ms
+    │  │  ├─ is_useful 64ms
+    │  │  ├─ is_useful 31ms
+    │  │  ├─ is_useful 67ms
+    │  │  ├─ is_useful 61ms
     │  │  ├─ is_useful 33ms
-    │  │  ├─ is_useful 75ms
-    │  │  ├─ is_useful 75ms
-    │  │  ├─ is_useful 35ms
+    │  │  ├─ is_useful 61ms
     │  │  ├─ is_useful 72ms
-    │  │  ├─ is_useful 69ms
-    │  │  ├─ is_useful 38ms
-    │  │  ├─ is_useful 70ms
-    │  │  ├─ is_useful 72ms
+    │  │  ├─ is_useful 39ms
+    │  │  ├─ is_useful 65ms
+    │  │  ├─ is_useful 65ms
     │  │  ├─ is_useful 35ms
-    │  │  ├─ is_useful 69ms
-    │  │  ├─ is_useful 85ms
-    │  │  ├─ is_useful 36ms
-    │  │  ├─ is_useful 72ms
-    │  │  ├─ is_useful 86ms
-    │  │  ├─ is_useful 42ms
-    │  │  ├─ is_useful 73ms
-    │  │  ├─ is_useful 88ms
-    │  │  ├─ is_useful 35ms
-    │  │  ├─ is_useful 78ms
-    │  │  ├─ is_useful 73ms
-    │  │  ├─ is_useful 38ms
-    │  │  ├─ is_useful 82ms
-    │  │  ├─ is_useful 80ms
-    │  │  ├─ is_useful 41ms
-    │  │  ├─ is_useful 76ms
-    │  │  ├─ is_useful 90ms
-    │  │  ├─ is_useful 44ms
-    │  │  ├─ is_useful 76ms
-    │  │  ├─ is_useful 89ms
-    │  │  ├─ is_useful 51ms
-    │  │  ├─ is_useful 82ms
-    │  │  ├─ is_useful 81ms
-    │  │  ├─ is_useful 40ms
-    │  │  ├─ is_useful 81ms
-    │  │  ├─ is_useful 83ms
-    │  │  ├─ is_useful 42ms
-    │  │  ├─ is_useful 82ms
-    │  │  ├─ is_useful 81ms
-    │  │  ├─ is_useful 49ms
-    │  │  ├─ is_useful 100ms
-    │  │  ├─ is_useful 100ms
-    │  │  ├─ is_useful 46ms
-    │  │  ├─ is_useful 99ms
-    │  │  ├─ is_useful 89ms
-    │  │  ├─ is_useful 54ms
-    │  │  ├─ is_useful 90ms
-    │  │  ├─ is_useful 129ms
-    │  │  ├─ is_useful 47ms
-    │  │  ├─ is_useful 107ms
-    │  │  ├─ is_useful 101ms
     │  │  ├─ is_useful 71ms
-    │  │  ├─ is_useful 130ms
-    │  │  ├─ is_useful 100ms
-    │  │  ├─ is_useful 49ms
+    │  │  ├─ is_useful 72ms
+    │  │  ├─ is_useful 40ms
+    │  │  ├─ is_useful 72ms
+    │  │  ├─ is_useful 74ms
+    │  │  ├─ is_useful 38ms
+    │  │  ├─ is_useful 75ms
+    │  │  ├─ is_useful 80ms
+    │  │  ├─ is_useful 37ms
+    │  │  ├─ is_useful 76ms
+    │  │  ├─ is_useful 74ms
+    │  │  ├─ is_useful 38ms
+    │  │  ├─ is_useful 80ms
+    │  │  ├─ is_useful 79ms
+    │  │  ├─ is_useful 41ms
+    │  │  ├─ is_useful 79ms
+    │  │  ├─ is_useful 83ms
+    │  │  ├─ is_useful 41ms
+    │  │  ├─ is_useful 79ms
+    │  │  ├─ is_useful 84ms
+    │  │  ├─ is_useful 41ms
+    │  │  ├─ is_useful 92ms
+    │  │  ├─ is_useful 87ms
+    │  │  ├─ is_useful 48ms
+    │  │  ├─ is_useful 98ms
+    │  │  ├─ is_useful 94ms
+    │  │  ├─ is_useful 45ms
+    │  │  ├─ is_useful 93ms
+    │  │  ├─ is_useful 90ms
+    │  │  ├─ is_useful 51ms
+    │  │  ├─ is_useful 90ms
+    │  │  ├─ is_useful 99ms
+    │  │  ├─ is_useful 48ms
     │  │  ├─ is_useful 97ms
+    │  │  ├─ is_useful 100ms
+    │  │  ├─ is_useful 51ms
+    │  │  ├─ is_useful 97ms
+    │  │  ├─ is_useful 99ms
+    │  │  ├─ is_useful 55ms
+    │  │  ├─ is_useful 105ms
+    │  │  ├─ is_useful 103ms
+    │  │  ├─ is_useful 49ms
     │  │  ├─ is_useful 102ms
-    │  │  ├─ is_useful 50ms
-    │  │  ├─ is_useful 102ms
+    │  │  ├─ is_useful 112ms
+    │  │  ├─ is_useful 57ms
+    │  │  ├─ is_useful 108ms
+    │  │  ├─ is_useful 97ms
+    │  │  ├─ is_useful 52ms
     │  │  ├─ is_useful 115ms
-    │  │  ├─ is_useful 53ms
-    │  │  ├─ is_useful 122ms
-    │  │  ├─ is_useful 133ms
-    │  │  ├─ is_useful 54ms
-    │  │  ├─ is_useful 122ms
-    │  │  ├─ is_useful 111ms
-    │  │  ├─ is_useful 53ms
-    │  │  ├─ is_useful 118ms
-    │  │  ├─ is_useful 119ms
-    │  │  ├─ is_useful 56ms
-    │  │  ├─ is_useful 121ms
-    │  │  ├─ is_useful 139ms
-    │  │  └─ is_useful 3613ms
+    │  │  ├─ is_useful 104ms
+    │  │  └─ is_useful 2913ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
     │  │     ├─ difference_por 11ms
     │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 13ms
     │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 16ms
     │  │     ├─ difference_por 13ms
     │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 13ms
     │  │     ├─ difference_por 15ms
     │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 16ms
     │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 15ms
     │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 18ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 18ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 15ms
     │  │     ├─ difference_por 15ms
     │  │     ├─ difference_por 18ms
     │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 15ms
     │  │     ├─ difference_por 16ms
     │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 15ms
     │  │     ├─ difference_por 16ms
     │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 22ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 13ms
     │  │     ├─ difference_por 16ms
     │  │     ├─ difference_por 19ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 19ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 16ms
     │  │     ├─ difference_por 20ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 21ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 25ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 19ms
-    │  │     ├─ difference_por 19ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 23ms
-    │  │     ├─ difference_por 19ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 27ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 23ms
-    │  │     ├─ difference_por 26ms
-    │  │     ├─ difference_por 29ms
-    │  │     ├─ difference_por 23ms
-    │  │     ├─ difference_por 21ms
-    │  │     ├─ difference_por 19ms
-    │  │     ├─ difference_por 25ms
-    │  │     ├─ difference_por 19ms
-    │  │     ├─ difference_por 24ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 24ms
-    │  │     ├─ difference_por 24ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 29ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 28ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 30ms
-    │  │     ├─ difference_por 21ms
-    │  │     ├─ difference_por 28ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 26ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 19ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 21ms
-    │  │     ├─ difference_por 19ms
-    │  │     ├─ difference_por 29ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 31ms
-    │  │     ├─ difference_por 37ms
-    │  │     ├─ difference_por 23ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 27ms
-    │  │     ├─ difference_por 19ms
     │  │     ├─ difference_por 17ms
     │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 24ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 16ms
+    │  │     ├─ difference_por 21ms
     │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 27ms
-    │  │     ├─ difference_por 23ms
+    │  │     ├─ difference_por 16ms
     │  │     ├─ difference_por 21ms
     │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 18ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 16ms
     │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 18ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 18ms
+    │  │     ├─ difference_por 18ms
+    │  │     ├─ difference_por 20ms
+    │  │     ├─ difference_por 17ms
     │  │     ├─ difference_por 19ms
-    │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 19ms
-    │  └─ check_exhaustiveness 4373ms
-    │     └─ is_useful 4373ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 17ms
+    │  └─ check_exhaustiveness 3874ms
+    │     └─ is_useful 3873ms
+    │        ├─ difference_por 11ms
     │        ├─ difference_por 12ms
+    │        ├─ difference_por 11ms
     │        ├─ difference_por 12ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 11ms
     │        ├─ difference_por 12ms
     │        ├─ difference_por 12ms
     │        ├─ difference_por 15ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 14ms
     │        ├─ difference_por 13ms
     │        ├─ difference_por 13ms
     │        ├─ difference_por 17ms
-    │        ├─ difference_por 12ms
     │        ├─ difference_por 14ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 16ms
     │        ├─ difference_por 15ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 22ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 11ms
     │        ├─ difference_por 15ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 11ms
     │        ├─ difference_por 17ms
     │        ├─ difference_por 16ms
-    │        ├─ difference_por 22ms
+    │        ├─ difference_por 16ms
     │        ├─ difference_por 15ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 19ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 18ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 19ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 23ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 21ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 17ms
     │        ├─ difference_por 24ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 22ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 17ms
-    │        ├─ difference_por 19ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 13ms
     │        ├─ difference_por 16ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 30ms
     │        ├─ difference_por 17ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 14ms
-    │        ├─ difference_por 15ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 16ms
     │        ├─ difference_por 16ms
     │        ├─ difference_por 19ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 16ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 16ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 16ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 23ms
-    │        ├─ difference_por 31ms
-    │        ├─ difference_por 16ms
-    │        ├─ difference_por 16ms
-    │        ├─ difference_por 16ms
-    │        ├─ difference_por 16ms
     │        ├─ difference_por 17ms
-    │        ├─ difference_por 16ms
-    │        ├─ difference_por 17ms
-    │        ├─ difference_por 16ms
-    │        ├─ difference_por 22ms
     │        ├─ difference_por 17ms
     │        ├─ difference_por 18ms
     │        ├─ difference_por 16ms
-    │        ├─ difference_por 21ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 18ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 18ms
     │        ├─ difference_por 20ms
     │        ├─ difference_por 17ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 18ms
+    │        ├─ difference_por 17ms
     │        ├─ difference_por 17ms
     │        ├─ difference_por 19ms
-    │        ├─ difference_por 27ms
     │        ├─ difference_por 17ms
+    │        ├─ difference_por 18ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 21ms
     │        ├─ difference_por 17ms
-    │        ├─ difference_por 30ms
-    │        ├─ difference_por 17ms
-    │        ├─ difference_por 27ms
-    │        ├─ difference_por 29ms
-    │        ├─ difference_por 17ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 27ms
-    │        ├─ difference_por 22ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 26ms
-    │        ├─ difference_por 26ms
-    │        ├─ difference_por 29ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 19ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 19ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 19ms
-    │        ├─ difference_por 19ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 19ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 27ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 27ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 27ms
-    │        ├─ difference_por 19ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 22ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 22ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 20ms
-    │        ├─ difference_por 22ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 22ms
     │        ├─ difference_por 24ms
+    │        ├─ difference_por 21ms
+    │        ├─ difference_por 21ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 19ms
+    │        ├─ difference_por 18ms
+    │        ├─ difference_por 23ms
+    │        ├─ difference_por 19ms
+    │        ├─ difference_por 18ms
+    │        ├─ difference_por 21ms
+    │        ├─ difference_por 18ms
+    │        ├─ difference_por 18ms
+    │        ├─ difference_por 22ms
+    │        ├─ difference_por 19ms
+    │        ├─ difference_por 25ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 21ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 19ms
+    │        ├─ difference_por 19ms
+    │        ├─ difference_por 19ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 22ms
+    │        ├─ difference_por 21ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 21ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 22ms
+    │        ├─ difference_por 25ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 22ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 21ms
+    │        ├─ difference_por 21ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 25ms
+    │        ├─ difference_por 22ms
+    │        ├─ difference_por 25ms
+    │        ├─ difference_por 21ms
     │        ├─ difference_por 23ms
     │        ├─ difference_por 21ms
-    │        ├─ difference_por 22ms
+    │        ├─ difference_por 24ms
+    │        ├─ difference_por 27ms
+    │        ├─ difference_por 20ms
+    │        ├─ difference_por 23ms
     │        ├─ difference_por 22ms
     │        ├─ difference_por 23ms
-    │        ├─ difference_por 23ms
     │        ├─ difference_por 22ms
-    │        ├─ difference_por 22ms
-    │        ├─ difference_por 26ms
-    │        ├─ difference_por 26ms
-    │        ├─ difference_por 22ms
-    │        ├─ difference_por 23ms
-    │        ├─ difference_por 38ms
-    │        ├─ overlap_por 51ms
-    │        │  ├─ overlap_pconstant 50ms
-    │        │  │  └─ overlap_por 49ms
-    │        └─ difference_por 49ms
-    └─ eval_arms 752ms
+    │        ├─ overlap_por 48ms
+    │        │  ├─ overlap_pconstant 47ms
+    │        │  │  └─ overlap_por 47ms
+    │        └─ difference_por 48ms
+    └─ eval_arms 817ms
 
 . 
 . dis "`c(current_time)'"
-13:04:26
+15:39:31
 
 . 
 . mata: profiler_summarize(PROFILER)
-pmatch                                   depth 1            1x     19231ms
-check_match                              depth 2            1x     18351ms
-is_useful                                depth 4          305x     18143ms
-check_useful                             depth 3            1x     13900ms
-difference_por                           depth 5          603x      7492ms
-overlap_pconstant                        depth 5        45753x      6868ms
-check_exhaustiveness                     depth 3            1x      4373ms
-difference_pwild                         depth 6        29902x      3471ms
-overlap_prange_prange                    depth 6        20301x      1276ms
-overlap_pconstant                        depth 6        10606x       769ms
-eval_arms                                depth 2            1x       752ms
-overlap_por                              depth 5          304x       369ms
-difference_prange                        depth 6          599x       349ms
-difference_prange_prange                 depth 7          400x       154ms
-parse_arms                               depth 3            1x       115ms
-parse_string                             depth 2            1x       115ms
-compress_por                             depth 8          599x        82ms
-includes_por_default                     depth 6          201x        75ms
-difference_prange_pconstant              depth 7          199x        71ms
-overlap_por                              depth 7            1x        49ms
-parse_arm                                depth 4          304x        41ms
-difference_list                          depth 7          201x        29ms
-parse_or                                 depth 5          304x        27ms
-overlap_pconstant                        depth 8          100x        20ms
-includes_por_pconstant                   depth 7          100x        15ms
-includes_por_pconstant                   depth 6          100x        15ms
-overlap_pconstant                        depth 7          101x        15ms
-parse_pattern                            depth 6          506x        15ms
-overlap_prange_prange                    depth 7          202x        14ms
+pmatch                                   depth 1            1x     16374ms
+check_match                              depth 2            1x     15417ms
+is_useful                                depth 4          305x     15225ms
+check_useful                             depth 3            1x     11464ms
+difference_por                           depth 5          603x      6371ms
+overlap_pconstant                        depth 5        45753x      5743ms
+check_exhaustiveness                     depth 3            1x      3874ms
+difference_pwild                         depth 6        29902x      2942ms
+overlap_prange_prange                    depth 6        20301x      1029ms
+eval_arms                                depth 2            1x       817ms
+overlap_pconstant                        depth 6        10606x       716ms
+overlap_por                              depth 5          304x       307ms
+difference_prange                        depth 6          599x       301ms
+parse_string                             depth 2            1x       127ms
+parse_arms                               depth 3            1x       126ms
+difference_prange_prange                 depth 7          400x       120ms
+includes_por_default                     depth 6          201x        71ms
+compress_por                             depth 8          599x        64ms
+difference_prange_pconstant              depth 7          199x        60ms
+parse_arm                                depth 4          304x        49ms
+overlap_por                              depth 7            1x        47ms
+parse_or                                 depth 5          304x        31ms
+difference_list                          depth 7          201x        23ms
+includes_por_pconstant                   depth 8          100x        22ms
+overlap_prange_prange                    depth 7          202x        22ms
+includes_por_pconstant                   depth 7          100x        16ms
+parse_pattern                            depth 6          506x        12ms
 init_variables                           depth 2            1x        12ms
 Variable::init_levels_int                depth 5            1x        11ms
 Variable::init_levels                    depth 4            1x        11ms
 Variable::init                           depth 3            1x        11ms
 Variable::init_levels_int_base           depth 6            1x        10ms
-includes_por_pconstant                   depth 8          100x        10ms
-parse_number                             depth 7          505x        10ms
+overlap_pconstant                        depth 7          101x         9ms
+overlap_pconstant                        depth 8          100x         8ms
+includes_por_pconstant                   depth 6          100x         8ms
 consume                                  depth 5          304x         6ms
-parse_range                              depth 8          101x         2ms
+parse_number                             depth 7          505x         6ms
 compress_por                             depth 6          303x         1ms
+new_pwild                                depth 4            1x         1ms
 Variable::should_tab                     depth 6            1x         1ms
+compress_por                             depth 9            1x         1ms
 difference_prange_pconstant              depth 8            1x         1ms
 difference_prange                        depth 7            1x         1ms
 difference_por                           depth 6            1x         1ms
 difference_pwild                         depth 5            1x         1ms
-compress_por                             depth 9            1x        -0ms
-Variable::init_type                      depth 4            1x        -0ms
-new_pwild                                depth 4            1x        -0ms
-compress_por                             depth 5            1x        -0ms
 new_pwild                                depth 7            1x        -0ms
+Variable::init_type                      depth 4            1x        -0ms
+compress_por                             depth 5            1x        -0ms
+parse_range                              depth 8          101x        -0ms
 
 . 
 . dis "`c(current_time)'"
-13:04:27
+15:39:32
 
 . 
 . mata: profiler_graph(PROFILER, 10)
@@ -671,1199 +604,1196 @@ file dev/logs/profile.png saved as PNG format
 . bench_obs_float,   obs(10000000) levels(1000) rep(1) nobench
 
 . mata: profiler_print(PROFILER, 10)
-PROFILER 311745ms
- └─ pmatch 311745ms
-    ├─ init_variables 2832ms
-    │  └─ Variable::init 2832ms
-    │     └─ Variable::init_levels 2832ms
-    │        └─ Variable::init_levels_float 2832ms
-    │           └─ Variable::init_levels_hash 2831ms
-    ├─ parse_string 135ms
-    │  └─ parse_arms 135ms
-    ├─ check_match 215945ms
-    │  ├─ check_useful 63461ms
+PROFILER 282303ms
+ └─ pmatch 282303ms
+    ├─ init_variables 2797ms
+    │  └─ Variable::init 2797ms
+    │     └─ Variable::init_levels 2797ms
+    │        └─ Variable::init_levels_float 2797ms
+    │           └─ Variable::init_levels_hash 2796ms
+    ├─ parse_string 116ms
+    │  └─ parse_arms 115ms
+    ├─ check_match 194976ms
+    │  ├─ check_useful 52009ms
     │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 14ms
     │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 26ms
     │  │  ├─ is_useful 15ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 16ms
+    │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 16ms
     │  │  ├─ is_useful 17ms
     │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 19ms
-    │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 12ms
-    │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 18ms
+    │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 22ms
     │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 23ms
-    │  │  ├─ is_useful 25ms
-    │  │  ├─ is_useful 25ms
-    │  │  ├─ is_useful 14ms
-    │  │  ├─ is_useful 26ms
+    │  │  ├─ is_useful 28ms
     │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 26ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 38ms
-    │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 37ms
-    │  │  ├─ is_useful 16ms
-    │  │  ├─ is_useful 31ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 31ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 33ms
     │  │  ├─ is_useful 24ms
-    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 22ms
+    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 24ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 28ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 10ms
+    │  │  ├─ is_useful 25ms
+    │  │  ├─ is_useful 15ms
+    │  │  ├─ is_useful 29ms
+    │  │  ├─ is_useful 15ms
     │  │  ├─ is_useful 32ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 30ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 30ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 31ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 31ms
     │  │  ├─ is_useful 20ms
     │  │  ├─ is_useful 34ms
     │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 35ms
+    │  │  ├─ is_useful 23ms
+    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 35ms
+    │  │  ├─ is_useful 23ms
     │  │  ├─ is_useful 10ms
-    │  │  ├─ is_useful 35ms
-    │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 44ms
-    │  │  ├─ is_useful 33ms
+    │  │  ├─ is_useful 38ms
+    │  │  ├─ is_useful 22ms
     │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 37ms
+    │  │  ├─ is_useful 23ms
+    │  │  ├─ is_useful 10ms
+    │  │  ├─ is_useful 37ms
+    │  │  ├─ is_useful 22ms
     │  │  ├─ is_useful 42ms
-    │  │  ├─ is_useful 26ms
+    │  │  ├─ is_useful 23ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 41ms
+    │  │  ├─ is_useful 25ms
+    │  │  ├─ is_useful 15ms
+    │  │  ├─ is_useful 41ms
+    │  │  ├─ is_useful 28ms
     │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 51ms
-    │  │  ├─ is_useful 35ms
-    │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 39ms
-    │  │  ├─ is_useful 44ms
-    │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 42ms
-    │  │  ├─ is_useful 24ms
     │  │  ├─ is_useful 43ms
-    │  │  ├─ is_useful 32ms
+    │  │  ├─ is_useful 27ms
+    │  │  ├─ is_useful 11ms
     │  │  ├─ is_useful 45ms
-    │  │  ├─ is_useful 26ms
+    │  │  ├─ is_useful 27ms
     │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 48ms
+    │  │  ├─ is_useful 31ms
+    │  │  ├─ is_useful 11ms
     │  │  ├─ is_useful 46ms
-    │  │  ├─ is_useful 26ms
-    │  │  ├─ is_useful 12ms
-    │  │  ├─ is_useful 45ms
-    │  │  ├─ is_useful 45ms
-    │  │  ├─ is_useful 12ms
-    │  │  ├─ is_useful 46ms
-    │  │  ├─ is_useful 44ms
-    │  │  ├─ is_useful 14ms
-    │  │  ├─ is_useful 62ms
-    │  │  ├─ is_useful 36ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 51ms
+    │  │  ├─ is_useful 30ms
+    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 50ms
+    │  │  ├─ is_useful 31ms
+    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 54ms
     │  │  ├─ is_useful 31ms
     │  │  ├─ is_useful 14ms
-    │  │  ├─ is_useful 52ms
-    │  │  ├─ is_useful 29ms
+    │  │  ├─ is_useful 51ms
+    │  │  ├─ is_useful 33ms
+    │  │  ├─ is_useful 16ms
+    │  │  ├─ is_useful 56ms
+    │  │  ├─ is_useful 31ms
     │  │  ├─ is_useful 14ms
     │  │  ├─ is_useful 55ms
-    │  │  ├─ is_useful 47ms
+    │  │  ├─ is_useful 31ms
     │  │  ├─ is_useful 16ms
-    │  │  ├─ is_useful 58ms
-    │  │  ├─ is_useful 32ms
-    │  │  ├─ is_useful 16ms
-    │  │  ├─ is_useful 58ms
-    │  │  ├─ is_useful 34ms
+    │  │  ├─ is_useful 53ms
+    │  │  ├─ is_useful 33ms
     │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 58ms
-    │  │  ├─ is_useful 45ms
+    │  │  ├─ is_useful 60ms
+    │  │  ├─ is_useful 33ms
     │  │  ├─ is_useful 17ms
     │  │  ├─ is_useful 62ms
+    │  │  ├─ is_useful 40ms
+    │  │  ├─ is_useful 17ms
+    │  │  ├─ is_useful 73ms
+    │  │  ├─ is_useful 37ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 74ms
+    │  │  ├─ is_useful 41ms
+    │  │  ├─ is_useful 22ms
+    │  │  ├─ is_useful 65ms
+    │  │  ├─ is_useful 46ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 72ms
+    │  │  ├─ is_useful 48ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 75ms
+    │  │  ├─ is_useful 48ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 74ms
+    │  │  ├─ is_useful 50ms
+    │  │  ├─ is_useful 24ms
+    │  │  ├─ is_useful 83ms
+    │  │  ├─ is_useful 54ms
+    │  │  ├─ is_useful 26ms
+    │  │  ├─ is_useful 93ms
     │  │  ├─ is_useful 61ms
-    │  │  ├─ is_useful 23ms
-    │  │  ├─ is_useful 70ms
+    │  │  ├─ is_useful 30ms
+    │  │  ├─ is_useful 101ms
+    │  │  ├─ is_useful 57ms
+    │  │  ├─ is_useful 26ms
+    │  │  ├─ is_useful 106ms
     │  │  ├─ is_useful 60ms
     │  │  ├─ is_useful 29ms
-    │  │  ├─ is_useful 88ms
-    │  │  ├─ is_useful 40ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 74ms
-    │  │  ├─ is_useful 53ms
-    │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 82ms
-    │  │  ├─ is_useful 41ms
-    │  │  ├─ is_useful 19ms
-    │  │  ├─ is_useful 66ms
-    │  │  ├─ is_useful 47ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 73ms
-    │  │  ├─ is_useful 42ms
-    │  │  ├─ is_useful 22ms
-    │  │  ├─ is_useful 74ms
-    │  │  ├─ is_useful 49ms
-    │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 94ms
-    │  │  ├─ is_useful 45ms
-    │  │  ├─ is_useful 23ms
-    │  │  ├─ is_useful 78ms
-    │  │  ├─ is_useful 57ms
-    │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 91ms
-    │  │  ├─ is_useful 54ms
-    │  │  ├─ is_useful 23ms
-    │  │  ├─ is_useful 93ms
-    │  │  ├─ is_useful 47ms
-    │  │  ├─ is_useful 24ms
-    │  │  ├─ is_useful 95ms
-    │  │  ├─ is_useful 57ms
-    │  │  ├─ is_useful 26ms
-    │  │  ├─ is_useful 131ms
-    │  │  ├─ is_useful 77ms
-    │  │  ├─ is_useful 29ms
-    │  │  ├─ is_useful 111ms
-    │  │  ├─ is_useful 65ms
-    │  │  ├─ is_useful 30ms
-    │  │  ├─ is_useful 110ms
-    │  │  ├─ is_useful 67ms
-    │  │  ├─ is_useful 29ms
-    │  │  ├─ is_useful 114ms
-    │  │  ├─ is_useful 77ms
+    │  │  ├─ is_useful 116ms
+    │  │  ├─ is_useful 69ms
     │  │  ├─ is_useful 32ms
-    │  │  ├─ is_useful 119ms
-    │  │  ├─ is_useful 87ms
-    │  │  ├─ is_useful 44ms
-    │  │  ├─ is_useful 162ms
-    │  │  ├─ is_useful 90ms
-    │  │  ├─ is_useful 53ms
-    │  │  ├─ is_useful 164ms
-    │  │  ├─ is_useful 106ms
-    │  │  ├─ is_useful 38ms
-    │  │  ├─ is_useful 142ms
-    │  │  ├─ is_useful 97ms
-    │  │  ├─ is_useful 51ms
-    │  │  ├─ is_useful 185ms
-    │  │  ├─ is_useful 123ms
-    │  │  ├─ is_useful 50ms
-    │  │  ├─ is_useful 167ms
-    │  │  ├─ is_useful 131ms
-    │  │  ├─ is_useful 43ms
-    │  │  ├─ is_useful 158ms
-    │  │  ├─ is_useful 97ms
-    │  │  ├─ is_useful 43ms
-    │  │  ├─ is_useful 166ms
-    │  │  ├─ is_useful 86ms
-    │  │  ├─ is_useful 45ms
-    │  │  ├─ is_useful 163ms
+    │  │  ├─ is_useful 134ms
+    │  │  ├─ is_useful 73ms
+    │  │  ├─ is_useful 33ms
     │  │  ├─ is_useful 120ms
-    │  │  ├─ is_useful 61ms
-    │  │  ├─ is_useful 194ms
-    │  │  ├─ is_useful 97ms
+    │  │  ├─ is_useful 73ms
+    │  │  ├─ is_useful 37ms
+    │  │  ├─ is_useful 133ms
+    │  │  ├─ is_useful 80ms
+    │  │  ├─ is_useful 33ms
+    │  │  ├─ is_useful 131ms
+    │  │  ├─ is_useful 81ms
+    │  │  ├─ is_useful 40ms
+    │  │  ├─ is_useful 140ms
+    │  │  ├─ is_useful 79ms
+    │  │  ├─ is_useful 38ms
+    │  │  ├─ is_useful 146ms
+    │  │  ├─ is_useful 94ms
+    │  │  ├─ is_useful 38ms
+    │  │  ├─ is_useful 146ms
+    │  │  ├─ is_useful 89ms
+    │  │  ├─ is_useful 41ms
+    │  │  ├─ is_useful 164ms
+    │  │  ├─ is_useful 88ms
+    │  │  ├─ is_useful 43ms
+    │  │  ├─ is_useful 164ms
+    │  │  ├─ is_useful 101ms
     │  │  ├─ is_useful 46ms
-    │  │  ├─ is_useful 166ms
-    │  │  ├─ is_useful 104ms
-    │  │  ├─ is_useful 55ms
-    │  │  ├─ is_useful 203ms
-    │  │  ├─ is_useful 102ms
-    │  │  ├─ is_useful 65ms
-    │  │  ├─ is_useful 176ms
+    │  │  ├─ is_useful 167ms
+    │  │  ├─ is_useful 101ms
+    │  │  ├─ is_useful 45ms
+    │  │  ├─ is_useful 167ms
+    │  │  ├─ is_useful 107ms
+    │  │  ├─ is_useful 48ms
+    │  │  ├─ is_useful 174ms
+    │  │  ├─ is_useful 101ms
+    │  │  ├─ is_useful 59ms
+    │  │  ├─ is_useful 185ms
+    │  │  ├─ is_useful 111ms
+    │  │  ├─ is_useful 46ms
+    │  │  ├─ is_useful 191ms
+    │  │  ├─ is_useful 121ms
+    │  │  ├─ is_useful 58ms
+    │  │  ├─ is_useful 181ms
+    │  │  ├─ is_useful 111ms
+    │  │  ├─ is_useful 52ms
+    │  │  ├─ is_useful 185ms
     │  │  ├─ is_useful 114ms
     │  │  ├─ is_useful 50ms
-    │  │  ├─ is_useful 214ms
-    │  │  ├─ is_useful 110ms
-    │  │  ├─ is_useful 64ms
-    │  │  ├─ is_useful 265ms
-    │  │  ├─ is_useful 135ms
-    │  │  ├─ is_useful 53ms
-    │  │  ├─ is_useful 221ms
-    │  │  ├─ is_useful 124ms
-    │  │  ├─ is_useful 64ms
-    │  │  ├─ is_useful 282ms
-    │  │  ├─ is_useful 129ms
-    │  │  ├─ is_useful 58ms
-    │  │  ├─ is_useful 223ms
-    │  │  ├─ is_useful 151ms
-    │  │  ├─ is_useful 65ms
-    │  │  ├─ is_useful 243ms
-    │  │  ├─ is_useful 149ms
-    │  │  ├─ is_useful 89ms
-    │  │  ├─ is_useful 257ms
-    │  │  ├─ is_useful 160ms
-    │  │  ├─ is_useful 88ms
-    │  │  ├─ is_useful 273ms
-    │  │  ├─ is_useful 165ms
-    │  │  ├─ is_useful 84ms
-    │  │  ├─ is_useful 280ms
-    │  │  ├─ is_useful 171ms
-    │  │  ├─ is_useful 84ms
-    │  │  ├─ is_useful 306ms
-    │  │  ├─ is_useful 196ms
-    │  │  ├─ is_useful 85ms
-    │  │  ├─ is_useful 332ms
-    │  │  ├─ is_useful 191ms
-    │  │  ├─ is_useful 79ms
-    │  │  ├─ is_useful 360ms
     │  │  ├─ is_useful 187ms
-    │  │  ├─ is_useful 80ms
-    │  │  ├─ is_useful 330ms
-    │  │  ├─ is_useful 214ms
-    │  │  └─ is_useful 46755ms
-    │  │     ├─ difference_pwild 222ms
-    │  │     │  └─ difference_por 222ms
-    │  │     ├─ difference_por 524ms
-    │  │     ├─ difference_por 233ms
-    │  │     ├─ difference_por 171ms
-    │  │     ├─ difference_por 344ms
-    │  │     ├─ difference_por 172ms
-    │  │     ├─ difference_por 170ms
-    │  │     ├─ difference_por 335ms
-    │  │     ├─ difference_por 168ms
+    │  │  ├─ is_useful 116ms
+    │  │  ├─ is_useful 55ms
+    │  │  ├─ is_useful 207ms
+    │  │  ├─ is_useful 120ms
+    │  │  ├─ is_useful 56ms
+    │  │  ├─ is_useful 202ms
+    │  │  ├─ is_useful 129ms
+    │  │  ├─ is_useful 54ms
+    │  │  ├─ is_useful 222ms
+    │  │  ├─ is_useful 135ms
+    │  │  ├─ is_useful 59ms
+    │  │  ├─ is_useful 229ms
+    │  │  ├─ is_useful 134ms
+    │  │  ├─ is_useful 60ms
+    │  │  ├─ is_useful 230ms
+    │  │  ├─ is_useful 140ms
+    │  │  ├─ is_useful 64ms
+    │  │  ├─ is_useful 239ms
+    │  │  ├─ is_useful 143ms
+    │  │  ├─ is_useful 64ms
+    │  │  ├─ is_useful 238ms
+    │  │  ├─ is_useful 142ms
+    │  │  ├─ is_useful 61ms
+    │  │  ├─ is_useful 228ms
+    │  │  ├─ is_useful 139ms
+    │  │  ├─ is_useful 63ms
+    │  │  ├─ is_useful 243ms
+    │  │  ├─ is_useful 141ms
+    │  │  ├─ is_useful 67ms
+    │  │  ├─ is_useful 239ms
+    │  │  ├─ is_useful 150ms
+    │  │  ├─ is_useful 70ms
+    │  │  ├─ is_useful 258ms
+    │  │  ├─ is_useful 151ms
+    │  │  ├─ is_useful 69ms
+    │  │  ├─ is_useful 237ms
+    │  │  ├─ is_useful 149ms
+    │  │  └─ is_useful 36880ms
+    │  │     ├─ difference_pwild 161ms
+    │  │     │  └─ difference_por 161ms
+    │  │     ├─ difference_por 323ms
+    │  │     ├─ difference_por 159ms
+    │  │     ├─ difference_por 162ms
+    │  │     ├─ difference_por 319ms
     │  │     ├─ difference_por 165ms
-    │  │     ├─ difference_por 337ms
-    │  │     ├─ difference_por 165ms
-    │  │     ├─ difference_por 165ms
-    │  │     ├─ difference_por 332ms
-    │  │     ├─ difference_por 167ms
-    │  │     ├─ difference_por 174ms
-    │  │     ├─ difference_por 449ms
-    │  │     ├─ difference_por 199ms
-    │  │     ├─ difference_por 216ms
-    │  │     ├─ difference_por 395ms
-    │  │     ├─ difference_por 178ms
-    │  │     ├─ difference_por 164ms
-    │  │     ├─ difference_por 342ms
-    │  │     ├─ difference_por 161ms
-    │  │     ├─ difference_por 156ms
-    │  │     ├─ difference_por 339ms
-    │  │     ├─ difference_por 166ms
-    │  │     ├─ difference_por 188ms
-    │  │     ├─ difference_por 343ms
-    │  │     ├─ difference_por 210ms
-    │  │     ├─ difference_por 208ms
-    │  │     ├─ difference_por 404ms
-    │  │     ├─ difference_por 212ms
-    │  │     ├─ difference_por 216ms
-    │  │     ├─ difference_por 390ms
-    │  │     ├─ difference_por 177ms
-    │  │     ├─ difference_por 175ms
-    │  │     ├─ difference_por 342ms
-    │  │     ├─ difference_por 196ms
-    │  │     ├─ difference_por 167ms
-    │  │     ├─ difference_por 338ms
-    │  │     ├─ difference_por 179ms
-    │  │     ├─ difference_por 184ms
-    │  │     ├─ difference_por 349ms
-    │  │     ├─ difference_por 170ms
-    │  │     ├─ difference_por 197ms
-    │  │     ├─ difference_por 376ms
-    │  │     ├─ difference_por 190ms
-    │  │     ├─ difference_por 218ms
-    │  │     ├─ difference_por 403ms
-    │  │     ├─ difference_por 174ms
-    │  │     ├─ difference_por 157ms
-    │  │     ├─ difference_por 313ms
-    │  │     ├─ difference_por 156ms
-    │  │     ├─ difference_por 153ms
-    │  │     ├─ difference_por 302ms
-    │  │     ├─ difference_por 172ms
-    │  │     ├─ difference_por 172ms
-    │  │     ├─ difference_por 340ms
-    │  │     ├─ difference_por 219ms
-    │  │     ├─ difference_por 216ms
-    │  │     ├─ difference_por 339ms
-    │  │     ├─ difference_por 195ms
-    │  │     ├─ difference_por 168ms
-    │  │     ├─ difference_por 327ms
-    │  │     ├─ difference_por 157ms
-    │  │     ├─ difference_por 173ms
-    │  │     ├─ difference_por 313ms
-    │  │     ├─ difference_por 158ms
-    │  │     ├─ difference_por 161ms
-    │  │     ├─ difference_por 317ms
-    │  │     ├─ difference_por 166ms
-    │  │     ├─ difference_por 185ms
-    │  │     ├─ difference_por 318ms
-    │  │     ├─ difference_por 135ms
-    │  │     ├─ difference_por 151ms
-    │  │     ├─ difference_por 271ms
-    │  │     ├─ difference_por 143ms
-    │  │     ├─ difference_por 164ms
-    │  │     ├─ difference_por 341ms
-    │  │     ├─ difference_por 160ms
-    │  │     ├─ difference_por 167ms
-    │  │     ├─ difference_por 291ms
-    │  │     ├─ difference_por 148ms
-    │  │     ├─ difference_por 151ms
-    │  │     ├─ difference_por 293ms
-    │  │     ├─ difference_por 140ms
-    │  │     ├─ difference_por 132ms
-    │  │     ├─ difference_por 373ms
-    │  │     ├─ difference_por 173ms
-    │  │     ├─ difference_por 171ms
-    │  │     ├─ difference_por 332ms
-    │  │     ├─ difference_por 153ms
-    │  │     ├─ difference_por 139ms
-    │  │     ├─ difference_por 277ms
-    │  │     ├─ difference_por 146ms
-    │  │     ├─ difference_por 143ms
-    │  │     ├─ difference_por 298ms
-    │  │     ├─ difference_por 148ms
-    │  │     ├─ difference_por 153ms
-    │  │     ├─ difference_por 263ms
-    │  │     ├─ difference_por 172ms
-    │  │     ├─ difference_por 177ms
-    │  │     ├─ difference_por 354ms
-    │  │     ├─ difference_por 155ms
-    │  │     ├─ difference_por 129ms
-    │  │     ├─ difference_por 302ms
-    │  │     ├─ difference_por 146ms
-    │  │     ├─ difference_por 150ms
-    │  │     ├─ difference_por 290ms
-    │  │     ├─ difference_por 135ms
     │  │     ├─ difference_por 163ms
-    │  │     ├─ difference_por 288ms
-    │  │     ├─ difference_por 146ms
+    │  │     ├─ difference_por 327ms
     │  │     ├─ difference_por 158ms
-    │  │     ├─ difference_por 276ms
-    │  │     ├─ difference_por 142ms
-    │  │     ├─ difference_por 139ms
-    │  │     ├─ difference_por 251ms
+    │  │     ├─ difference_por 165ms
+    │  │     ├─ difference_por 319ms
+    │  │     ├─ difference_por 161ms
     │  │     ├─ difference_por 154ms
-    │  │     ├─ difference_por 128ms
-    │  │     ├─ difference_por 255ms
-    │  │     ├─ difference_por 122ms
-    │  │     ├─ difference_por 140ms
-    │  │     ├─ difference_por 290ms
-    │  │     ├─ difference_por 129ms
+    │  │     ├─ difference_por 337ms
+    │  │     ├─ difference_por 153ms
+    │  │     ├─ difference_por 165ms
+    │  │     ├─ difference_por 325ms
+    │  │     ├─ difference_por 155ms
+    │  │     ├─ difference_por 156ms
+    │  │     ├─ difference_por 321ms
+    │  │     ├─ difference_por 153ms
+    │  │     ├─ difference_por 162ms
+    │  │     ├─ difference_por 311ms
+    │  │     ├─ difference_por 156ms
+    │  │     ├─ difference_por 159ms
+    │  │     ├─ difference_por 313ms
     │  │     ├─ difference_por 160ms
+    │  │     ├─ difference_por 154ms
+    │  │     ├─ difference_por 324ms
+    │  │     ├─ difference_por 152ms
+    │  │     ├─ difference_por 164ms
+    │  │     ├─ difference_por 316ms
+    │  │     ├─ difference_por 150ms
+    │  │     ├─ difference_por 159ms
+    │  │     ├─ difference_por 304ms
+    │  │     ├─ difference_por 145ms
+    │  │     ├─ difference_por 143ms
+    │  │     ├─ difference_por 297ms
+    │  │     ├─ difference_por 151ms
+    │  │     ├─ difference_por 146ms
+    │  │     ├─ difference_por 282ms
+    │  │     ├─ difference_por 153ms
+    │  │     ├─ difference_por 147ms
+    │  │     ├─ difference_por 296ms
+    │  │     ├─ difference_por 152ms
+    │  │     ├─ difference_por 140ms
+    │  │     ├─ difference_por 287ms
+    │  │     ├─ difference_por 147ms
+    │  │     ├─ difference_por 140ms
+    │  │     ├─ difference_por 276ms
+    │  │     ├─ difference_por 145ms
+    │  │     ├─ difference_por 138ms
+    │  │     ├─ difference_por 281ms
+    │  │     ├─ difference_por 142ms
+    │  │     ├─ difference_por 144ms
+    │  │     ├─ difference_por 276ms
+    │  │     ├─ difference_por 139ms
+    │  │     ├─ difference_por 134ms
     │  │     ├─ difference_por 272ms
-    │  │     ├─ difference_por 157ms
-    │  │     ├─ difference_por 110ms
-    │  │     ├─ difference_por 238ms
-    │  │     ├─ difference_por 110ms
-    │  │     ├─ difference_por 128ms
-    │  │     ├─ difference_por 254ms
+    │  │     ├─ difference_por 135ms
+    │  │     ├─ difference_por 138ms
+    │  │     ├─ difference_por 266ms
+    │  │     ├─ difference_por 132ms
+    │  │     ├─ difference_por 134ms
+    │  │     ├─ difference_por 265ms
+    │  │     ├─ difference_por 134ms
+    │  │     ├─ difference_por 131ms
+    │  │     ├─ difference_por 258ms
+    │  │     ├─ difference_por 131ms
+    │  │     ├─ difference_por 134ms
+    │  │     ├─ difference_por 253ms
+    │  │     ├─ difference_por 131ms
+    │  │     ├─ difference_por 129ms
+    │  │     ├─ difference_por 252ms
+    │  │     ├─ difference_por 126ms
+    │  │     ├─ difference_por 122ms
+    │  │     ├─ difference_por 264ms
+    │  │     ├─ difference_por 134ms
+    │  │     ├─ difference_por 136ms
+    │  │     ├─ difference_por 260ms
+    │  │     ├─ difference_por 132ms
+    │  │     ├─ difference_por 130ms
+    │  │     ├─ difference_por 256ms
+    │  │     ├─ difference_por 130ms
+    │  │     ├─ difference_por 129ms
+    │  │     ├─ difference_por 277ms
+    │  │     ├─ difference_por 120ms
+    │  │     ├─ difference_por 124ms
+    │  │     ├─ difference_por 249ms
     │  │     ├─ difference_por 126ms
     │  │     ├─ difference_por 119ms
-    │  │     ├─ difference_por 252ms
-    │  │     ├─ difference_por 116ms
-    │  │     ├─ difference_por 150ms
-    │  │     ├─ difference_por 254ms
-    │  │     ├─ difference_por 136ms
-    │  │     ├─ difference_por 151ms
-    │  │     ├─ difference_por 232ms
-    │  │     ├─ difference_por 136ms
-    │  │     ├─ difference_por 123ms
-    │  │     ├─ difference_por 214ms
-    │  │     ├─ difference_por 101ms
-    │  │     ├─ difference_por 127ms
-    │  │     ├─ difference_por 224ms
-    │  │     ├─ difference_por 116ms
-    │  │     ├─ difference_por 113ms
-    │  │     ├─ difference_por 258ms
-    │  │     ├─ difference_por 105ms
-    │  │     ├─ difference_por 133ms
-    │  │     ├─ difference_por 227ms
-    │  │     ├─ difference_por 119ms
-    │  │     ├─ difference_por 112ms
-    │  │     ├─ difference_por 209ms
-    │  │     ├─ difference_por 112ms
-    │  │     ├─ difference_por 101ms
-    │  │     ├─ difference_por 230ms
-    │  │     ├─ difference_por 159ms
-    │  │     ├─ difference_por 94ms
-    │  │     ├─ difference_por 224ms
-    │  │     ├─ difference_por 135ms
-    │  │     ├─ difference_por 121ms
-    │  │     ├─ difference_por 208ms
-    │  │     ├─ difference_por 96ms
-    │  │     ├─ difference_por 110ms
-    │  │     ├─ difference_por 196ms
-    │  │     ├─ difference_por 87ms
-    │  │     ├─ difference_por 96ms
-    │  │     ├─ difference_por 190ms
-    │  │     ├─ difference_por 94ms
+    │  │     ├─ difference_por 244ms
+    │  │     ├─ difference_por 130ms
     │  │     ├─ difference_por 120ms
-    │  │     ├─ difference_por 215ms
-    │  │     ├─ difference_por 83ms
-    │  │     ├─ difference_por 108ms
-    │  │     ├─ difference_por 230ms
-    │  │     ├─ difference_por 106ms
-    │  │     ├─ difference_por 114ms
-    │  │     ├─ difference_por 172ms
-    │  │     ├─ difference_por 89ms
-    │  │     ├─ difference_por 100ms
-    │  │     ├─ difference_por 190ms
-    │  │     ├─ difference_por 98ms
-    │  │     ├─ difference_por 94ms
-    │  │     ├─ difference_por 205ms
-    │  │     ├─ difference_por 81ms
+    │  │     ├─ difference_por 245ms
     │  │     ├─ difference_por 110ms
-    │  │     ├─ difference_por 201ms
-    │  │     ├─ difference_por 94ms
-    │  │     ├─ difference_por 91ms
+    │  │     ├─ difference_por 117ms
+    │  │     ├─ difference_por 240ms
+    │  │     ├─ difference_por 117ms
+    │  │     ├─ difference_por 121ms
+    │  │     ├─ difference_por 228ms
+    │  │     ├─ difference_por 122ms
+    │  │     ├─ difference_por 113ms
+    │  │     ├─ difference_por 232ms
+    │  │     ├─ difference_por 112ms
+    │  │     ├─ difference_por 113ms
     │  │     ├─ difference_por 225ms
+    │  │     ├─ difference_por 112ms
+    │  │     ├─ difference_por 110ms
+    │  │     ├─ difference_por 220ms
+    │  │     ├─ difference_por 106ms
+    │  │     ├─ difference_por 106ms
+    │  │     ├─ difference_por 215ms
+    │  │     ├─ difference_por 110ms
+    │  │     ├─ difference_por 114ms
+    │  │     ├─ difference_por 220ms
+    │  │     ├─ difference_por 110ms
+    │  │     ├─ difference_por 106ms
+    │  │     ├─ difference_por 222ms
+    │  │     ├─ difference_por 112ms
+    │  │     ├─ difference_por 107ms
+    │  │     ├─ difference_por 215ms
+    │  │     ├─ difference_por 104ms
+    │  │     ├─ difference_por 106ms
+    │  │     ├─ difference_por 205ms
+    │  │     ├─ difference_por 107ms
+    │  │     ├─ difference_por 102ms
+    │  │     ├─ difference_por 211ms
+    │  │     ├─ difference_por 100ms
+    │  │     ├─ difference_por 100ms
+    │  │     ├─ difference_por 198ms
+    │  │     ├─ difference_por 98ms
+    │  │     ├─ difference_por 96ms
+    │  │     ├─ difference_por 191ms
     │  │     ├─ difference_por 97ms
     │  │     ├─ difference_por 94ms
-    │  │     ├─ difference_por 186ms
-    │  │     ├─ difference_por 92ms
-    │  │     ├─ difference_por 73ms
-    │  │     ├─ difference_por 162ms
-    │  │     ├─ difference_por 85ms
-    │  │     ├─ difference_por 107ms
-    │  │     ├─ difference_por 182ms
-    │  │     ├─ difference_por 102ms
-    │  │     ├─ difference_por 74ms
-    │  │     ├─ difference_por 187ms
-    │  │     ├─ difference_por 80ms
+    │  │     ├─ difference_por 197ms
     │  │     ├─ difference_por 96ms
-    │  │     ├─ difference_por 180ms
-    │  │     ├─ difference_por 79ms
-    │  │     ├─ difference_por 84ms
-    │  │     ├─ difference_por 180ms
-    │  │     ├─ difference_por 79ms
-    │  │     ├─ difference_por 89ms
-    │  │     ├─ difference_por 176ms
-    │  │     ├─ difference_por 73ms
-    │  │     ├─ difference_por 78ms
-    │  │     ├─ difference_por 161ms
-    │  │     ├─ difference_por 67ms
-    │  │     ├─ difference_por 76ms
-    │  │     ├─ difference_por 142ms
-    │  │     ├─ difference_por 87ms
-    │  │     ├─ difference_por 70ms
-    │  │     ├─ difference_por 143ms
-    │  │     ├─ difference_por 75ms
-    │  │     ├─ difference_por 66ms
-    │  │     ├─ difference_por 149ms
-    │  │     ├─ difference_por 69ms
-    │  │     ├─ difference_por 76ms
-    │  │     ├─ difference_por 140ms
-    │  │     ├─ difference_por 63ms
-    │  │     ├─ difference_por 62ms
-    │  │     ├─ difference_por 109ms
-    │  │     ├─ difference_por 55ms
-    │  │     ├─ difference_por 53ms
-    │  │     ├─ difference_por 132ms
-    │  │     ├─ difference_por 51ms
-    │  │     ├─ difference_por 57ms
-    │  │     ├─ difference_por 144ms
-    │  │     ├─ difference_por 68ms
-    │  │     ├─ difference_por 48ms
-    │  │     ├─ difference_por 121ms
-    │  │     ├─ difference_por 59ms
-    │  │     ├─ difference_por 70ms
-    │  │     ├─ difference_por 112ms
-    │  │     ├─ difference_por 51ms
-    │  │     ├─ difference_por 56ms
-    │  │     ├─ difference_por 141ms
-    │  │     ├─ difference_por 69ms
-    │  │     ├─ difference_por 62ms
-    │  │     ├─ difference_por 126ms
-    │  │     ├─ difference_por 58ms
-    │  │     ├─ difference_por 74ms
-    │  │     ├─ difference_por 135ms
-    │  │     ├─ difference_por 77ms
-    │  │     ├─ difference_por 60ms
-    │  │     ├─ difference_por 108ms
-    │  │     ├─ difference_por 50ms
-    │  │     ├─ difference_por 55ms
-    │  │     ├─ difference_por 90ms
-    │  │     ├─ difference_por 39ms
-    │  │     ├─ difference_por 50ms
-    │  │     ├─ difference_por 101ms
-    │  │     ├─ difference_por 52ms
-    │  │     ├─ difference_por 44ms
-    │  │     ├─ difference_por 88ms
-    │  │     ├─ difference_por 43ms
-    │  │     ├─ difference_por 32ms
+    │  │     ├─ difference_por 95ms
+    │  │     ├─ difference_por 188ms
+    │  │     ├─ difference_por 97ms
     │  │     ├─ difference_por 93ms
-    │  │     ├─ difference_por 37ms
-    │  │     ├─ difference_por 45ms
-    │  │     ├─ difference_por 84ms
-    │  │     ├─ difference_por 49ms
-    │  │     ├─ difference_por 45ms
-    │  │     ├─ difference_por 74ms
-    │  │     ├─ difference_por 32ms
-    │  │     ├─ difference_por 46ms
+    │  │     ├─ difference_por 195ms
+    │  │     ├─ difference_por 95ms
     │  │     ├─ difference_por 92ms
-    │  │     ├─ difference_por 40ms
-    │  │     ├─ difference_por 33ms
-    │  │     ├─ difference_por 81ms
-    │  │     ├─ difference_por 41ms
-    │  │     ├─ difference_por 33ms
-    │  │     ├─ difference_por 72ms
-    │  │     ├─ difference_por 47ms
-    │  │     ├─ difference_por 38ms
+    │  │     ├─ difference_por 192ms
+    │  │     ├─ difference_por 92ms
+    │  │     ├─ difference_por 93ms
+    │  │     ├─ difference_por 198ms
+    │  │     ├─ difference_por 91ms
+    │  │     ├─ difference_por 91ms
+    │  │     ├─ difference_por 181ms
+    │  │     ├─ difference_por 91ms
+    │  │     ├─ difference_por 86ms
+    │  │     ├─ difference_por 182ms
+    │  │     ├─ difference_por 88ms
+    │  │     ├─ difference_por 85ms
+    │  │     ├─ difference_por 175ms
     │  │     ├─ difference_por 89ms
-    │  │     ├─ difference_por 37ms
-    │  │     ├─ difference_por 23ms
+    │  │     ├─ difference_por 92ms
+    │  │     ├─ difference_por 171ms
+    │  │     ├─ difference_por 89ms
+    │  │     ├─ difference_por 94ms
+    │  │     ├─ difference_por 172ms
+    │  │     ├─ difference_por 82ms
+    │  │     ├─ difference_por 83ms
+    │  │     ├─ difference_por 170ms
+    │  │     ├─ difference_por 79ms
+    │  │     ├─ difference_por 83ms
+    │  │     ├─ difference_por 163ms
+    │  │     ├─ difference_por 82ms
+    │  │     ├─ difference_por 79ms
+    │  │     ├─ difference_por 155ms
+    │  │     ├─ difference_por 83ms
+    │  │     ├─ difference_por 76ms
+    │  │     ├─ difference_por 164ms
+    │  │     ├─ difference_por 83ms
+    │  │     ├─ difference_por 77ms
+    │  │     ├─ difference_por 156ms
+    │  │     ├─ difference_por 88ms
+    │  │     ├─ difference_por 78ms
+    │  │     ├─ difference_por 151ms
+    │  │     ├─ difference_por 76ms
+    │  │     ├─ difference_por 78ms
+    │  │     ├─ difference_por 162ms
+    │  │     ├─ difference_por 75ms
+    │  │     ├─ difference_por 71ms
+    │  │     ├─ difference_por 151ms
+    │  │     ├─ difference_por 70ms
+    │  │     ├─ difference_por 75ms
+    │  │     ├─ difference_por 146ms
+    │  │     ├─ difference_por 71ms
+    │  │     ├─ difference_por 68ms
+    │  │     ├─ difference_por 144ms
+    │  │     ├─ difference_por 70ms
+    │  │     ├─ difference_por 68ms
+    │  │     ├─ difference_por 131ms
+    │  │     ├─ difference_por 70ms
+    │  │     ├─ difference_por 66ms
+    │  │     ├─ difference_por 135ms
+    │  │     ├─ difference_por 65ms
+    │  │     ├─ difference_por 67ms
+    │  │     ├─ difference_por 132ms
+    │  │     ├─ difference_por 63ms
+    │  │     ├─ difference_por 61ms
+    │  │     ├─ difference_por 125ms
+    │  │     ├─ difference_por 64ms
+    │  │     ├─ difference_por 61ms
+    │  │     ├─ difference_por 126ms
+    │  │     ├─ difference_por 61ms
+    │  │     ├─ difference_por 60ms
+    │  │     ├─ difference_por 121ms
+    │  │     ├─ difference_por 61ms
     │  │     ├─ difference_por 59ms
-    │  │     ├─ difference_por 25ms
-    │  │     ├─ difference_por 22ms
-    │  │     ├─ difference_por 53ms
-    │  │     ├─ difference_por 22ms
-    │  │     ├─ difference_por 20ms
+    │  │     ├─ difference_por 114ms
+    │  │     ├─ difference_por 57ms
+    │  │     ├─ difference_por 55ms
+    │  │     ├─ difference_por 118ms
+    │  │     ├─ difference_por 58ms
+    │  │     ├─ difference_por 54ms
+    │  │     ├─ difference_por 111ms
+    │  │     ├─ difference_por 54ms
+    │  │     ├─ difference_por 54ms
+    │  │     ├─ difference_por 111ms
+    │  │     ├─ difference_por 55ms
+    │  │     ├─ difference_por 56ms
+    │  │     ├─ difference_por 104ms
+    │  │     ├─ difference_por 52ms
+    │  │     ├─ difference_por 54ms
+    │  │     ├─ difference_por 103ms
+    │  │     ├─ difference_por 49ms
+    │  │     ├─ difference_por 52ms
+    │  │     ├─ difference_por 98ms
     │  │     ├─ difference_por 50ms
+    │  │     ├─ difference_por 48ms
+    │  │     ├─ difference_por 99ms
+    │  │     ├─ difference_por 46ms
+    │  │     ├─ difference_por 50ms
+    │  │     ├─ difference_por 92ms
+    │  │     ├─ difference_por 54ms
+    │  │     ├─ difference_por 44ms
+    │  │     ├─ difference_por 91ms
+    │  │     ├─ difference_por 45ms
+    │  │     ├─ difference_por 46ms
+    │  │     ├─ difference_por 90ms
+    │  │     ├─ difference_por 50ms
+    │  │     ├─ difference_por 49ms
+    │  │     ├─ difference_por 85ms
+    │  │     ├─ difference_por 42ms
+    │  │     ├─ difference_por 40ms
+    │  │     ├─ difference_por 84ms
     │  │     ├─ difference_por 39ms
-    │  │     ├─ difference_por 31ms
+    │  │     ├─ difference_por 42ms
+    │  │     ├─ difference_por 76ms
+    │  │     ├─ difference_por 40ms
+    │  │     ├─ difference_por 41ms
+    │  │     ├─ difference_por 75ms
     │  │     ├─ difference_por 39ms
-    │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 17ms
     │  │     ├─ difference_por 36ms
+    │  │     ├─ difference_por 78ms
+    │  │     ├─ difference_por 35ms
+    │  │     ├─ difference_por 35ms
+    │  │     ├─ difference_por 74ms
+    │  │     ├─ difference_por 37ms
+    │  │     ├─ difference_por 31ms
+    │  │     ├─ difference_por 67ms
+    │  │     ├─ difference_por 33ms
+    │  │     ├─ difference_por 30ms
+    │  │     ├─ difference_por 71ms
+    │  │     ├─ difference_por 32ms
+    │  │     ├─ difference_por 32ms
+    │  │     ├─ difference_por 63ms
+    │  │     ├─ difference_por 30ms
+    │  │     ├─ difference_por 29ms
+    │  │     ├─ difference_por 61ms
+    │  │     ├─ difference_por 30ms
+    │  │     ├─ difference_por 30ms
+    │  │     ├─ difference_por 56ms
+    │  │     ├─ difference_por 28ms
+    │  │     ├─ difference_por 26ms
+    │  │     ├─ difference_por 51ms
+    │  │     ├─ difference_por 26ms
     │  │     ├─ difference_por 25ms
-    │  └─ check_exhaustiveness 152400ms
-    │     └─ is_useful 152399ms
-    │        ├─ overlap_por 236ms
-    │        ├─ difference_por 209ms
-    │        ├─ overlap_por 483ms
-    │        ├─ difference_por 485ms
-    │        ├─ overlap_por 242ms
-    │        ├─ difference_por 520ms
-    │        ├─ overlap_por 216ms
-    │        ├─ difference_por 278ms
-    │        ├─ overlap_por 552ms
-    │        ├─ difference_por 411ms
-    │        ├─ overlap_por 193ms
-    │        ├─ difference_por 391ms
-    │        ├─ overlap_por 195ms
-    │        ├─ difference_por 199ms
-    │        ├─ overlap_por 387ms
-    │        ├─ difference_por 377ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 404ms
-    │        ├─ overlap_por 195ms
-    │        ├─ difference_por 195ms
-    │        ├─ overlap_por 395ms
-    │        ├─ difference_por 407ms
-    │        ├─ overlap_por 212ms
-    │        ├─ difference_por 395ms
-    │        ├─ overlap_por 220ms
-    │        ├─ difference_por 197ms
-    │        ├─ overlap_por 396ms
-    │        ├─ difference_por 389ms
-    │        ├─ overlap_por 208ms
-    │        ├─ difference_por 437ms
-    │        ├─ overlap_por 204ms
-    │        ├─ difference_por 227ms
-    │        ├─ overlap_por 499ms
-    │        ├─ difference_por 503ms
-    │        ├─ overlap_por 265ms
-    │        ├─ difference_por 474ms
-    │        ├─ overlap_por 204ms
-    │        ├─ difference_por 202ms
-    │        ├─ overlap_por 469ms
-    │        ├─ difference_por 375ms
-    │        ├─ overlap_por 256ms
-    │        ├─ difference_por 405ms
-    │        ├─ overlap_por 194ms
-    │        ├─ difference_por 194ms
-    │        ├─ overlap_por 385ms
-    │        ├─ difference_por 387ms
-    │        ├─ overlap_por 196ms
-    │        ├─ difference_por 366ms
-    │        ├─ overlap_por 208ms
-    │        ├─ difference_por 193ms
-    │        ├─ overlap_por 448ms
-    │        ├─ difference_por 368ms
-    │        ├─ overlap_por 208ms
-    │        ├─ difference_por 395ms
-    │        ├─ overlap_por 205ms
-    │        ├─ difference_por 209ms
-    │        ├─ overlap_por 420ms
-    │        ├─ difference_por 358ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 393ms
-    │        ├─ overlap_por 212ms
-    │        ├─ difference_por 198ms
-    │        ├─ overlap_por 509ms
-    │        ├─ difference_por 427ms
-    │        ├─ overlap_por 274ms
-    │        ├─ difference_por 401ms
-    │        ├─ overlap_por 193ms
-    │        ├─ difference_por 176ms
-    │        ├─ overlap_por 389ms
-    │        ├─ difference_por 348ms
-    │        ├─ overlap_por 195ms
-    │        ├─ difference_por 359ms
-    │        ├─ overlap_por 214ms
-    │        ├─ difference_por 173ms
-    │        ├─ overlap_por 393ms
-    │        ├─ difference_por 403ms
-    │        ├─ overlap_por 215ms
-    │        ├─ difference_por 358ms
-    │        ├─ overlap_por 226ms
-    │        ├─ difference_por 204ms
-    │        ├─ overlap_por 397ms
-    │        ├─ difference_por 357ms
-    │        ├─ overlap_por 249ms
-    │        ├─ difference_por 470ms
-    │        ├─ overlap_por 240ms
-    │        ├─ difference_por 171ms
-    │        ├─ overlap_por 453ms
-    │        ├─ difference_por 402ms
-    │        ├─ overlap_por 199ms
-    │        ├─ difference_por 343ms
-    │        ├─ overlap_por 204ms
-    │        ├─ difference_por 190ms
-    │        ├─ overlap_por 414ms
-    │        ├─ difference_por 378ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 385ms
-    │        ├─ overlap_por 196ms
-    │        ├─ difference_por 165ms
-    │        ├─ overlap_por 436ms
-    │        ├─ difference_por 371ms
-    │        ├─ overlap_por 202ms
-    │        ├─ difference_por 366ms
-    │        ├─ overlap_por 249ms
-    │        ├─ difference_por 188ms
-    │        ├─ overlap_por 446ms
-    │        ├─ difference_por 329ms
-    │        ├─ overlap_por 195ms
-    │        ├─ difference_por 328ms
-    │        ├─ overlap_por 196ms
-    │        ├─ difference_por 163ms
-    │        ├─ overlap_por 389ms
-    │        ├─ difference_por 326ms
-    │        ├─ overlap_por 195ms
-    │        ├─ difference_por 347ms
-    │        ├─ overlap_por 222ms
-    │        ├─ difference_por 166ms
-    │        ├─ overlap_por 422ms
-    │        ├─ difference_por 336ms
-    │        ├─ overlap_por 256ms
-    │        ├─ difference_por 340ms
-    │        ├─ overlap_por 217ms
-    │        ├─ difference_por 164ms
-    │        ├─ overlap_por 430ms
-    │        ├─ difference_por 332ms
-    │        ├─ overlap_por 195ms
-    │        ├─ difference_por 360ms
-    │        ├─ overlap_por 211ms
-    │        ├─ difference_por 160ms
-    │        ├─ overlap_por 456ms
-    │        ├─ difference_por 317ms
-    │        ├─ overlap_por 255ms
-    │        ├─ difference_por 335ms
-    │        ├─ overlap_por 212ms
-    │        ├─ difference_por 174ms
-    │        ├─ overlap_por 420ms
-    │        ├─ difference_por 344ms
-    │        ├─ overlap_por 194ms
-    │        ├─ difference_por 313ms
-    │        ├─ overlap_por 212ms
-    │        ├─ difference_por 165ms
-    │        ├─ overlap_por 455ms
-    │        ├─ difference_por 351ms
-    │        ├─ overlap_por 212ms
-    │        ├─ difference_por 310ms
-    │        ├─ overlap_por 214ms
-    │        ├─ difference_por 163ms
-    │        ├─ overlap_por 427ms
-    │        ├─ difference_por 341ms
-    │        ├─ overlap_por 234ms
-    │        ├─ difference_por 324ms
-    │        ├─ overlap_por 225ms
-    │        ├─ difference_por 173ms
-    │        ├─ overlap_por 431ms
-    │        ├─ difference_por 309ms
-    │        ├─ overlap_por 196ms
-    │        ├─ difference_por 304ms
-    │        ├─ overlap_por 219ms
-    │        ├─ difference_por 150ms
-    │        ├─ overlap_por 576ms
-    │        ├─ difference_por 335ms
-    │        ├─ overlap_por 211ms
-    │        ├─ difference_por 312ms
-    │        ├─ overlap_por 219ms
-    │        ├─ difference_por 148ms
-    │        ├─ overlap_por 395ms
-    │        ├─ difference_por 302ms
-    │        ├─ overlap_por 203ms
-    │        ├─ difference_por 308ms
-    │        ├─ overlap_por 201ms
-    │        ├─ difference_por 152ms
-    │        ├─ overlap_por 445ms
-    │        ├─ difference_por 295ms
-    │        ├─ overlap_por 197ms
-    │        ├─ difference_por 323ms
-    │        ├─ overlap_por 244ms
-    │        ├─ difference_por 143ms
-    │        ├─ overlap_por 421ms
-    │        ├─ difference_por 305ms
-    │        ├─ overlap_por 209ms
-    │        ├─ difference_por 293ms
-    │        ├─ overlap_por 193ms
-    │        ├─ difference_por 145ms
-    │        ├─ overlap_por 390ms
-    │        ├─ difference_por 286ms
-    │        ├─ overlap_por 210ms
-    │        ├─ difference_por 317ms
-    │        ├─ overlap_por 208ms
-    │        ├─ difference_por 157ms
-    │        ├─ overlap_por 400ms
-    │        ├─ difference_por 283ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 283ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 146ms
-    │        ├─ overlap_por 402ms
-    │        ├─ difference_por 282ms
-    │        ├─ overlap_por 212ms
-    │        ├─ difference_por 280ms
-    │        ├─ overlap_por 197ms
-    │        ├─ difference_por 139ms
-    │        ├─ overlap_por 403ms
-    │        ├─ difference_por 280ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 281ms
-    │        ├─ overlap_por 194ms
-    │        ├─ difference_por 137ms
-    │        ├─ overlap_por 407ms
-    │        ├─ difference_por 277ms
-    │        ├─ overlap_por 196ms
-    │        ├─ difference_por 280ms
-    │        ├─ overlap_por 199ms
-    │        ├─ difference_por 134ms
-    │        ├─ overlap_por 398ms
-    │        ├─ difference_por 278ms
-    │        ├─ overlap_por 201ms
-    │        ├─ difference_por 280ms
-    │        ├─ overlap_por 200ms
-    │        ├─ difference_por 133ms
-    │        ├─ overlap_por 395ms
-    │        ├─ difference_por 268ms
-    │        ├─ overlap_por 203ms
-    │        ├─ difference_por 288ms
-    │        ├─ overlap_por 208ms
-    │        ├─ difference_por 131ms
-    │        ├─ overlap_por 492ms
-    │        ├─ difference_por 277ms
-    │        ├─ overlap_por 201ms
-    │        ├─ difference_por 264ms
-    │        ├─ overlap_por 197ms
-    │        ├─ difference_por 129ms
-    │        ├─ overlap_por 392ms
-    │        ├─ difference_por 259ms
-    │        ├─ overlap_por 196ms
-    │        ├─ difference_por 259ms
-    │        ├─ overlap_por 196ms
-    │        ├─ difference_por 126ms
-    │        ├─ overlap_por 390ms
-    │        ├─ difference_por 258ms
-    │        ├─ overlap_por 199ms
-    │        ├─ difference_por 253ms
-    │        ├─ overlap_por 205ms
-    │        ├─ difference_por 132ms
-    │        ├─ overlap_por 394ms
-    │        ├─ difference_por 253ms
-    │        ├─ overlap_por 197ms
-    │        ├─ difference_por 255ms
-    │        ├─ overlap_por 193ms
-    │        ├─ difference_por 126ms
-    │        ├─ overlap_por 391ms
-    │        ├─ difference_por 248ms
-    │        ├─ overlap_por 199ms
-    │        ├─ difference_por 255ms
-    │        ├─ overlap_por 192ms
-    │        ├─ difference_por 122ms
-    │        ├─ overlap_por 402ms
-    │        ├─ difference_por 263ms
-    │        ├─ overlap_por 199ms
-    │        ├─ difference_por 243ms
-    │        ├─ overlap_por 208ms
-    │        │  ├─ overlap_pconstant 11ms
-    │        ├─ difference_por 123ms
-    │        ├─ overlap_por 408ms
-    │        ├─ difference_por 242ms
-    │        ├─ overlap_por 205ms
-    │        ├─ difference_por 255ms
-    │        ├─ overlap_por 196ms
-    │        ├─ difference_por 119ms
-    │        ├─ overlap_por 396ms
-    │        ├─ difference_por 238ms
-    │        ├─ overlap_por 199ms
-    │        ├─ difference_por 248ms
-    │        ├─ overlap_por 209ms
-    │        ├─ difference_por 132ms
-    │        ├─ overlap_por 407ms
-    │        ├─ difference_por 241ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 242ms
-    │        ├─ overlap_por 200ms
-    │        ├─ difference_por 115ms
-    │        ├─ overlap_por 390ms
-    │        ├─ difference_por 233ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 230ms
-    │        ├─ overlap_por 205ms
-    │        ├─ difference_por 114ms
-    │        ├─ overlap_por 404ms
-    │        ├─ difference_por 226ms
-    │        ├─ overlap_por 199ms
-    │        ├─ difference_por 228ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 118ms
-    │        ├─ overlap_por 401ms
+    │  │     ├─ difference_por 51ms
+    │  │     ├─ difference_por 24ms
+    │  │     ├─ difference_por 23ms
+    │  │     ├─ difference_por 48ms
+    │  │     ├─ difference_por 24ms
+    │  │     ├─ difference_por 22ms
+    │  │     ├─ difference_por 48ms
+    │  │     ├─ difference_por 27ms
+    │  │     ├─ difference_por 20ms
+    │  │     ├─ difference_por 42ms
+    │  │     ├─ difference_por 21ms
+    │  │     ├─ difference_por 18ms
+    │  │     ├─ difference_por 39ms
+    │  │     ├─ difference_por 21ms
+    │  │     ├─ difference_por 17ms
+    │  │     ├─ difference_por 35ms
+    │  │     ├─ difference_por 18ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 34ms
+    │  │     ├─ difference_por 15ms
+    │  └─ check_exhaustiveness 142889ms
+    │     └─ is_useful 142888ms
+    │        ├─ overlap_por 221ms
     │        ├─ difference_por 225ms
-    │        ├─ overlap_por 205ms
-    │        ├─ difference_por 225ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 110ms
-    │        ├─ overlap_por 408ms
-    │        ├─ difference_por 217ms
-    │        ├─ overlap_por 202ms
-    │        ├─ difference_por 222ms
-    │        ├─ overlap_por 197ms
-    │        ├─ difference_por 122ms
-    │        ├─ overlap_por 472ms
-    │        ├─ difference_por 216ms
-    │        ├─ overlap_por 202ms
-    │        ├─ difference_por 225ms
-    │        ├─ overlap_por 217ms
-    │        ├─ difference_por 133ms
-    │        ├─ overlap_por 404ms
-    │        ├─ difference_por 211ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 213ms
-    │        ├─ overlap_por 195ms
-    │        ├─ difference_por 107ms
-    │        ├─ overlap_por 399ms
-    │        ├─ difference_por 210ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 213ms
-    │        ├─ overlap_por 199ms
-    │        ├─ difference_por 104ms
-    │        ├─ overlap_por 400ms
-    │        ├─ difference_por 207ms
-    │        ├─ overlap_por 204ms
-    │        ├─ difference_por 206ms
-    │        ├─ overlap_por 197ms
-    │        ├─ difference_por 103ms
-    │        ├─ overlap_por 403ms
-    │        ├─ difference_por 200ms
-    │        ├─ overlap_por 204ms
-    │        ├─ difference_por 201ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 100ms
-    │        ├─ overlap_por 408ms
-    │        ├─ difference_por 210ms
-    │        ├─ overlap_por 200ms
-    │        ├─ difference_por 261ms
-    │        ├─ overlap_por 262ms
-    │        ├─ difference_por 120ms
-    │        ├─ overlap_por 559ms
-    │        ├─ difference_por 266ms
-    │        ├─ overlap_por 303ms
-    │        ├─ difference_por 280ms
-    │        ├─ overlap_por 287ms
-    │        ├─ difference_por 124ms
-    │        ├─ overlap_por 573ms
-    │        ├─ difference_por 263ms
-    │        ├─ overlap_por 233ms
-    │        ├─ difference_por 208ms
-    │        ├─ overlap_por 232ms
-    │        ├─ difference_por 101ms
-    │        ├─ overlap_por 522ms
-    │        ├─ difference_por 274ms
-    │        ├─ overlap_por 270ms
-    │        ├─ difference_por 248ms
-    │        ├─ overlap_por 218ms
-    │        ├─ difference_por 107ms
-    │        ├─ overlap_por 554ms
-    │        ├─ difference_por 210ms
-    │        ├─ overlap_por 255ms
-    │        ├─ difference_por 228ms
-    │        ├─ overlap_por 268ms
-    │        ├─ difference_por 122ms
-    │        ├─ overlap_por 569ms
-    │        ├─ difference_por 252ms
-    │        ├─ overlap_por 279ms
-    │        ├─ difference_por 256ms
-    │        ├─ overlap_por 278ms
-    │        ├─ difference_por 148ms
-    │        ├─ overlap_por 500ms
-    │        ├─ difference_por 217ms
-    │        ├─ overlap_por 237ms
-    │        ├─ difference_por 245ms
-    │        ├─ overlap_por 257ms
-    │        ├─ difference_por 139ms
-    │        ├─ overlap_por 541ms
-    │        ├─ difference_por 276ms
-    │        ├─ overlap_por 269ms
-    │        ├─ difference_por 247ms
-    │        ├─ overlap_por 284ms
-    │        ├─ difference_por 103ms
-    │        ├─ overlap_por 550ms
-    │        ├─ difference_por 224ms
-    │        ├─ overlap_por 259ms
-    │        ├─ difference_por 214ms
-    │        ├─ overlap_por 262ms
-    │        ├─ difference_por 128ms
-    │        ├─ overlap_por 594ms
-    │        ├─ difference_por 221ms
-    │        ├─ overlap_por 293ms
-    │        ├─ difference_por 252ms
-    │        ├─ overlap_por 273ms
-    │        ├─ difference_por 111ms
-    │        ├─ overlap_por 571ms
-    │        ├─ difference_por 206ms
-    │        ├─ overlap_por 212ms
-    │        ├─ difference_por 188ms
-    │        ├─ overlap_por 218ms
-    │        ├─ difference_por 81ms
-    │        ├─ overlap_por 471ms
-    │        ├─ difference_por 182ms
-    │        ├─ overlap_por 248ms
-    │        ├─ difference_por 206ms
-    │        ├─ overlap_por 250ms
-    │        ├─ difference_por 109ms
-    │        ├─ overlap_por 569ms
-    │        ├─ difference_por 242ms
-    │        ├─ overlap_por 267ms
-    │        ├─ difference_por 237ms
-    │        ├─ overlap_por 274ms
-    │        ├─ difference_por 98ms
-    │        ├─ overlap_por 538ms
-    │        ├─ difference_por 240ms
-    │        ├─ overlap_por 273ms
-    │        ├─ difference_por 219ms
-    │        ├─ overlap_por 224ms
-    │        ├─ difference_por 79ms
-    │        ├─ overlap_por 499ms
-    │        ├─ difference_por 189ms
-    │        ├─ overlap_por 293ms
-    │        ├─ difference_por 215ms
-    │        ├─ overlap_por 240ms
-    │        ├─ difference_por 97ms
-    │        ├─ overlap_por 543ms
-    │        ├─ difference_por 232ms
-    │        ├─ overlap_por 274ms
-    │        ├─ difference_por 228ms
-    │        ├─ overlap_por 284ms
-    │        ├─ difference_por 97ms
-    │        ├─ overlap_por 572ms
-    │        ├─ difference_por 187ms
-    │        ├─ overlap_por 323ms
-    │        ├─ difference_por 176ms
-    │        ├─ overlap_por 287ms
-    │        ├─ difference_por 84ms
-    │        ├─ overlap_por 586ms
-    │        ├─ difference_por 217ms
-    │        ├─ overlap_por 271ms
-    │        ├─ difference_por 193ms
-    │        ├─ overlap_por 262ms
-    │        ├─ difference_por 88ms
-    │        ├─ overlap_por 469ms
-    │        ├─ difference_por 146ms
-    │        ├─ overlap_por 213ms
-    │        ├─ difference_por 190ms
-    │        ├─ overlap_por 255ms
-    │        ├─ difference_por 81ms
-    │        ├─ overlap_por 450ms
-    │        ├─ difference_por 165ms
-    │        ├─ overlap_por 209ms
-    │        ├─ difference_por 132ms
-    │        ├─ overlap_por 200ms
-    │        ├─ difference_por 64ms
-    │        ├─ overlap_por 411ms
-    │        ├─ difference_por 129ms
+    │        ├─ overlap_por 419ms
+    │        ├─ difference_por 412ms
+    │        ├─ overlap_por 201ms
+    │        ├─ difference_por 406ms
     │        ├─ overlap_por 207ms
-    │        ├─ difference_por 129ms
+    │        ├─ difference_por 203ms
+    │        ├─ overlap_por 420ms
+    │        ├─ difference_por 421ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 412ms
+    │        ├─ overlap_por 203ms
+    │        ├─ difference_por 193ms
+    │        ├─ overlap_por 410ms
+    │        ├─ difference_por 391ms
     │        ├─ overlap_por 199ms
-    │        ├─ difference_por 73ms
-    │        ├─ overlap_por 488ms
-    │        ├─ difference_por 126ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 124ms
-    │        ├─ overlap_por 239ms
-    │        ├─ difference_por 97ms
-    │        ├─ overlap_por 566ms
-    │        ├─ difference_por 158ms
-    │        ├─ overlap_por 289ms
-    │        ├─ difference_por 166ms
-    │        ├─ overlap_por 259ms
-    │        ├─ difference_por 79ms
-    │        ├─ overlap_por 566ms
-    │        ├─ difference_por 161ms
-    │        ├─ overlap_por 273ms
-    │        ├─ difference_por 185ms
-    │        ├─ overlap_por 268ms
-    │        ├─ difference_por 69ms
-    │        ├─ overlap_por 527ms
-    │        ├─ difference_por 148ms
-    │        ├─ overlap_por 286ms
-    │        ├─ difference_por 142ms
-    │        ├─ overlap_por 211ms
-    │        ├─ difference_por 57ms
-    │        ├─ overlap_por 399ms
-    │        ├─ difference_por 114ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 113ms
-    │        ├─ overlap_por 197ms
-    │        ├─ difference_por 54ms
-    │        ├─ overlap_por 399ms
-    │        ├─ difference_por 122ms
-    │        ├─ overlap_por 232ms
-    │        ├─ difference_por 107ms
-    │        ├─ overlap_por 237ms
-    │        ├─ difference_por 51ms
-    │        ├─ overlap_por 424ms
-    │        ├─ difference_por 105ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 106ms
-    │        ├─ overlap_por 198ms
-    │        ├─ difference_por 50ms
-    │        ├─ overlap_por 429ms
-    │        ├─ difference_por 117ms
-    │        ├─ overlap_por 215ms
-    │        ├─ difference_por 116ms
-    │        ├─ overlap_por 251ms
-    │        ├─ difference_por 50ms
-    │        ├─ overlap_por 397ms
-    │        ├─ difference_por 119ms
-    │        ├─ overlap_por 254ms
-    │        ├─ difference_por 138ms
-    │        ├─ overlap_por 241ms
-    │        ├─ difference_por 72ms
-    │        ├─ overlap_por 559ms
-    │        ├─ difference_por 113ms
-    │        ├─ overlap_por 267ms
-    │        ├─ difference_por 110ms
-    │        ├─ overlap_por 263ms
-    │        ├─ difference_por 57ms
-    │        ├─ overlap_por 490ms
-    │        ├─ difference_por 93ms
-    │        ├─ overlap_por 255ms
-    │        ├─ difference_por 95ms
-    │        ├─ overlap_por 260ms
-    │        ├─ difference_por 53ms
-    │        ├─ overlap_por 584ms
-    │        ├─ difference_por 108ms
-    │        ├─ overlap_por 275ms
-    │        ├─ difference_por 113ms
-    │        ├─ overlap_por 246ms
-    │        ├─ difference_por 54ms
-    │        ├─ overlap_por 517ms
-    │        ├─ difference_por 97ms
-    │        ├─ overlap_por 250ms
-    │        ├─ difference_por 120ms
-    │        ├─ overlap_por 278ms
-    │        ├─ difference_por 42ms
-    │        ├─ overlap_por 524ms
-    │        ├─ difference_por 119ms
-    │        ├─ overlap_por 296ms
-    │        ├─ difference_por 98ms
-    │        ├─ overlap_por 282ms
-    │        ├─ difference_por 66ms
-    │        ├─ overlap_por 525ms
-    │        ├─ difference_por 78ms
-    │        ├─ overlap_por 232ms
-    │        ├─ difference_por 97ms
-    │        ├─ overlap_por 254ms
-    │        ├─ difference_por 48ms
-    │        ├─ overlap_por 479ms
-    │        ├─ difference_por 92ms
-    │        ├─ overlap_por 259ms
-    │        ├─ difference_por 74ms
-    │        ├─ overlap_por 283ms
-    │        ├─ difference_por 46ms
-    │        ├─ overlap_por 522ms
-    │        ├─ difference_por 99ms
-    │        ├─ overlap_por 266ms
-    │        ├─ difference_por 70ms
-    │        ├─ overlap_por 244ms
-    │        ├─ difference_por 34ms
-    │        ├─ overlap_por 422ms
-    │        ├─ difference_por 65ms
-    │        ├─ overlap_por 203ms
-    │        ├─ difference_por 65ms
-    │        ├─ overlap_por 222ms
-    │        ├─ difference_por 32ms
-    │        ├─ overlap_por 448ms
-    │        ├─ difference_por 64ms
-    │        ├─ overlap_por 205ms
-    │        ├─ difference_por 60ms
-    │        ├─ overlap_por 223ms
-    │        ├─ difference_por 36ms
-    │        ├─ overlap_por 426ms
-    │        ├─ difference_por 65ms
-    │        ├─ overlap_por 197ms
-    │        ├─ difference_por 57ms
-    │        ├─ overlap_por 210ms
-    │        ├─ difference_por 27ms
-    │        ├─ overlap_por 403ms
-    │        ├─ difference_por 53ms
-    │        ├─ overlap_por 251ms
-    │        ├─ difference_por 54ms
-    │        ├─ overlap_por 203ms
-    │        ├─ difference_por 34ms
-    │        ├─ overlap_por 406ms
-    │        ├─ difference_por 50ms
-    │        ├─ overlap_por 201ms
-    │        ├─ difference_por 49ms
-    │        ├─ overlap_por 202ms
-    │        ├─ difference_por 23ms
-    │        ├─ overlap_por 407ms
-    │        ├─ difference_por 48ms
+    │        ├─ difference_por 393ms
     │        ├─ overlap_por 206ms
-    │        ├─ difference_por 46ms
+    │        ├─ difference_por 200ms
+    │        ├─ overlap_por 404ms
+    │        ├─ difference_por 393ms
     │        ├─ overlap_por 199ms
-    │        ├─ difference_por 22ms
-    │        ├─ overlap_por 406ms
-    │        ├─ difference_por 44ms
+    │        ├─ difference_por 396ms
+    │        ├─ overlap_por 198ms
+    │        ├─ difference_por 193ms
+    │        ├─ overlap_por 400ms
+    │        ├─ difference_por 384ms
     │        ├─ overlap_por 203ms
-    │        ├─ difference_por 43ms
-    │        ├─ overlap_por 197ms
+    │        ├─ difference_por 406ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 193ms
+    │        ├─ overlap_por 402ms
+    │        ├─ difference_por 383ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 387ms
+    │        ├─ overlap_por 200ms
+    │        ├─ difference_por 203ms
+    │        ├─ overlap_por 402ms
+    │        ├─ difference_por 398ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 386ms
+    │        ├─ overlap_por 198ms
+    │        ├─ difference_por 194ms
+    │        ├─ overlap_por 423ms
+    │        ├─ difference_por 376ms
+    │        ├─ overlap_por 200ms
+    │        ├─ difference_por 382ms
+    │        ├─ overlap_por 210ms
+    │        ├─ difference_por 185ms
     │        ├─ overlap_por 412ms
-    │        ├─ overlap_por 295ms
-    │        ├─ overlap_por 509ms
-    │        └─ difference_por 44ms
-    └─ eval_arms 92832ms
+    │        ├─ difference_por 379ms
+    │        ├─ overlap_por 221ms
+    │        ├─ difference_por 369ms
+    │        ├─ overlap_por 199ms
+    │        ├─ difference_por 189ms
+    │        ├─ overlap_por 401ms
+    │        ├─ difference_por 372ms
+    │        ├─ overlap_por 203ms
+    │        ├─ difference_por 373ms
+    │        ├─ overlap_por 199ms
+    │        ├─ difference_por 180ms
+    │        ├─ overlap_por 403ms
+    │        ├─ difference_por 378ms
+    │        ├─ overlap_por 202ms
+    │        ├─ difference_por 367ms
+    │        ├─ overlap_por 218ms
+    │        ├─ difference_por 187ms
+    │        ├─ overlap_por 398ms
+    │        ├─ difference_por 357ms
+    │        ├─ overlap_por 205ms
+    │        ├─ difference_por 360ms
+    │        ├─ overlap_por 205ms
+    │        ├─ difference_por 184ms
+    │        ├─ overlap_por 422ms
+    │        ├─ difference_por 357ms
+    │        ├─ overlap_por 199ms
+    │        ├─ difference_por 361ms
+    │        ├─ overlap_por 216ms
+    │        ├─ difference_por 195ms
+    │        ├─ overlap_por 419ms
+    │        ├─ difference_por 363ms
+    │        ├─ overlap_por 210ms
+    │        ├─ difference_por 377ms
+    │        ├─ overlap_por 217ms
+    │        ├─ difference_por 175ms
+    │        ├─ overlap_por 410ms
+    │        ├─ difference_por 377ms
+    │        ├─ overlap_por 210ms
+    │        ├─ difference_por 375ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 175ms
+    │        ├─ overlap_por 401ms
+    │        ├─ difference_por 348ms
+    │        ├─ overlap_por 202ms
+    │        ├─ difference_por 354ms
+    │        ├─ overlap_por 200ms
+    │        ├─ difference_por 175ms
+    │        ├─ overlap_por 401ms
+    │        ├─ difference_por 344ms
+    │        ├─ overlap_por 204ms
+    │        ├─ difference_por 339ms
+    │        ├─ overlap_por 198ms
+    │        ├─ difference_por 171ms
+    │        ├─ overlap_por 418ms
+    │        ├─ difference_por 343ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 358ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 167ms
+    │        ├─ overlap_por 421ms
+    │        ├─ difference_por 341ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 359ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 166ms
+    │        ├─ overlap_por 426ms
+    │        ├─ difference_por 362ms
+    │        ├─ overlap_por 215ms
+    │        ├─ difference_por 349ms
+    │        ├─ overlap_por 201ms
+    │        ├─ difference_por 169ms
+    │        ├─ overlap_por 418ms
+    │        ├─ difference_por 334ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 340ms
+    │        ├─ overlap_por 202ms
+    │        ├─ difference_por 174ms
+    │        ├─ overlap_por 434ms
+    │        ├─ difference_por 343ms
+    │        ├─ overlap_por 220ms
+    │        ├─ difference_por 335ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 162ms
+    │        ├─ overlap_por 423ms
+    │        ├─ difference_por 337ms
+    │        ├─ overlap_por 202ms
+    │        ├─ difference_por 331ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 175ms
+    │        ├─ overlap_por 404ms
+    │        ├─ difference_por 327ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 320ms
+    │        ├─ overlap_por 204ms
+    │        ├─ difference_por 165ms
+    │        ├─ overlap_por 415ms
+    │        ├─ difference_por 341ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 327ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 160ms
+    │        ├─ overlap_por 406ms
+    │        ├─ difference_por 324ms
+    │        ├─ overlap_por 201ms
+    │        ├─ difference_por 318ms
+    │        ├─ overlap_por 217ms
+    │        ├─ difference_por 170ms
+    │        ├─ overlap_por 427ms
+    │        ├─ difference_por 312ms
+    │        ├─ overlap_por 204ms
+    │        ├─ difference_por 324ms
+    │        ├─ overlap_por 199ms
+    │        ├─ difference_por 155ms
+    │        ├─ overlap_por 417ms
+    │        ├─ difference_por 317ms
+    │        ├─ overlap_por 219ms
+    │        ├─ difference_por 325ms
+    │        ├─ overlap_por 205ms
+    │        ├─ difference_por 151ms
+    │        ├─ overlap_por 406ms
+    │        ├─ difference_por 300ms
+    │        ├─ overlap_por 202ms
+    │        ├─ difference_por 319ms
+    │        ├─ overlap_por 202ms
+    │        ├─ difference_por 154ms
+    │        ├─ overlap_por 411ms
+    │        ├─ difference_por 307ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 311ms
+    │        ├─ overlap_por 200ms
+    │        ├─ difference_por 148ms
+    │        ├─ overlap_por 402ms
+    │        ├─ difference_por 296ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 295ms
+    │        ├─ overlap_por 201ms
+    │        ├─ difference_por 146ms
+    │        ├─ overlap_por 405ms
+    │        ├─ difference_por 295ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 290ms
+    │        ├─ overlap_por 199ms
+    │        ├─ difference_por 146ms
+    │        ├─ overlap_por 433ms
+    │        ├─ difference_por 305ms
+    │        ├─ overlap_por 221ms
+    │        ├─ difference_por 299ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 151ms
+    │        ├─ overlap_por 418ms
+    │        ├─ difference_por 283ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 297ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 139ms
+    │        ├─ overlap_por 409ms
+    │        ├─ difference_por 292ms
+    │        ├─ overlap_por 223ms
+    │        ├─ difference_por 291ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 150ms
+    │        ├─ overlap_por 411ms
+    │        ├─ difference_por 287ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 280ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 140ms
+    │        ├─ overlap_por 403ms
+    │        ├─ difference_por 279ms
+    │        ├─ overlap_por 210ms
+    │        ├─ difference_por 276ms
+    │        ├─ overlap_por 204ms
+    │        ├─ difference_por 135ms
+    │        ├─ overlap_por 402ms
+    │        ├─ difference_por 273ms
+    │        ├─ overlap_por 218ms
+    │        ├─ difference_por 278ms
+    │        ├─ overlap_por 198ms
+    │        ├─ difference_por 133ms
+    │        ├─ overlap_por 422ms
+    │        ├─ difference_por 266ms
+    │        ├─ overlap_por 203ms
+    │        ├─ difference_por 267ms
+    │        ├─ overlap_por 198ms
+    │        ├─ difference_por 143ms
+    │        ├─ overlap_por 417ms
+    │        ├─ difference_por 269ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 275ms
+    │        ├─ overlap_por 201ms
+    │        ├─ difference_por 133ms
+    │        ├─ overlap_por 425ms
+    │        ├─ difference_por 266ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 266ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 128ms
+    │        ├─ overlap_por 433ms
+    │        ├─ difference_por 266ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 266ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 131ms
+    │        ├─ overlap_por 440ms
+    │        ├─ difference_por 256ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 267ms
+    │        ├─ overlap_por 203ms
+    │        ├─ difference_por 124ms
+    │        ├─ overlap_por 410ms
+    │        ├─ difference_por 261ms
+    │        ├─ overlap_por 198ms
+    │        ├─ difference_por 248ms
+    │        ├─ overlap_por 204ms
+    │        ├─ difference_por 128ms
+    │        ├─ overlap_por 426ms
+    │        ├─ difference_por 254ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 250ms
+    │        ├─ overlap_por 205ms
+    │        ├─ difference_por 126ms
+    │        ├─ overlap_por 415ms
+    │        ├─ difference_por 242ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 237ms
+    │        ├─ overlap_por 213ms
+    │        ├─ difference_por 120ms
+    │        ├─ overlap_por 408ms
+    │        ├─ difference_por 257ms
+    │        ├─ overlap_por 223ms
+    │        ├─ difference_por 250ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 121ms
+    │        ├─ overlap_por 414ms
+    │        ├─ difference_por 243ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 235ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 132ms
+    │        ├─ overlap_por 424ms
+    │        ├─ difference_por 247ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 251ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 122ms
+    │        ├─ overlap_por 417ms
+    │        ├─ difference_por 237ms
+    │        ├─ overlap_por 220ms
+    │        ├─ difference_por 240ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 112ms
+    │        ├─ overlap_por 416ms
+    │        ├─ difference_por 224ms
+    │        ├─ overlap_por 224ms
+    │        ├─ difference_por 252ms
+    │        ├─ overlap_por 210ms
+    │        ├─ difference_por 107ms
+    │        ├─ overlap_por 412ms
+    │        ├─ difference_por 221ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 224ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 108ms
+    │        ├─ overlap_por 414ms
+    │        ├─ difference_por 215ms
+    │        ├─ overlap_por 201ms
+    │        ├─ difference_por 222ms
+    │        ├─ overlap_por 219ms
+    │        ├─ difference_por 107ms
+    │        ├─ overlap_por 430ms
+    │        ├─ difference_por 212ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 212ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 105ms
+    │        ├─ overlap_por 420ms
+    │        ├─ difference_por 220ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 213ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 112ms
+    │        ├─ overlap_por 422ms
+    │        ├─ difference_por 212ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 214ms
+    │        ├─ overlap_por 217ms
+    │        ├─ difference_por 106ms
+    │        ├─ overlap_por 425ms
+    │        ├─ difference_por 205ms
+    │        ├─ overlap_por 213ms
+    │        ├─ difference_por 206ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 98ms
+    │        ├─ overlap_por 421ms
+    │        ├─ difference_por 202ms
+    │        ├─ overlap_por 213ms
+    │        ├─ difference_por 206ms
+    │        ├─ overlap_por 205ms
+    │        ├─ difference_por 98ms
+    │        ├─ overlap_por 406ms
+    │        ├─ difference_por 199ms
+    │        ├─ overlap_por 217ms
+    │        ├─ difference_por 199ms
+    │        ├─ overlap_por 205ms
+    │        ├─ difference_por 97ms
+    │        ├─ overlap_por 420ms
+    │        ├─ difference_por 193ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 198ms
+    │        ├─ overlap_por 202ms
+    │        ├─ difference_por 92ms
+    │        ├─ overlap_por 435ms
+    │        ├─ difference_por 187ms
+    │        ├─ overlap_por 202ms
+    │        ├─ difference_por 190ms
+    │        ├─ overlap_por 209ms
+    │        ├─ difference_por 91ms
+    │        ├─ overlap_por 411ms
+    │        ├─ difference_por 189ms
+    │        ├─ overlap_por 205ms
+    │        ├─ difference_por 184ms
+    │        ├─ overlap_por 199ms
+    │        ├─ difference_por 91ms
+    │        ├─ overlap_por 418ms
+    │        ├─ difference_por 181ms
+    │        ├─ overlap_por 205ms
+    │        ├─ difference_por 189ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 88ms
+    │        ├─ overlap_por 418ms
+    │        ├─ difference_por 181ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 182ms
+    │        ├─ overlap_por 209ms
+    │        ├─ difference_por 90ms
+    │        ├─ overlap_por 434ms
+    │        ├─ difference_por 184ms
+    │        ├─ overlap_por 220ms
+    │        ├─ difference_por 178ms
+    │        ├─ overlap_por 205ms
+    │        ├─ difference_por 85ms
+    │        ├─ overlap_por 412ms
+    │        ├─ difference_por 170ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 174ms
+    │        ├─ overlap_por 205ms
+    │        ├─ difference_por 85ms
+    │        ├─ overlap_por 411ms
+    │        ├─ difference_por 166ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 166ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 81ms
+    │        ├─ overlap_por 414ms
+    │        ├─ difference_por 168ms
+    │        ├─ overlap_por 210ms
+    │        ├─ difference_por 166ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 80ms
+    │        ├─ overlap_por 419ms
+    │        ├─ difference_por 183ms
+    │        ├─ overlap_por 209ms
+    │        ├─ difference_por 160ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 78ms
+    │        ├─ overlap_por 415ms
+    │        ├─ difference_por 158ms
+    │        ├─ overlap_por 202ms
+    │        ├─ difference_por 156ms
+    │        ├─ overlap_por 204ms
+    │        ├─ difference_por 77ms
+    │        ├─ overlap_por 416ms
+    │        ├─ difference_por 155ms
+    │        ├─ overlap_por 201ms
+    │        ├─ difference_por 153ms
+    │        ├─ overlap_por 201ms
+    │        ├─ difference_por 76ms
+    │        ├─ overlap_por 420ms
+    │        ├─ difference_por 144ms
+    │        ├─ overlap_por 221ms
+    │        ├─ difference_por 152ms
+    │        ├─ overlap_por 216ms
+    │        ├─ difference_por 76ms
+    │        ├─ overlap_por 430ms
+    │        ├─ difference_por 150ms
+    │        ├─ overlap_por 224ms
+    │        ├─ difference_por 152ms
+    │        ├─ overlap_por 223ms
+    │        ├─ difference_por 70ms
+    │        ├─ overlap_por 415ms
+    │        ├─ difference_por 141ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 141ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 70ms
+    │        ├─ overlap_por 423ms
+    │        ├─ difference_por 142ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 138ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 67ms
+    │        ├─ overlap_por 431ms
+    │        ├─ difference_por 134ms
+    │        ├─ overlap_por 204ms
+    │        ├─ difference_por 139ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 67ms
+    │        ├─ overlap_por 424ms
+    │        ├─ difference_por 132ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 132ms
+    │        ├─ overlap_por 217ms
+    │        ├─ difference_por 65ms
+    │        ├─ overlap_por 429ms
+    │        ├─ difference_por 126ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 130ms
+    │        ├─ overlap_por 216ms
+    │        ├─ difference_por 60ms
+    │        ├─ overlap_por 421ms
+    │        ├─ difference_por 127ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 123ms
+    │        ├─ overlap_por 201ms
+    │        ├─ difference_por 60ms
+    │        ├─ overlap_por 412ms
+    │        ├─ difference_por 119ms
+    │        ├─ overlap_por 204ms
+    │        ├─ difference_por 119ms
+    │        ├─ overlap_por 200ms
+    │        ├─ difference_por 58ms
+    │        ├─ overlap_por 420ms
+    │        ├─ difference_por 123ms
+    │        ├─ overlap_por 204ms
+    │        ├─ difference_por 122ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 60ms
+    │        ├─ overlap_por 440ms
+    │        ├─ difference_por 114ms
+    │        ├─ overlap_por 216ms
+    │        ├─ difference_por 115ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 54ms
+    │        ├─ overlap_por 413ms
+    │        ├─ difference_por 114ms
+    │        ├─ overlap_por 225ms
+    │        ├─ difference_por 110ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 53ms
+    │        ├─ overlap_por 435ms
+    │        ├─ difference_por 115ms
+    │        ├─ overlap_por 219ms
+    │        ├─ difference_por 108ms
+    │        ├─ overlap_por 221ms
+    │        ├─ difference_por 56ms
+    │        ├─ overlap_por 416ms
+    │        ├─ difference_por 99ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 105ms
+    │        ├─ overlap_por 213ms
+    │        ├─ difference_por 53ms
+    │        ├─ overlap_por 444ms
+    │        ├─ difference_por 108ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 95ms
+    │        ├─ overlap_por 214ms
+    │        ├─ difference_por 48ms
+    │        ├─ overlap_por 423ms
+    │        ├─ difference_por 92ms
+    │        ├─ overlap_por 218ms
+    │        ├─ difference_por 93ms
+    │        ├─ overlap_por 201ms
+    │        ├─ difference_por 45ms
+    │        ├─ overlap_por 413ms
+    │        ├─ difference_por 89ms
+    │        ├─ overlap_por 208ms
+    │        ├─ difference_por 91ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 42ms
+    │        ├─ overlap_por 414ms
+    │        ├─ difference_por 88ms
+    │        ├─ overlap_por 225ms
+    │        ├─ difference_por 89ms
+    │        ├─ overlap_por 224ms
+    │        ├─ difference_por 40ms
+    │        ├─ overlap_por 414ms
+    │        ├─ difference_por 83ms
+    │        ├─ overlap_por 213ms
+    │        ├─ difference_por 81ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 39ms
+    │        ├─ overlap_por 414ms
+    │        ├─ difference_por 80ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 80ms
+    │        ├─ overlap_por 204ms
+    │        ├─ difference_por 37ms
+    │        ├─ overlap_por 425ms
+    │        ├─ difference_por 79ms
+    │        ├─ overlap_por 221ms
+    │        ├─ difference_por 86ms
+    │        ├─ overlap_por 209ms
+    │        ├─ difference_por 35ms
+    │        ├─ overlap_por 429ms
+    │        ├─ difference_por 81ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 70ms
+    │        ├─ overlap_por 203ms
+    │        ├─ difference_por 33ms
+    │        ├─ overlap_por 430ms
+    │        ├─ difference_por 65ms
+    │        ├─ overlap_por 210ms
+    │        ├─ difference_por 64ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 36ms
+    │        ├─ overlap_por 430ms
+    │        ├─ difference_por 67ms
+    │        ├─ overlap_por 206ms
+    │        ├─ difference_por 70ms
+    │        ├─ overlap_por 223ms
+    │        ├─ difference_por 30ms
+    │        ├─ overlap_por 443ms
+    │        ├─ difference_por 67ms
+    │        ├─ overlap_por 216ms
+    │        ├─ difference_por 68ms
+    │        ├─ overlap_por 222ms
+    │        ├─ difference_por 28ms
+    │        ├─ overlap_por 426ms
+    │        ├─ difference_por 58ms
+    │        ├─ overlap_por 210ms
+    │        ├─ difference_por 58ms
+    │        ├─ overlap_por 211ms
+    │        ├─ difference_por 25ms
+    │        ├─ overlap_por 423ms
+    │        ├─ difference_por 53ms
+    │        ├─ overlap_por 218ms
+    │        ├─ difference_por 52ms
+    │        ├─ overlap_por 212ms
+    │        ├─ difference_por 27ms
+    │        ├─ overlap_por 435ms
+    │        ├─ difference_por 55ms
+    │        ├─ overlap_por 217ms
+    │        ├─ difference_por 48ms
+    │        ├─ overlap_por 209ms
+    │        ├─ difference_por 23ms
+    │        ├─ overlap_por 434ms
+    │        ├─ difference_por 46ms
+    │        ├─ overlap_por 207ms
+    │        ├─ difference_por 44ms
+    │        ├─ overlap_por 213ms
+    │        ├─ overlap_por 420ms
+    │        ├─ overlap_por 308ms
+    │        ├─ overlap_por 546ms
+    │        └─ difference_por 47ms
+    └─ eval_arms 84414ms
 
 . mata: profiler_summarize(PROFILER)
-pmatch                                   depth 1            1x    311745ms
-check_match                              depth 2            1x    215945ms
-is_useful                                depth 4          305x    215691ms
-check_exhaustiveness                     depth 3            1x    152400ms
-difference_por                           depth 5          603x    106844ms
-overlap_por                              depth 5        15555x     99856ms
-eval_arms                                depth 2            1x     92832ms
-difference_pwild                         depth 6       331100x     69696ms
-check_useful                             depth 3            1x     63461ms
-overlap_pconstant                        depth 6       354904x     61156ms
-includes_por_pconstant                   depth 7       283100x     31017ms
-overlap_pconstant                        depth 5        30502x      5824ms
-Variable::init_levels_float              depth 5            1x      2832ms
-Variable::init_levels                    depth 4            1x      2832ms
-Variable::init                           depth 3            1x      2832ms
-init_variables                           depth 2            1x      2832ms
-Variable::init_levels_hash               depth 6            1x      2831ms
-overlap_por                              depth 6         5151x      2131ms
-overlap_pconstant                        depth 7        15453x       884ms
-includes_por_pconstant                   depth 6         6050x       393ms
-overlap_prange_prange                    depth 6         5050x       256ms
-difference_por                           depth 6            1x       222ms
-difference_pwild                         depth 5            1x       222ms
-parse_arms                               depth 3            1x       135ms
-parse_string                             depth 2            1x       135ms
-difference_pwild                         depth 7         1000x       100ms
-parse_arm                                depth 4          304x        39ms
-parse_or                                 depth 5          304x        30ms
+pmatch                                   depth 1            1x    282303ms
+check_match                              depth 2            1x    194976ms
+is_useful                                depth 4          305x    194781ms
+check_exhaustiveness                     depth 3            1x    142889ms
+difference_por                           depth 5          603x     94293ms
+overlap_por                              depth 5        15555x     92340ms
+eval_arms                                depth 2            1x     84414ms
+difference_pwild                         depth 6       331100x     62080ms
+overlap_pconstant                        depth 6       354904x     56433ms
+check_useful                             depth 3            1x     52009ms
+includes_por_pconstant                   depth 7       283100x     28415ms
+overlap_pconstant                        depth 5        30502x      5275ms
+Variable::init_levels_float              depth 5            1x      2797ms
+Variable::init_levels                    depth 4            1x      2797ms
+Variable::init                           depth 3            1x      2797ms
+init_variables                           depth 2            1x      2797ms
+Variable::init_levels_hash               depth 6            1x      2796ms
+overlap_por                              depth 6         5151x      1957ms
+overlap_pconstant                        depth 7        15453x       774ms
+includes_por_pconstant                   depth 6         6050x       372ms
+overlap_prange_prange                    depth 6         5050x       237ms
+difference_por                           depth 6            1x       161ms
+difference_pwild                         depth 5            1x       161ms
+parse_string                             depth 2            1x       116ms
+parse_arms                               depth 3            1x       115ms
+difference_pwild                         depth 7         1000x        82ms
+parse_arm                                depth 4          304x        37ms
+parse_or                                 depth 5          304x        29ms
 parse_pattern                            depth 6          506x        12ms
-parse_number                             depth 7          505x         3ms
-compress_por                             depth 6          303x         2ms
-new_pwild                                depth 7            1x         1ms
+parse_number                             depth 7          505x         6ms
+consume                                  depth 5          304x         3ms
+compress_por                             depth 6          303x         1ms
+new_pwild                                depth 4            1x         1ms
 Variable::should_tab                     depth 6            1x         1ms
-check_wildcard_por                       depth 5          101x         0ms
-consume                                  depth 5          304x         0ms
+new_pwild                                depth 7            1x         1ms
+htable_expand                            depth 7            5x         1ms
+parse_range                              depth 8          101x         0ms
 compress_por                             depth 5            1x        -0ms
 Variable::init_type                      depth 4            1x        -0ms
-new_pwild                                depth 4            1x        -0ms
-htable_expand                            depth 7            5x        -0ms
-parse_range                              depth 8          101x        -1ms
+check_wildcard_por                       depth 5          101x        -1ms
 
 . mata: profiler_graph(PROFILER, 1)
 
@@ -1877,516 +1807,576 @@ parse_range                              depth 8          101x        -1ms
 . bench_obs_string,  obs(1000000)  levels(1000) rep(1) nobench
 
 . mata: profiler_print(PROFILER, 10)
-PROFILER 17090ms
- └─ pmatch 17090ms
-    ├─ init_variables 475ms
-    │  └─ Variable::init 475ms
-    │     └─ Variable::init_levels 475ms
-    │        └─ Variable::init_levels_string 475ms
-    │           ├─ Variable::init_levels_hash 474ms
-    ├─ parse_string 59ms
-    │  └─ parse_arms 58ms
-    ├─ check_match 7429ms
-    │  ├─ check_useful 3471ms
+PROFILER 16854ms
+ └─ pmatch 16854ms
+    ├─ init_variables 425ms
+    │  └─ Variable::init 425ms
+    │     └─ Variable::init_levels 425ms
+    │        └─ Variable::init_levels_string 425ms
+    │           ├─ Variable::init_levels_hash 425ms
+    ├─ parse_string 53ms
+    │  └─ parse_arms 52ms
+    ├─ check_match 7544ms
+    │  ├─ check_useful 3321ms
+    │  │  ├─ is_useful 10ms
+    │  │  ├─ is_useful 10ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 10ms
+    │  │  ├─ is_useful 10ms
+    │  │  ├─ is_useful 10ms
+    │  │  ├─ is_useful 10ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 10ms
+    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 16ms
     │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 18ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 10ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 15ms
     │  │  ├─ is_useful 14ms
     │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 15ms
+    │  │  ├─ is_useful 21ms
     │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 16ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 18ms
+    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 15ms
     │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 21ms
+    │  │  ├─ is_useful 18ms
+    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 19ms
+    │  │  ├─ is_useful 18ms
     │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 13ms
     │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 25ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 14ms
     │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 12ms
     │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 14ms
-    │  │  ├─ is_useful 11ms
-    │  │  ├─ is_useful 14ms
-    │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 16ms
-    │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 16ms
-    │  │  ├─ is_useful 17ms
-    │  │  ├─ is_useful 16ms
-    │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 15ms
-    │  │  ├─ is_useful 20ms
-    │  │  ├─ is_useful 27ms
-    │  │  ├─ is_useful 13ms
+    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 26ms
+    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 19ms
     │  │  ├─ is_useful 23ms
-    │  │  ├─ is_useful 14ms
+    │  │  ├─ is_useful 11ms
     │  │  ├─ is_useful 24ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 34ms
-    │  │  ├─ is_useful 13ms
-    │  │  ├─ is_useful 19ms
-    │  │  ├─ is_useful 10ms
-    │  │  ├─ is_useful 27ms
-    │  │  ├─ is_useful 10ms
-    │  │  ├─ is_useful 19ms
-    │  │  ├─ is_useful 14ms
-    │  │  ├─ is_useful 31ms
-    │  │  ├─ is_useful 10ms
-    │  │  ├─ is_useful 18ms
-    │  │  ├─ is_useful 14ms
-    │  │  ├─ is_useful 21ms
-    │  │  ├─ is_useful 20ms
+    │  │  ├─ is_useful 30ms
+    │  │  ├─ is_useful 11ms
     │  │  ├─ is_useful 22ms
-    │  │  ├─ is_useful 10ms
-    │  │  ├─ is_useful 20ms
-    │  │  └─ is_useful 1759ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 28ms
-    │  │     ├─ difference_por 13ms
+    │  │  ├─ is_useful 12ms
+    │  │  ├─ is_useful 28ms
+    │  │  ├─ is_useful 11ms
+    │  │  ├─ is_useful 24ms
+    │  │  └─ is_useful 1746ms
     │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 17ms
     │  │     ├─ difference_por 11ms
     │  │     ├─ difference_por 14ms
     │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 14ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 25ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 16ms
-    │  │     ├─ difference_por 13ms
-    │  │     ├─ difference_por 22ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 10ms
+    │  │     ├─ difference_por 21ms
     │  │     ├─ difference_por 20ms
     │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 14ms
     │  │     ├─ difference_por 10ms
     │  │     ├─ difference_por 10ms
     │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 18ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 17ms
-    │  │     ├─ difference_por 10ms
-    │  │     ├─ difference_por 11ms
-    │  │     ├─ difference_por 15ms
-    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 14ms
     │  │     ├─ difference_por 11ms
     │  │     ├─ difference_por 11ms
     │  │     ├─ difference_por 12ms
-    │  │     ├─ difference_por 24ms
+    │  │     ├─ difference_por 12ms
     │  │     ├─ difference_por 11ms
     │  │     ├─ difference_por 11ms
-    │  └─ check_exhaustiveness 3927ms
-    │     └─ is_useful 3927ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 22ms
-    │        ├─ difference_por 16ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 11ms
+    │  │     ├─ difference_por 19ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 12ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 15ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 14ms
+    │  │     ├─ difference_por 13ms
+    │  │     ├─ difference_por 15ms
+    │  └─ check_exhaustiveness 4188ms
+    │     └─ is_useful 4188ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 19ms
+    │        ├─ difference_por 23ms
     │        ├─ difference_por 26ms
     │        ├─ difference_por 10ms
-    │        ├─ difference_por 23ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 10ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 11ms
     │        ├─ difference_por 12ms
     │        ├─ difference_por 12ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 11ms
+    │        ├─ difference_por 12ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 11ms
     │        ├─ difference_por 14ms
     │        ├─ difference_por 12ms
     │        ├─ difference_por 12ms
     │        ├─ difference_por 12ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 13ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 14ms
     │        ├─ difference_por 16ms
     │        ├─ difference_por 13ms
-    │        ├─ difference_por 16ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 14ms
+    │        ├─ difference_por 13ms
     │        ├─ difference_por 17ms
     │        ├─ difference_por 14ms
-    │        ├─ difference_por 19ms
+    │        ├─ difference_por 18ms
+    │        ├─ difference_por 17ms
     │        ├─ difference_por 14ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 17ms
-    │        ├─ difference_por 18ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 23ms
-    │        ├─ difference_por 17ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 16ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 16ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 17ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 19ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 10ms
-    │        ├─ difference_por 10ms
     │        ├─ difference_por 15ms
     │        ├─ difference_por 18ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 23ms
-    │        ├─ difference_por 11ms
+    │        ├─ difference_por 18ms
     │        ├─ difference_por 19ms
-    │        ├─ difference_por 20ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 15ms
     │        ├─ difference_por 16ms
     │        ├─ difference_por 17ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 22ms
-    │        ├─ difference_por 21ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 15ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 12ms
     │        ├─ difference_por 16ms
-    │        ├─ difference_por 26ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 19ms
-    │        ├─ difference_por 24ms
-    │        ├─ difference_por 11ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 12ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 13ms
+    │        ├─ difference_por 16ms
     │        ├─ difference_por 18ms
-    │        ├─ difference_por 31ms
-    │        ├─ difference_por 19ms
-    │        ├─ difference_por 13ms
-    │        ├─ difference_por 23ms
-    │        ├─ difference_por 13ms
-    │        ├─ overlap_por 826ms
-    │        │  ├─ overlap_pconstant 826ms
-    │        │  │  └─ overlap_por 826ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 15ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 16ms
+    │        ├─ difference_por 18ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 17ms
+    │        ├─ difference_por 17ms
+    │        ├─ overlap_por 951ms
+    │        │  ├─ overlap_pconstant 950ms
+    │        │  │  └─ overlap_por 950ms
+    │        │  │     ├─ includes_por_default 10ms
+    │        │  │     │  └─ difference_list 10ms
+    │        │  │     ├─ includes_por_default 10ms
+    │        │  │     │  └─ difference_list 10ms
+    │        │  │     ├─ includes_por_default 10ms
+    │        │  │     │  └─ difference_list 10ms
+    │        │  │     ├─ includes_por_default 12ms
+    │        │  │     │  └─ difference_list 12ms
     │        │  │     ├─ includes_por_default 11ms
     │        │  │     │  └─ difference_list 11ms
     │        │  │     ├─ includes_por_default 10ms
-    │        │  │     │  └─ difference_list 10ms
-    │        │  │     ├─ includes_por_default 10ms
-    │        │  │     │  └─ difference_list 10ms
+    │        │  │     ├─ includes_por_default 11ms
+    │        │  │     │  └─ difference_list 11ms
+    │        │  │     ├─ includes_por_default 11ms
+    │        │  │     │  └─ difference_list 11ms
+    │        │  │     ├─ includes_por_default 12ms
+    │        │  │     │  └─ difference_list 12ms
+    │        │  │     ├─ includes_por_default 12ms
+    │        │  │     │  └─ difference_list 12ms
+    │        │  │     ├─ includes_por_default 13ms
+    │        │  │     │  └─ difference_list 13ms
+    │        │  │     ├─ includes_por_default 13ms
+    │        │  │     │  └─ difference_list 13ms
+    │        │  │     ├─ includes_por_default 13ms
+    │        │  │     │  └─ difference_list 13ms
+    │        │  │     ├─ includes_por_default 13ms
+    │        │  │     │  └─ difference_list 13ms
+    │        │  │     ├─ includes_por_default 15ms
+    │        │  │     │  └─ difference_list 15ms
+    │        │  │     ├─ includes_por_default 13ms
+    │        │  │     │  └─ difference_list 13ms
+    │        │  │     ├─ includes_por_default 13ms
+    │        │  │     │  └─ difference_list 13ms
     │        │  │     ├─ includes_por_default 14ms
     │        │  │     │  └─ difference_list 14ms
+    │        │  │     ├─ includes_por_default 14ms
+    │        │  │     │  └─ difference_list 14ms
+    │        │  │     ├─ includes_por_default 15ms
+    │        │  │     │  └─ difference_list 15ms
+    │        │  │     ├─ includes_por_default 15ms
+    │        │  │     │  └─ difference_list 15ms
+    │        │  │     ├─ includes_por_default 14ms
+    │        │  │     │  └─ difference_list 14ms
+    │        │  │     ├─ includes_por_default 15ms
+    │        │  │     │  └─ difference_list 15ms
     │        │  │     ├─ includes_por_default 16ms
     │        │  │     │  └─ difference_list 16ms
-    │        │  │     ├─ includes_por_default 14ms
-    │        │  │     │  └─ difference_list 14ms
+    │        │  │     ├─ includes_por_default 16ms
+    │        │  │     │  └─ difference_list 16ms
+    │        │  │     ├─ includes_por_default 16ms
+    │        │  │     │  └─ difference_list 16ms
+    │        │  │     ├─ includes_por_default 15ms
+    │        │  │     │  └─ difference_list 15ms
+    │        │  │     ├─ includes_por_default 16ms
+    │        │  │     │  └─ difference_list 16ms
+    │        │  │     ├─ includes_por_default 16ms
+    │        │  │     │  └─ difference_list 16ms
+    │        │  │     ├─ includes_por_default 16ms
+    │        │  │     │  └─ difference_list 16ms
+    │        │  │     ├─ includes_por_default 16ms
+    │        │  │     │  └─ difference_list 16ms
     │        │  │     ├─ includes_por_default 17ms
     │        │  │     │  └─ difference_list 17ms
-    │        │  │     ├─ includes_por_default 12ms
-    │        │  │     │  └─ difference_list 12ms
-    │        │  │     ├─ includes_por_default 11ms
-    │        │  │     │  └─ difference_list 11ms
-    │        │  │     ├─ includes_por_default 10ms
-    │        │  │     │  └─ difference_list 11ms
-    │        │  │     ├─ includes_por_default 10ms
-    │        │  │     │  └─ difference_list 10ms
-    │        │  │     ├─ includes_por_default 20ms
-    │        │  │     │  └─ difference_list 20ms
-    │        │  │     ├─ includes_por_default 10ms
-    │        │  │     │  └─ difference_list 10ms
-    │        │  │     ├─ includes_por_default 10ms
-    │        │  │     │  └─ difference_list 10ms
-    │        │  │     ├─ includes_por_default 10ms
-    │        │  │     │  └─ difference_list 10ms
-    │        │  │     ├─ includes_por_default 11ms
-    │        │  │     │  └─ difference_list 11ms
-    │        │  │     ├─ includes_por_default 11ms
-    │        │  │     │  └─ difference_list 11ms
-    │        │  │     ├─ includes_por_default 11ms
-    │        │  │     │  └─ difference_list 11ms
-    │        │  │     ├─ includes_por_default 11ms
-    │        │  │     │  └─ difference_list 11ms
-    │        │  │     ├─ includes_por_default 11ms
-    │        │  │     │  └─ difference_list 11ms
-    │        │  │     ├─ includes_por_default 12ms
-    │        │  │     │  └─ difference_list 12ms
-    │        │  │     ├─ includes_por_default 12ms
-    │        │  │     │  └─ difference_list 12ms
-    │        │  │     ├─ includes_por_default 13ms
-    │        │  │     │  └─ difference_list 12ms
-    │        │  │     ├─ includes_por_default 12ms
-    │        │  │     │  └─ difference_list 12ms
-    │        │  │     ├─ includes_por_default 13ms
-    │        │  │     │  └─ difference_list 13ms
-    │        │  │     ├─ includes_por_default 12ms
-    │        │  │     │  └─ difference_list 12ms
-    │        │  │     ├─ includes_por_default 28ms
-    │        │  │     │  └─ difference_list 28ms
+    │        │  │     ├─ includes_por_default 16ms
+    │        │  │     │  └─ difference_list 16ms
+    │        │  │     ├─ includes_por_default 17ms
+    │        │  │     │  └─ difference_list 17ms
     │        │  │     ├─ includes_por_default 18ms
     │        │  │     │  └─ difference_list 18ms
-    │        │  │     ├─ includes_por_default 13ms
-    │        │  │     │  └─ difference_list 13ms
-    │        │  │     ├─ includes_por_default 14ms
-    │        │  │     │  └─ difference_list 14ms
-    │        │  │     ├─ includes_por_default 23ms
-    │        │  │     │  └─ difference_list 23ms
-    │        │  │     ├─ includes_por_default 14ms
-    │        │  │     │  └─ difference_list 13ms
-    │        │  │     ├─ includes_por_default 13ms
-    │        │  │     │  └─ difference_list 12ms
-    │        │  │     ├─ includes_por_default 14ms
-    │        │  │     │  └─ difference_list 14ms
-    │        │  │     ├─ includes_por_default 15ms
-    │        │  │     │  └─ difference_list 15ms
-    │        │  │     ├─ includes_por_default 14ms
-    │        │  │     │  └─ difference_list 14ms
-    │        │  │     ├─ includes_por_default 14ms
-    │        │  │     │  └─ difference_list 14ms
-    │        │  │     ├─ includes_por_default 15ms
-    │        │  │     │  └─ difference_list 15ms
-    │        │  │     ├─ includes_por_default 15ms
-    │        │  │     │  └─ difference_list 15ms
-    │        │  │     └─ includes_por_default 15ms
-    │        │  │        └─ difference_list 15ms
-    │        └─ difference_por 934ms
-    │           ├─ difference_prange 10ms
-    │           │  └─ difference_prange_por 10ms
-    │           │     └─ difference_list 10ms
-    │           ├─ difference_prange 12ms
-    │           │  └─ difference_prange_por 12ms
-    │           │     └─ difference_list 11ms
-    │           ├─ difference_prange 11ms
-    │           │  └─ difference_prange_por 11ms
-    │           │     └─ difference_list 11ms
-    │           ├─ difference_prange 12ms
-    │           │  └─ difference_prange_por 11ms
-    │           │     └─ difference_list 11ms
-    │           ├─ difference_prange 17ms
-    │           │  └─ difference_prange_por 17ms
-    │           │     └─ difference_list 17ms
-    │           ├─ difference_prange 20ms
-    │           │  └─ difference_prange_por 20ms
-    │           │     └─ difference_list 20ms
-    │           ├─ difference_prange 18ms
-    │           │  └─ difference_prange_por 18ms
-    │           │     └─ difference_list 18ms
-    │           ├─ difference_prange 12ms
-    │           │  └─ difference_prange_por 11ms
-    │           │     └─ difference_list 11ms
-    │           ├─ difference_prange 11ms
-    │           │  └─ difference_prange_por 11ms
-    │           ├─ difference_prange 10ms
-    │           │  └─ difference_prange_por 11ms
-    │           │     └─ difference_list 11ms
-    │           ├─ difference_prange 18ms
-    │           │  └─ difference_prange_por 18ms
-    │           │     └─ difference_list 18ms
-    │           ├─ difference_prange 17ms
-    │           │  └─ difference_prange_por 17ms
-    │           │     └─ difference_list 17ms
-    │           ├─ difference_prange 11ms
-    │           │  └─ difference_prange_por 11ms
-    │           │     └─ difference_list 11ms
-    │           ├─ difference_prange 16ms
-    │           │  └─ difference_prange_por 16ms
-    │           │     └─ difference_list 16ms
-    │           ├─ difference_prange 15ms
-    │           │  └─ difference_prange_por 15ms
-    │           │     └─ difference_list 15ms
-    │           ├─ difference_prange 15ms
-    │           │  └─ difference_prange_por 15ms
-    │           │     └─ difference_list 15ms
-    │           ├─ difference_prange 11ms
-    │           │  └─ difference_prange_por 11ms
-    │           │     └─ difference_list 11ms
-    │           ├─ difference_prange 11ms
-    │           │  └─ difference_prange_por 11ms
-    │           │     └─ difference_list 11ms
-    │           ├─ difference_prange 11ms
-    │           │  └─ difference_prange_por 10ms
-    │           │     └─ difference_list 10ms
-    │           ├─ difference_prange 23ms
-    │           │  └─ difference_prange_por 23ms
-    │           │     └─ difference_list 23ms
+    │        │  │     ├─ includes_por_default 18ms
+    │        │  │     │  └─ difference_list 18ms
+    │        │  │     ├─ includes_por_default 17ms
+    │        │  │     │  └─ difference_list 17ms
+    │        │  │     ├─ includes_por_default 19ms
+    │        │  │     │  └─ difference_list 19ms
+    │        │  │     ├─ includes_por_default 18ms
+    │        │  │     │  └─ difference_list 18ms
+    │        │  │     ├─ includes_por_default 20ms
+    │        │  │     │  └─ difference_list 20ms
+    │        │  │     ├─ includes_por_default 18ms
+    │        │  │     │  └─ difference_list 18ms
+    │        │  │     ├─ includes_por_default 19ms
+    │        │  │     │  └─ difference_list 19ms
+    │        │  │     ├─ includes_por_default 19ms
+    │        │  │     │  └─ difference_list 19ms
+    │        │  │     ├─ includes_por_default 19ms
+    │        │  │     │  └─ difference_list 19ms
+    │        │  │     ├─ includes_por_default 19ms
+    │        │  │     │  └─ difference_list 19ms
+    │        │  │     └─ includes_por_default 19ms
+    │        │  │        └─ difference_list 19ms
+    │        └─ difference_por 978ms
     │           ├─ difference_prange 12ms
     │           │  └─ difference_prange_por 12ms
     │           │     └─ difference_list 12ms
     │           ├─ difference_prange 10ms
     │           │  └─ difference_prange_por 10ms
     │           │     └─ difference_list 10ms
-    │           ├─ difference_prange 12ms
+    │           ├─ difference_prange 10ms
+    │           │  └─ difference_prange_por 10ms
+    │           │     └─ difference_list 10ms
+    │           ├─ difference_prange 10ms
+    │           │  └─ difference_prange_por 10ms
+    │           │     └─ difference_list 10ms
+    │           ├─ difference_prange 11ms
     │           │  └─ difference_prange_por 11ms
     │           │     └─ difference_list 11ms
-    │           ├─ difference_prange 31ms
-    │           │  └─ difference_prange_por 31ms
-    │           │     └─ difference_list 31ms
-    │           ├─ difference_prange 28ms
-    │           │  └─ difference_prange_por 28ms
-    │           │     └─ difference_list 28ms
+    │           ├─ difference_prange 11ms
+    │           │  └─ difference_prange_por 11ms
+    │           │     └─ difference_list 11ms
+    │           ├─ difference_prange 11ms
+    │           │  └─ difference_prange_por 11ms
+    │           │     └─ difference_list 11ms
+    │           ├─ difference_prange 11ms
+    │           │  └─ difference_prange_por 11ms
+    │           │     └─ difference_list 11ms
+    │           ├─ difference_prange 12ms
+    │           │  └─ difference_prange_por 12ms
+    │           │     └─ difference_list 12ms
+    │           ├─ difference_prange 13ms
+    │           │  └─ difference_prange_por 13ms
+    │           │     └─ difference_list 13ms
+    │           ├─ difference_prange 12ms
+    │           │  └─ difference_prange_por 12ms
+    │           │     └─ difference_list 12ms
+    │           ├─ difference_prange 13ms
+    │           │  └─ difference_prange_por 13ms
+    │           │     └─ difference_list 13ms
+    │           ├─ difference_prange 13ms
+    │           │  └─ difference_prange_por 13ms
+    │           │     └─ difference_list 13ms
+    │           ├─ difference_prange 13ms
+    │           │  └─ difference_prange_por 13ms
+    │           │     └─ difference_list 13ms
     │           ├─ difference_prange 15ms
     │           │  └─ difference_prange_por 15ms
     │           │     └─ difference_list 15ms
-    │           ├─ difference_prange 22ms
-    │           │  └─ difference_prange_por 22ms
-    │           │     └─ difference_list 22ms
+    │           ├─ difference_prange 14ms
+    │           │  └─ difference_prange_por 14ms
+    │           │     └─ difference_list 14ms
+    │           ├─ difference_prange 13ms
+    │           │  └─ difference_prange_por 13ms
+    │           │     └─ difference_list 13ms
     │           ├─ difference_prange 13ms
     │           │  └─ difference_prange_por 13ms
     │           │     └─ difference_list 13ms
     │           ├─ difference_prange 14ms
-    │           │  └─ difference_prange_por 13ms
-    │           │     └─ difference_list 13ms
-    │           ├─ difference_prange 14ms
-    │           │  └─ difference_prange_por 14ms
-    │           │     └─ difference_list 13ms
-    │           ├─ difference_prange 14ms
     │           │  └─ difference_prange_por 14ms
     │           │     └─ difference_list 14ms
-    │           ├─ difference_prange 14ms
-    │           │  └─ difference_prange_por 14ms
-    │           │     └─ difference_list 14ms
-    │           ├─ difference_prange 14ms
-    │           │  └─ difference_prange_por 14ms
-    │           │     └─ difference_list 14ms
-    │           ├─ difference_prange 22ms
-    │           │  └─ difference_prange_por 21ms
-    │           │     └─ difference_list 21ms
     │           ├─ difference_prange 18ms
-    │           │  └─ difference_prange_por 18ms
-    │           │     └─ difference_list 18ms
-    │           ├─ difference_prange 21ms
-    │           │  └─ difference_prange_por 21ms
-    │           │     └─ difference_list 21ms
+    │           │  └─ difference_prange_por 17ms
+    │           │     └─ difference_list 17ms
+    │           ├─ difference_prange 14ms
+    │           │  └─ difference_prange_por 14ms
+    │           │     └─ difference_list 14ms
+    │           ├─ difference_prange 15ms
+    │           │  └─ difference_prange_por 15ms
+    │           │     └─ difference_list 14ms
     │           ├─ difference_prange 16ms
     │           │  └─ difference_prange_por 16ms
     │           │     └─ difference_list 16ms
     │           ├─ difference_prange 16ms
+    │           │  └─ difference_prange_por 15ms
+    │           │     └─ difference_list 15ms
+    │           ├─ difference_prange 15ms
+    │           │  └─ difference_prange_por 15ms
+    │           │     └─ difference_list 15ms
+    │           ├─ difference_prange 15ms
+    │           │  └─ difference_prange_por 15ms
+    │           │     └─ difference_list 15ms
+    │           ├─ difference_prange 16ms
     │           │  └─ difference_prange_por 16ms
     │           │     └─ difference_list 15ms
+    │           ├─ difference_prange 18ms
+    │           │  └─ difference_prange_por 18ms
+    │           │     └─ difference_list 18ms
+    │           ├─ difference_prange 20ms
+    │           │  └─ difference_prange_por 20ms
+    │           │     └─ difference_list 20ms
+    │           ├─ difference_prange 18ms
+    │           │  └─ difference_prange_por 18ms
+    │           │     └─ difference_list 18ms
+    │           ├─ difference_prange 16ms
+    │           │  └─ difference_prange_por 16ms
+    │           │     └─ difference_list 16ms
+    │           ├─ difference_prange 17ms
+    │           │  └─ difference_prange_por 17ms
+    │           │     └─ difference_list 17ms
+    │           ├─ difference_prange 16ms
+    │           │  └─ difference_prange_por 16ms
+    │           │     └─ difference_list 15ms
+    │           ├─ difference_prange 18ms
+    │           │  └─ difference_prange_por 18ms
+    │           │     └─ difference_list 18ms
+    │           ├─ difference_prange 17ms
+    │           │  └─ difference_prange_por 17ms
+    │           │     └─ difference_list 17ms
+    │           ├─ difference_prange 19ms
+    │           │  └─ difference_prange_por 19ms
+    │           │     └─ difference_list 19ms
+    │           ├─ difference_prange 17ms
+    │           │  └─ difference_prange_por 17ms
+    │           │     └─ difference_list 17ms
+    │           ├─ difference_prange 18ms
+    │           │  └─ difference_prange_por 18ms
+    │           │     └─ difference_list 18ms
+    │           ├─ difference_prange 19ms
+    │           │  └─ difference_prange_por 19ms
+    │           │     └─ difference_list 19ms
+    │           ├─ difference_prange 18ms
+    │           │  └─ difference_prange_por 18ms
+    │           │     └─ difference_list 18ms
+    │           ├─ difference_prange 18ms
+    │           │  └─ difference_prange_por 18ms
+    │           │     └─ difference_list 18ms
+    │           ├─ difference_prange 18ms
+    │           │  └─ difference_prange_por 18ms
+    │           │     └─ difference_list 18ms
+    │           ├─ difference_prange 17ms
+    │           │  └─ difference_prange_por 17ms
+    │           │     └─ difference_list 17ms
+    │           ├─ difference_prange 19ms
+    │           │  └─ difference_prange_por 19ms
+    │           │     └─ difference_list 19ms
+    │           ├─ difference_prange 19ms
+    │           │  └─ difference_prange_por 19ms
+    │           │     └─ difference_list 19ms
     │           ├─ difference_prange 22ms
     │           │  └─ difference_prange_por 22ms
     │           │     └─ difference_list 22ms
-    │           ├─ difference_prange 15ms
-    │           │  └─ difference_prange_por 15ms
-    │           │     └─ difference_list 15ms
-    │           ├─ difference_prange 15ms
-    │           │  └─ difference_prange_por 15ms
-    │           │     └─ difference_list 15ms
-    │           └─ difference_prange 26ms
-    │              └─ difference_prange_por 26ms
-    │                 └─ difference_list 26ms
-    └─ eval_arms 9127ms
+    │           ├─ difference_prange 20ms
+    │           │  └─ difference_prange_por 20ms
+    │           │     └─ difference_list 20ms
+    │           └─ difference_prange 19ms
+    │              └─ difference_prange_por 19ms
+    │                 └─ difference_list 19ms
+    └─ eval_arms 8832ms
 
 . mata: profiler_summarize(PROFILER)
-pmatch                                   depth 1            1x     17090ms
-eval_arms                                depth 2            1x      9127ms
-check_match                              depth 2            1x      7429ms
-is_useful                                depth 4          202x      7349ms
-difference_por                           depth 5          400x      4771ms
-check_exhaustiveness                     depth 3            1x      3927ms
-check_useful                             depth 3            1x      3471ms
-difference_prange                        depth 6        23476x      3394ms
-difference_prange_por                    depth 7          415x      1116ms
-difference_list                          depth 8          415x      1086ms
-overlap_pconstant                        depth 5        19801x       979ms
-overlap_pconstant                        depth 6         5494x       932ms
-overlap_por                              depth 5          300x       904ms
-overlap_por                              depth 7           10x       831ms
-includes_por_default                     depth 8           91x       799ms
-difference_list                          depth 9           91x       794ms
-difference_prange                        depth 9         6922x       727ms
-difference_prange                        depth 10        5805x       548ms
-Variable::init_levels_string             depth 5            1x       475ms
-Variable::init_levels                    depth 4            1x       475ms
-Variable::init                           depth 3            1x       475ms
-init_variables                           depth 2            1x       475ms
-Variable::init_levels_hash               depth 6            1x       474ms
-difference_prange_prange                 depth 7        11432x       368ms
-difference_prange_pconstant              depth 7        11629x       366ms
-difference_pwild                         depth 6         6804x       195ms
-difference_prange_prange                 depth 10        4186x       130ms
-overlap_por                              depth 6          810x       120ms
-difference_prange_prange                 depth 11        4095x       118ms
-difference_prange_pconstant              depth 10        2736x        91ms
-overlap_prange_prange                    depth 6         4095x        75ms
-parse_string                             depth 2            1x        59ms
-parse_arms                               depth 3            1x        58ms
-overlap_pconstant                        depth 7         2530x        52ms
-difference_prange_pconstant              depth 11        1710x        39ms
-includes_por_pconstant                   depth 6          946x        18ms
-overlap_pconstant                        depth 8          154x        17ms
-parse_arm                                depth 4          201x        16ms
-drop_empty_patterns                      depth 9          415x        13ms
-parse_or                                 depth 5          201x        13ms
-includes_por_pconstant                   depth 7          144x        10ms
-compress_por                             depth 8          381x        10ms
-parse_pattern                            depth 6          401x         8ms
-includes_por_default                     depth 6          101x         7ms
+pmatch                                   depth 1            1x     16854ms
+eval_arms                                depth 2            1x      8832ms
+check_match                              depth 2            1x      7544ms
+is_useful                                depth 4          202x      7462ms
+difference_por                           depth 5          400x      4897ms
+check_exhaustiveness                     depth 3            1x      4188ms
+difference_prange                        depth 6        23476x      3429ms
+check_useful                             depth 3            1x      3321ms
+difference_prange_por                    depth 7          415x      1157ms
+difference_list                          depth 8          415x      1134ms
+overlap_pconstant                        depth 6         5494x      1059ms
+overlap_por                              depth 5          300x      1020ms
+overlap_por                              depth 7           10x       952ms
+overlap_pconstant                        depth 5        19801x       943ms
+includes_por_default                     depth 8           91x       915ms
+difference_list                          depth 9           91x       910ms
+difference_prange                        depth 9         6922x       750ms
+difference_prange                        depth 10        5805x       651ms
+Variable::init_levels_hash               depth 6            1x       425ms
+Variable::init_levels_string             depth 5            1x       425ms
+Variable::init_levels                    depth 4            1x       425ms
+Variable::init                           depth 3            1x       425ms
+init_variables                           depth 2            1x       425ms
+difference_prange_prange                 depth 7        11432x       365ms
+difference_prange_pconstant              depth 7        11629x       353ms
+difference_pwild                         depth 6         6804x       240ms
+difference_prange_prange                 depth 11        4095x       166ms
+difference_prange_prange                 depth 10        4186x       143ms
+overlap_por                              depth 6          810x        94ms
+difference_prange_pconstant              depth 10        2736x        90ms
+overlap_prange_prange                    depth 6         4095x        72ms
+difference_prange_pconstant              depth 11        1710x        65ms
+parse_string                             depth 2            1x        53ms
+parse_arms                               depth 3            1x        52ms
+overlap_pconstant                        depth 7         2530x        47ms
+includes_por_pconstant                   depth 6          946x        16ms
+drop_empty_patterns                      depth 9          415x        15ms
+parse_arm                                depth 4          201x        14ms
+compress_por                             depth 8          381x        14ms
+overlap_pconstant                        depth 8          154x        11ms
+includes_por_default                     depth 6          101x        11ms
+parse_or                                 depth 5          201x         9ms
 compress_por                             depth 11         145x         7ms
-overlap_prange_prange                    depth 9           91x         6ms
-Variable::get_level_index                depth 7          400x         6ms
-drop_empty_patterns                      depth 10          90x         5ms
-overlap_prange_prange                    depth 7           91x         4ms
-binary_search                            depth 8          400x         3ms
-difference_list                          depth 7          101x         3ms
-includes_por_pconstant                   depth 8           63x         1ms
-Variable::quote_levels                   depth 6            1x         1ms
-consume                                  depth 5          201x         0ms
+includes_por_pconstant                   depth 8           63x         7ms
+Variable::get_level_index                depth 7          400x         5ms
+drop_empty_patterns                      depth 10          90x         3ms
+parse_pattern                            depth 6          401x         3ms
+overlap_prange_prange                    depth 7           91x         3ms
+includes_por_pconstant                   depth 7          144x         3ms
+overlap_prange_prange                    depth 9           91x         2ms
+compress_por                             depth 6          200x         2ms
+binary_search                            depth 8          400x         1ms
+htable_expand                            depth 7            5x         1ms
+consume                                  depth 5          201x         1ms
+difference_list                          depth 7          101x         0ms
+Variable::quote_levels                   depth 6            1x        -0ms
 Variable::init_type                      depth 4            1x        -0ms
 new_pwild                                depth 4            1x        -0ms
-compress_por                             depth 9            1x        -0ms
 new_pwild                                depth 7            1x        -0ms
+compress_por                             depth 9            1x        -0ms
 compress_por                             depth 5            1x        -0ms
 difference_prange_pconstant              depth 8            1x        -0ms
 difference_prange                        depth 7            1x        -0ms
 difference_por                           depth 6            1x        -0ms
 difference_pwild                         depth 5            1x        -0ms
-htable_expand                            depth 7            5x        -0ms
 check_wildcard_por                       depth 5            9x        -0ms
-compress_por                             depth 6          200x        -1ms
 
 . mata: profiler_graph(PROFILER, 1)
 
@@ -2400,5 +2390,5 @@ file dev/logs/profile.png saved as PNG format
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/profile.log
   log type:  text
- closed on:  19 May 2026, 13:28:30
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ closed on:  19 May 2026, 15:56:08
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

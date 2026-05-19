@@ -151,7 +151,7 @@ void Variable::init_levels_int() {
     if (st_nobs() < `N_MATA_SORT') {
         this.init_levels_int_base()
     }
-    if (this.should_tab()) {
+    else if (this.should_tab()) {
         this.init_levels_tab()
     }
     else {
@@ -167,10 +167,10 @@ void Variable::init_levels_float() {
     if (st_nobs() < `N_MATA_SORT') {
         this.init_levels_float_base()
     }
-    if (this.should_tab()) {
+    else if (this.should_tab()) {
         this.init_levels_tab()
     }
-    if (st_nobs() > `N_MATA_HASH') {
+    else if (st_nobs() > `N_MATA_HASH') {
         this.init_levels_hash()
     }
     else {
