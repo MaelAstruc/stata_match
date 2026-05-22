@@ -2,23 +2,23 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/class_count.log
   log type:  text
- opened on:  19 May 2026, 15:31:20
+ opened on:  22 May 2026, 12:58:25
 
 . 
 . mata: print_class_count()
 CLASS NAME         INSTANCES
   Pattern                  0
-  PEmpty                  73
+  PEmpty                  74
   PWild                    2
   PConstant               34
   PRange                   1
-  POr                     15
+  POr                     14
   Tuple                    0
   TupleOr                  0
   TupleWild                0
   TupleEmpty               0
   Variable                 1
-  Arm                     66
+  Arm                     63
   Match_report             1
   Usefulness              21
 
@@ -27,5 +27,5 @@ CLASS NAME         INSTANCES
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/class_count.log
   log type:  text
- closed on:  19 May 2026, 15:31:20
+ closed on:  22 May 2026, 12:58:25
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

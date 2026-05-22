@@ -107,4 +107,4 @@ do "dev/benchmark/bench_e2e.do"
 
 **#*************************************************************** Run profilers
 
-do "dev/profiler/profile_end_to_end.do"
+// do "dev/profiler/profile_end_to_end.do"

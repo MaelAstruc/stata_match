@@ -49,6 +49,7 @@ mata
             }
         }
         pwild[1, 2] = k
+        pwild = pwild[1..(k+1), .]
     }
     else if (variable.type == "float") {
         pwild = (`WILD_TYPE', n_pat, 0, variable_type) \ J(n_pat, 4, 0)
@@ -169,7 +170,7 @@ mata
 `STRING' to_expr_prange(`RANGE' prange, `VARIABLE' variable) {
     string scalar expr
     string vector exprs
-    real scalar min, max, n_vals
+    `REAL' min, max, n_vals
     
     min = prange[1, 2]
     max = prange[1, 3]
@@ -357,7 +358,7 @@ mata
     }
 }
 
-// `PATTERN' compress_por(`OR' por, | real scalar downgrade) {
+// `PATTERN' compress_por(`OR' por, | `REAL' downgrade) {
 //     `OR' por_compressed
 //     `PATTERN' patterns
 //     `REAL' i, k, n_pat
@@ -593,24 +594,30 @@ mata
 }
 
 `REAL' includes_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
+    `REAL' res
+    
+    // // profiler_on("includes_pconstant")
     if (pattern[1, 1] == `EMPTY_TYPE') {
-        return(1)
+        res = 1
     }
     else if (pattern[1, 1] == `WILD_TYPE') {
-        return(includes_pconstant_pwild(pconstant, pattern))
+        res = includes_pconstant_pwild(pconstant, pattern)
     }
     else if (pattern[1, 1] == `CONSTANT_TYPE') {
-        return(includes_pconstant_pconstant(pconstant, pattern))
+        res = includes_pconstant_pconstant(pconstant, pattern)
     }
     else if (pattern[1, 1] == `RANGE_TYPE') {
-        return(includes_pconstant_prange(pconstant, pattern))
+        res = includes_pconstant_prange(pconstant, pattern)
     }
     else if (pattern[1, 1] == `OR_TYPE') {
-        return(includes_pconstant_por(pconstant, pattern))
+        res = includes_pconstant_por(pconstant, pattern)
     }
     else {
         unknown_pattern(pattern)
     }
+    
+    // // profiler_off()
+    return(res)
 }
 
 `REAL' includes_pconstant_pwild(`CONSTANT' pconstant, `WILD' pwild) {
@@ -627,7 +634,7 @@ mata
 
 `REAL' includes_pconstant_por(`CONSTANT' pconstant, `OR' por) {
     `REAL' i
-    // profiler_on("includes_pconstant_por")
+    // // profiler_on("includes_pconstant_por")
     
     // TODO: Use matrix with any
     for (i = 1; i <= por[1, 2]; i++) {
@@ -637,29 +644,35 @@ mata
         }
     }
     
-    // profiler_off()
+    // // profiler_off()
     return(1)
 }
 
 `REAL' includes_prange(`RANGE' prange, `PATTERN' pattern) {
+    `REAL' res
+    // // profiler_on("includes_prange")
+    
     if (pattern[1, 1] == `EMPTY_TYPE') {
-        return(1)
+        res = 1
     }
     else if (pattern[1, 1] == `WILD_TYPE') {
-        return(includes_prange_pwild(prange, pattern))
+        res = includes_prange_pwild(prange, pattern)
     }
     else if (pattern[1, 1] == `CONSTANT_TYPE') {
-        return(includes_prange_pconstant(prange, pattern))
+        res = includes_prange_pconstant(prange, pattern)
     }
     else if (pattern[1, 1] == `RANGE_TYPE') {
-        return(includes_prange_prange(prange, pattern))
+        res = includes_prange_prange(prange, pattern)
     }
     else if (pattern[1, 1] == `OR_TYPE') {
-        return(includes_prange_por(prange, pattern))
+        res = includes_prange_por(prange, pattern)
     }
     else {
         unknown_pattern(pattern)
     }
+    
+    // // profiler_off()
+    return(res)
 }
 
 `REAL' includes_prange_pwild(`RANGE' prange, `WILD' pwild) {
@@ -677,7 +690,7 @@ mata
 `REAL' includes_prange_por(`RANGE' prange, `OR' por) {
     `REAL' i
     
-    // profiler_on("includes_prange_por")
+    // // profiler_on("includes_prange_por")
     
     // TODO: Use matrix: prange min is smaller and max is larger
     for (i = 1; i <= por[1, 2]; i++) {
@@ -687,20 +700,27 @@ mata
         }
     }
     
-    // profiler_off()
+    // // profiler_off()
     return(1)
 }
 
 `REAL' includes_por(`OR' por, `PATTERN' pattern) {
+    `REAL' res
+    
+    // // profiler_on("includes_por")
+    
     if (pattern[1, 1] == `EMPTY_TYPE') {
-        return(1)
+        res = 1
     }
     else if (pattern[1, 1] == `CONSTANT_TYPE') {
-        return(includes_por_pconstant(por, pattern))
+        res = includes_por_pconstant(por, pattern)
     }
     else {
-        return(includes_por_default(por, pattern))
+        res = includes_por_default(por, pattern)
     }
+    
+    // // profiler_off()
+    return(res)
 }
 
 `REAL' includes_por_pconstant(`OR' por, `CONSTANT' pconstant) {
@@ -765,7 +785,7 @@ mata
 `PATTERN' difference_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
     `PATTERN' res
     
-    // profiler_on("difference_pwild")
+    // profiler_on("difference_pconstant")
     
     if (includes(pattern, pconstant)) {
         res = new_pempty()

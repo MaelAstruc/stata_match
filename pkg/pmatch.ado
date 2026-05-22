@@ -520,6 +520,7 @@ mata
             }
         }
         pwild[1, 2] = k
+        pwild = pwild[1..(k+1), .]
     }
     else if (variable.type == "float") {
         pwild = (`WILD_TYPE', n_pat, 0, variable_type) \ J(n_pat, 4, 0)
@@ -640,7 +641,7 @@ mata
 `STRING' to_expr_prange(`RANGE' prange, `VARIABLE' variable) {
     string scalar expr
     string vector exprs
-    real scalar min, max, n_vals
+    `REAL' min, max, n_vals
     
     min = prange[1, 2]
     max = prange[1, 3]
@@ -828,7 +829,7 @@ mata
     }
 }
 
-// `PATTERN' compress_por(`OR' por, | real scalar downgrade) {
+// `PATTERN' compress_por(`OR' por, | `REAL' downgrade) {
 //     `OR' por_compressed
 //     `PATTERN' patterns
 //     `REAL' i, k, n_pat
@@ -1064,24 +1065,30 @@ mata
 }
 
 `REAL' includes_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
+    `REAL' res
+    
+    // // profiler_on("includes_pconstant")
     if (pattern[1, 1] == `EMPTY_TYPE') {
-        return(1)
+        res = 1
     }
     else if (pattern[1, 1] == `WILD_TYPE') {
-        return(includes_pconstant_pwild(pconstant, pattern))
+        res = includes_pconstant_pwild(pconstant, pattern)
     }
     else if (pattern[1, 1] == `CONSTANT_TYPE') {
-        return(includes_pconstant_pconstant(pconstant, pattern))
+        res = includes_pconstant_pconstant(pconstant, pattern)
     }
     else if (pattern[1, 1] == `RANGE_TYPE') {
-        return(includes_pconstant_prange(pconstant, pattern))
+        res = includes_pconstant_prange(pconstant, pattern)
     }
     else if (pattern[1, 1] == `OR_TYPE') {
-        return(includes_pconstant_por(pconstant, pattern))
+        res = includes_pconstant_por(pconstant, pattern)
     }
     else {
         unknown_pattern(pattern)
     }
+    
+    // // profiler_off()
+    return(res)
 }
 
 `REAL' includes_pconstant_pwild(`CONSTANT' pconstant, `WILD' pwild) {
@@ -1098,7 +1105,7 @@ mata
 
 `REAL' includes_pconstant_por(`CONSTANT' pconstant, `OR' por) {
     `REAL' i
-    // profiler_on("includes_pconstant_por")
+    // // profiler_on("includes_pconstant_por")
     
     // TODO: Use matrix with any
     for (i = 1; i <= por[1, 2]; i++) {
@@ -1108,29 +1115,35 @@ mata
         }
     }
     
-    // profiler_off()
+    // // profiler_off()
     return(1)
 }
 
 `REAL' includes_prange(`RANGE' prange, `PATTERN' pattern) {
+    `REAL' res
+    // // profiler_on("includes_prange")
+    
     if (pattern[1, 1] == `EMPTY_TYPE') {
-        return(1)
+        res = 1
     }
     else if (pattern[1, 1] == `WILD_TYPE') {
-        return(includes_prange_pwild(prange, pattern))
+        res = includes_prange_pwild(prange, pattern)
     }
     else if (pattern[1, 1] == `CONSTANT_TYPE') {
-        return(includes_prange_pconstant(prange, pattern))
+        res = includes_prange_pconstant(prange, pattern)
     }
     else if (pattern[1, 1] == `RANGE_TYPE') {
-        return(includes_prange_prange(prange, pattern))
+        res = includes_prange_prange(prange, pattern)
     }
     else if (pattern[1, 1] == `OR_TYPE') {
-        return(includes_prange_por(prange, pattern))
+        res = includes_prange_por(prange, pattern)
     }
     else {
         unknown_pattern(pattern)
     }
+    
+    // // profiler_off()
+    return(res)
 }
 
 `REAL' includes_prange_pwild(`RANGE' prange, `WILD' pwild) {
@@ -1148,7 +1161,7 @@ mata
 `REAL' includes_prange_por(`RANGE' prange, `OR' por) {
     `REAL' i
     
-    // profiler_on("includes_prange_por")
+    // // profiler_on("includes_prange_por")
     
     // TODO: Use matrix: prange min is smaller and max is larger
     for (i = 1; i <= por[1, 2]; i++) {
@@ -1158,20 +1171,27 @@ mata
         }
     }
     
-    // profiler_off()
+    // // profiler_off()
     return(1)
 }
 
 `REAL' includes_por(`OR' por, `PATTERN' pattern) {
+    `REAL' res
+    
+    // // profiler_on("includes_por")
+    
     if (pattern[1, 1] == `EMPTY_TYPE') {
-        return(1)
+        res = 1
     }
     else if (pattern[1, 1] == `CONSTANT_TYPE') {
-        return(includes_por_pconstant(por, pattern))
+        res = includes_por_pconstant(por, pattern)
     }
     else {
-        return(includes_por_default(por, pattern))
+        res = includes_por_default(por, pattern)
     }
+    
+    // // profiler_off()
+    return(res)
 }
 
 `REAL' includes_por_pconstant(`OR' por, `CONSTANT' pconstant) {
@@ -1236,7 +1256,7 @@ mata
 `PATTERN' difference_pconstant(`CONSTANT' pconstant, `PATTERN' pattern) {
     `PATTERN' res
     
-    // profiler_on("difference_pwild")
+    // profiler_on("difference_pconstant")
     
     if (includes(pattern, pconstant)) {
         res = new_pempty()
@@ -1725,12 +1745,16 @@ mata
     return(tuple_compressed)
 }
 
-`T' compress_tupleor(`TUPLEOR' tuples) {
+`T' compress_tupleor(`TUPLEOR' tuples, | `REAL' downgrade) {
     `TUPLEOR' tuples_compressed
     `POINTER' pattern_compressed
     `REAL' i
     
     // profiler_on("compress_tupleor")
+    
+    if (args() == 1) {
+        downgrade = 1
+    }
     
     tuples_compressed = new_tupleor()
     
@@ -1751,10 +1775,10 @@ mata
     }
     
     // profiler_off()
-    if (tuples_compressed.length == 0) {
+    if (tuples_compressed.length == 0 & downgrade == 1) {
         return(TupleEmpty())
     }
-    if (tuples_compressed.length == 1) {
+    else if (tuples_compressed.length == 1 & downgrade == 1) {
         return(*tuples_compressed.list[1])
     }
     else {
@@ -4022,10 +4046,17 @@ mata
 
 ////////////////////////////////////////////////////////////////// Main function
 
+class UsefulnessResult {
+    `POINTER' usefulness_vec
+    `POINTER' covered
+}
+
+
 void function check_match(`ARMS' arms, `VARIABLES' variables) {
     class Match_report scalar report
     class Usefulness scalar usefulness
-    `POINTER' missings
+    class UsefulnessResult scalar usefulness_result
+    `POINTER' missings, covered
     `ARM' arm
     `ARMS' useful_arms
     `REAL' i
@@ -4033,7 +4064,9 @@ void function check_match(`ARMS' arms, `VARIABLES' variables) {
     // profiler_on("check_match")
     
     // bench_on("- usefulness")
-    report.usefulness = check_useful(arms)
+    usefulness_result = check_useful(arms)
+    report.usefulness = *usefulness_result.usefulness_vec
+    covered = usefulness_result.covered
     // bench_off("- usefulness")
 
     useful_arms = Arm(0)
@@ -4050,7 +4083,7 @@ void function check_match(`ARMS' arms, `VARIABLES' variables) {
     // bench_off("- combine")
 
     // bench_on("- exhaustiveness")
-    missings = &check_exhaustiveness(useful_arms, variables)
+    missings = &check_exhaustiveness(useful_arms, variables, covered)
     // bench_off("- exhaustiveness")
     
     // bench_on("- compress")
@@ -4066,12 +4099,14 @@ void function check_match(`ARMS' arms, `VARIABLES' variables) {
 
 /////////////////////////////////////////////////////////////// Check usefulness
 
-class Usefulness vector check_useful(`ARMS' arms) {
+class UsefulnessResult scalar check_useful(`ARMS' arms) {
     `ARMS' useful_arms
     `ARM' new_arm
     class Usefulness scalar usefulness
     class Usefulness vector usefulness_vec
+    class UsefulnessResult scalar usefulness_result
     `REAL' i, n_arms
+    `POINTER' covered
 
     // profiler_on("check_useful")
     
@@ -4080,11 +4115,13 @@ class Usefulness vector check_useful(`ARMS' arms) {
     n_arms = length(arms)
 
     usefulness_vec = Usefulness(n_arms)
+    
+    covered = empty_like(arms[1])
 
     // Check that each arm is useful compared to previous useful arms
     for (i = 1; i <= n_arms; i++) {
         // bench_on("  - is_useful() 1")
-        usefulness = is_useful(arms[i], useful_arms)
+        usefulness = is_useful(arms[i], useful_arms, covered)
         // bench_off("  - is_useful() 1")
         usefulness.arm_id = i
         usefulness.has_wildcard = arms[i].has_wildcard
@@ -4096,14 +4133,43 @@ class Usefulness vector check_useful(`ARMS' arms) {
         }
 
         usefulness_vec[i].define(usefulness)
+        
+        covered = combine(covered, arms[i].lhs.pattern)
     }
     
+    usefulness_result.usefulness_vec = &usefulness_vec
+    usefulness_result.covered = covered
+    
     // profiler_off()
-    return(usefulness_vec)
+    return(usefulness_result)
 }
 
-class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
-    `POINTER' tuple, differences, overlap_i
+`POINTER' empty_like(`ARM' arm) {
+    if (eltype(*arm.lhs.pattern) == "struct") {
+        return(&(new_tupleor()))
+    }
+    else {
+        return(&(new_por()))
+    }
+}
+
+`POINTER' combine(`POINTER' covered, `POINTER' pattern) {
+    if (eltype(*pattern) == "struct") {
+        push_tupleor(*covered, *pattern)
+        return(&compress_tupleor(*covered, 0))
+    }
+    else {
+        push_por(*covered, *pattern)
+        return(&compress_por(*covered, 0))
+    }
+}
+
+class Usefulness scalar function is_useful(
+    `ARM' arm,
+    `ARMS' useful_arms,
+    `POINTER' covered
+) {
+    `POINTER' tuple, differences, overlap_all, overlap_i
     struct LHS vector overlaps
     struct LHS scalar lhs_empty
     class Usefulness scalar result
@@ -4118,68 +4184,71 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
     
     tuple = arm.lhs.pattern
 
-    differences = tuple
-
     // If it is the first pattern, it's always useful
     if (length(useful_arms) == 0) {
         result.useful = 1
         result.any_overlap = 0
         result.overlaps = &lhs_empty
-        result.differences = differences
+        result.differences = tuple
 
         // profiler_off()
         return(result)
     }
-
-    k = 0
     
-    // We loop over all the patterns
+    // Compute the total overlap
+    // bench_on("+ Overlap() all")
+    overlap_all = &overlap(*tuple, *covered)
+    // bench_off("+ Overlap() all")
+
+    // Early exist if no overalp
+    if ((*overlap_all)[1, 1] == `EMPTY_TYPE' | structname(*overlap_all) == "TupleEmpty") {
+        result.useful = 1
+        result.any_overlap = 0
+        result.overlaps = &lhs_empty
+        result.differences = tuple
+
+        // profiler_off()
+        return(result)
+    }
+    
+    k = 0
+
+    // We loop over all the patterns to find the overlaps
     for (i = 1; i <= length(useful_arms); i++) {
-        // TODO: Use difference
         ref_arm = useful_arms[i]
 
-        // bench_on("+ Overlap()")
+        // bench_on("+ Overlap() i")
         overlap_i = &overlap(*tuple, *ref_arm.lhs.pattern)
-        // bench_off("+ Overlap()")
+        // bench_off("+ Overlap() i")
         
         if ((*overlap_i)[1, 1] != `EMPTY_TYPE' & structname(*overlap_i) != "TupleEmpty") {
             k++
             overlaps[k].pattern = overlap_i
             overlaps[k].arm_id = ref_arm.id
-            // bench_on("+ Difference()")
-            differences = &difference(*differences, *overlap_i)
-            // bench_off("+ Difference()")
         }
     }
     
-    if (k == 0) {
-        // No overlap, return tuple
-        result.useful = 1
-        result.any_overlap = 0
-        result.overlaps = &lhs_empty
-        result.differences = tuple
+    // bench_on("+ Difference()")
+    differences = &difference(*tuple, *overlap_all)
+    // bench_off("+ Difference()")
+
+    // Ensure that differences are compressed to remove this
+    differences = &compress(*differences)
+    
+    if ((*differences)[1, 1] == `EMPTY_TYPE' | structname(*differences) == "TupleEmpty") {
+    
+        // If no pattern remains, the pattern is not useful
+        result.useful = 0
+        result.any_overlap = 1
+        result.overlaps = &overlaps[1..k]
+        result.differences = differences
     }
     else {
-        // Compute the remaining patterns
-        //differences = difference_vec(*tuple, overlaps[1..k])
-        
-        // Ensure that differences are compressed to remove this
-        differences = &compress(*differences)
-        
-        if ((*differences)[1, 1] == `EMPTY_TYPE' | structname(*differences) == "TupleEmpty") {
-            // If no pattern remains, the pattern is not useful
-            result.useful = 0
-            result.any_overlap = 1
-            result.overlaps = &overlaps[1..k]
-            result.differences = differences
-        }
-        else {
-            // Else return the tuple, the overlaps and the differences
-            result.useful = 1
-            result.any_overlap = 1
-            result.overlaps = &overlaps[1..k]
-            result.differences = differences
-        }
+        // Else return the tuple, the overlaps and the differences
+        result.useful = 1
+        result.any_overlap = 1
+        result.overlaps = &overlaps[1..k]
+        result.differences = differences
     }
 
     // profiler_off()
@@ -4192,7 +4261,7 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
 
 ///////////////////////////////////////////////////////////// Check completeness
 
-`T' check_exhaustiveness(`ARMS' arms, `VARIABLES' variables ) {
+`T' check_exhaustiveness(`ARMS' arms, `VARIABLES' variables, `POINTER' covered) {
     `ARM' wild_arm
     pointer(`WILD') vector pwilds
     `TUPLE' tuple
@@ -4222,7 +4291,7 @@ class Usefulness scalar function is_useful(`ARM' arm, `ARMS' useful_arms) {
     }
 
     // bench_on("  - is_useful() 2")
-    usefulness = is_useful(wild_arm, arms)
+    usefulness = is_useful(wild_arm, arms, covered)
     // bench_off("  - is_useful() 2")
     
     // profiler_off()

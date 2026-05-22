@@ -168,12 +168,16 @@ mata
     return(tuple_compressed)
 }
 
-`T' compress_tupleor(`TUPLEOR' tuples) {
+`T' compress_tupleor(`TUPLEOR' tuples, | `REAL' downgrade) {
     `TUPLEOR' tuples_compressed
     `POINTER' pattern_compressed
     `REAL' i
     
     // profiler_on("compress_tupleor")
+    
+    if (args() == 1) {
+        downgrade = 1
+    }
     
     tuples_compressed = new_tupleor()
     
@@ -194,10 +198,10 @@ mata
     }
     
     // profiler_off()
-    if (tuples_compressed.length == 0) {
+    if (tuples_compressed.length == 0 & downgrade == 1) {
         return(TupleEmpty())
     }
-    if (tuples_compressed.length == 1) {
+    else if (tuples_compressed.length == 1 & downgrade == 1) {
         return(*tuples_compressed.list[1])
     }
     else {
