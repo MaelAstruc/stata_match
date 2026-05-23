@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.0.18 06/07/2025}{...}
+{* *! version 0.0.19 23/05/2026}{...}
 {marker syntax}{title:Title}
 
 {p2colset 5 16 18 2}{...}
@@ -364,7 +364,7 @@ Some quality of life bonus is the possibility to use label values instead of the
 
 {title:Package details}
 
-Version      : {bf:pmatch} version 0.0.18
+Version      : {bf:pmatch} version 0.0.19
 Source       : {browse "https://github.com/MaelAstruc/stata_match":GitHub}
 
 Author       : {browse "https://github.com/MaelAstruc":Mael Astruc--Le Souder}
@@ -378,12 +378,12 @@ E-mail       : mael.astruc-le-souder@u-bordeaux.fr
 
 Suggested citation for this package:
 
-{p}Astruc--Le Souder, M. (2025). Stata package 'pmatch' version 0.0.18 https://github.com/MaelAstruc/stata_match.{p_end}
+{p}Astruc--Le Souder, M. (2026). Stata package 'pmatch' version 0.0.19 https://github.com/MaelAstruc/stata_match.{p_end}
 
 @software{pmatch,
    author = {Astruc--Le Souder Mael},
    title = {Stata package },
    url = {https://github.com/MaelAstruc/stata_match},
-   version = {0.0.18},
-   date = {2025-07-06}
+   version = {0.0.19},
+   date = {2026-05-23}
 }

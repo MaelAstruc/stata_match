@@ -1,4 +1,4 @@
-*! version 0.0.18  06 Jul 2025
+*! version 0.0.19  23 May 2026
 
 **#************************************************************ src/declare.mata
 
@@ -491,6 +491,8 @@ mata
     n_pat = length(variable.levels)
     
     if (n_pat == 0) {
+        // profiler_off()
+    
         return((`WILD_TYPE', 0, 0, variable_type) \ new_pempty())
     }
     
@@ -558,7 +560,7 @@ mata
 `RANGE' new_prange(`REAL' min, `REAL' max, `REAL' variable_type) {
     check_var_type(variable_type)
 
-    if (min == . | max == .) {
+    if (min >= . | max >= .) {
         errprintf("Range boundaries should be non-missing reals\n")
         exit(_error(3253))
     }
@@ -573,8 +575,13 @@ mata
     return((`RANGE_TYPE', min, max, variable_type))
 }
 
-`OR' new_por() {
-    return((`OR_TYPE', 0, 0, 0) \ J(8, 4, 0))
+`OR' new_por(| `REAL' capacity) {
+    
+    if (args() == 0) {
+        capacity = 8
+    }
+    
+    return((`OR_TYPE', 0, 0, 0) \ J(capacity, 4, 0))
 }
 
 //////////////////////////////////////////////////////////////////// to_string()
@@ -829,81 +836,6 @@ mata
     }
 }
 
-// `PATTERN' compress_por(`OR' por, | `REAL' downgrade) {
-//     `OR' por_compressed
-//     `PATTERN' patterns
-//     `REAL' i, k, n_pat
-//     real vector constants
-//    
-//     // profiler_on("compress_por")
-//    
-//     if (args() == 1) {
-//         downgrade = 1
-//     }
-//    
-//     n_pat = por[1, 2]
-//    
-//     if (n_pat == 0) {
-//         // profiler_off()
-//         if (downgrade == 1) {
-//             return(new_pempty())
-//         }
-//         else {
-//             return(por)
-//         }
-//     }
-//    
-//     por_compressed = por
-//    
-//     _sort(por_compressed[2..(n_pat + 1), .], (2, -3))
-//    
-//     k = 1
-//     for (i = 2; i <= n_pat + 1; i++) {
-//         // We never push a wildcard pattern in a POr (it replaces it)
-//         // assert(patterns[i, 1] != `WILD_TYPE')
-//         if (por_compressed[i, 1] == `EMPTY_TYPE' | por_compressed[i, 2] > por_compressed[i, 3]) {
-//             continue
-//         }
-//         else if (k == 1) {
-//             k++
-//             por_compressed[k, .] = por_compressed[i, .]
-//         }
-//         else if (por_compressed[i, 4] == 4 & por_compressed[i, 2] > por_compressed[k, 3]) {
-//             k++
-//             por_compressed[k, .] = por_compressed[i, .]
-//         }
-//         else if (por_compressed[i, 4] != 4 & por_compressed[i, 2] > por_compressed[k, 3] + get_epsilon(por_compressed[k, 3], por_compressed[k, 4])) {
-//             k++
-//             por_compressed[k, .] = por_compressed[i, .]
-//         }
-//         else {
-//             por_compressed[k, 3] = max((por_compressed[k, 3], por_compressed[i, 3]))
-//         }
-//        
-//         // Adapt the type between constant or range
-//         // k is always at least 1 at this stage
-//         if (por_compressed[k, 2] == por_compressed[k, 3]) {
-//             por_compressed[k, 1] = `CONSTANT_TYPE'
-//         }
-//         else {
-//             por_compressed[k, 1] = `RANGE_TYPE'
-//         }
-//     }
-//    
-//     // profiler_off()
-//    
-//     // With the POr header, k=1 means no pattern and k=2 means 1 pattern
-//     if (k == 1 & downgrade == 1) {
-//         return(new_pempty())
-//     }
-//     else if (k == 2 & downgrade == 1) {
-//         return(por_compressed[k, .])
-//     }
-//     else {
-//         por_compressed[1, 2] = k - 1
-//         return(por_compressed)
-//     }
-// }
 
 ////////////////////////////////////////////////////////////////////// overlap()
 
@@ -1016,17 +948,104 @@ mata
 // The overlaps of a compressed POr and a pattern would always be compressed
 // This would work for tuples to
 `PATTERN' overlap_por(`OR' por, `PATTERN' pattern) {
+    `PATTERN' res
+    
+    // profiler_on("overlap_por")
+    
+    
+    if (pattern[1, 1] == `EMPTY_TYPE') {
+        res = new_pempty()
+    }
+    else if (pattern[1, 1] == `WILD_TYPE') {
+        res = por
+    }
+    else if (pattern[1, 1] == `CONSTANT_TYPE') {
+        res = overlap_por_pconstant(por, pattern)
+    }
+    else if (pattern[1, 1] == `RANGE_TYPE') {
+        res = overlap_por_prange(por, pattern)
+    }
+    else if (pattern[1, 1] == `OR_TYPE') {
+        res = overlap_por_por(por, pattern)
+    }
+    else {
+        unknown_pattern(pattern)
+    }
+    
+    // profiler_off()
+    
+    return(res)
+}
+
+`PATTERN' overlap_por_pconstant(`OR' por, `CONSTANT' pconstant) {
     `OR' por_overlap
     `PATTERN' overlap
     `REAL' i
     
-    // profiler_on("overlap_por")
+    if (includes_por_pconstant(por, pconstant)) {
+        return(pconstant)
+    }
+    else {
+        return(new_pempty())
+    }
+}
+
+`PATTERN' overlap_por_prange(`OR' por, `RANGE' prange) {
+    `OR' por_overlap
+    `REAL' i, n_pat, k
+    real colvector lows, highs, mask, lows_sel, highs_sel, types
+    
+    n_pat = por[1, 2]
+    
+    if (n_pat == 0) {
+        return(new_pempty())
+    }
+    
+    lows = rowmax((por[2..(n_pat + 1), 2], J(n_pat, 1, prange[1, 2])))
+    highs = rowmin((por[2..(n_pat + 1), 3], J(n_pat, 1, prange[1, 3])))
+    
+    // Handle the cases where constant is a missing value
+    mask = (lows :<= highs) :& (por[2..(n_pat + 1), 2] :< .)
+    k = sum(mask)
+    
+    if (k == 0) {
+        return(new_pempty())
+    }
+    
+    lows_sel  = select(lows, mask)
+    highs_sel = select(highs, mask)
+
+    types = J(k, 1, `RANGE_TYPE')
+    types = types :+ (lows_sel :== highs_sel) :* (`CONSTANT_TYPE' - `RANGE_TYPE')
+
+    por_overlap = new_por(k)
+    
+    por_overlap[1, 2] = k
+    por_overlap[2..(k + 1), 1] = types
+    por_overlap[2..(k + 1), 2] = lows_sel
+    por_overlap[2..(k + 1), 3] = highs_sel
+    por_overlap[2..(k + 1), 4] = J(k, 1, prange[1, 4])
+    
+    return(compress_por(por_overlap))
+}
+
+`PATTERN' overlap_por_por(`OR' por_1, `OR' por_2) {
+    `OR' por_overlap
+    `PATTERN' overlap, res
+    `REAL' i
+    
+    // profiler_on("overlap_por_por")
+    
+    if (por_1[1, 2] > por_2[1, 2]) {
+        res = overlap_por_por(por_2, por_1)
+        // profiler_off()
+        return(res)
+    }
     
     por_overlap = new_por()
     
-    // TODO: Use matrix if pattern is not por
-    for (i = 1; i <= por[1, 2]; i++) {
-        overlap = overlap(por[i + 1, .], pattern)
+    for (i = 1; i <= por_1[1, 2]; i++) {
+        overlap = overlap_por(por_2, por_1[i + 1, .])
         
         if (overlap[1, 1] == `EMPTY_TYPE') {
             continue
@@ -1036,22 +1055,14 @@ mata
             return(overlap)
         }
         else {
-            if (!includes_por(por_overlap, overlap)) {
-                push_por(por_overlap, overlap)
-            }
+            push_por(por_overlap, overlap)
         }
     }
     
+    por_overlap = compress_por(por_overlap)
+    
     // profiler_off()
-    if (por_overlap[1, 2] == 0) {
-        return(new_pempty())
-    }
-    if (por_overlap[1, 2] == 1) {
-        return(por_overlap[2, .])
-    }
-    else {
-        return(por_overlap)
-    }
+    return(por_overlap)
 }
 
 ///////////////////////////////////////////////////////////////////// includes()
@@ -1195,20 +1206,23 @@ mata
 }
 
 `REAL' includes_por_pconstant(`OR' por, `CONSTANT' pconstant) {
-    `REAL' i
+    `REAL' res, n_pat, value
     
     // profiler_on("includes_por_pconstant")
     
-    // TODO: Use matrix
-    for (i = 1; i <= por[1, 2]; i++) {
-        if (includes(por[i + 1, .], pconstant)) {
-            // profiler_off()
-            return(1)
-        }
+    n_pat = por[1, 2]
+    
+    if (n_pat == 0) {
+        // profiler_off()
+        return(0)
     }
     
+    value = pconstant[1, 2]
+    
+    res = any((por[2..(n_pat + 1), 2] :<= value) :& (value :<= por[2..(n_pat + 1), 3]))
+    
     // profiler_off()
-    return(0)
+    return(res)
 }
 
 `REAL' includes_por_default(`OR' por, `PATTERN' pattern) {

@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/test.log
   log type:  text
- opened on:  22 May 2026, 12:58:18
+ opened on:  23 May 2026, 12:24:41
 . }
 
 . 
@@ -11,6 +11,7 @@
 . // TODO: run "dev/test/test_variables.do"
 . run "dev/test/test_patterns.do"
 
+. 
 . // TODO: run "dev/test/test_arm.do"
 . // TODO: run "dev/test/test_parser.do"
 . // TODO: run "dev/test/test_algorithm.do"
@@ -56,5 +57,5 @@ TEST FAILED:    0
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/test.log
   log type:  text
- closed on:  22 May 2026, 12:58:25
+ closed on:  23 May 2026, 12:24:43
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

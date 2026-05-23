@@ -212,10 +212,14 @@ mata drop new_pempty() new_pwild() new_pconstant() new_prange() new_por() new_tu
     return((`RANGE_TYPE', min, max, variable_type))
 }
 
-`OR' new_por() {
+`OR' new_por(| `REAL' capacity) {
     increase_pattern_count("POr")
     
-    return((`OR_TYPE', 0, 0, 0) \ J(8, 4, 0))
+    if (args() == 0) {
+        capacity = 8
+    }
+    
+    return((`OR_TYPE', 0, 0, 0) \ J(capacity, 4, 0))
 }
 
 /*

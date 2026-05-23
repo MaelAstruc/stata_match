@@ -15,8 +15,8 @@ shell powershell -Command "while ((Get-Counter).CounterSamples.CookedValue[1] -g
 
 **#********************************************************************** Locals
 
-local pkg_version    = "0.0.18"
-local distrib_date   = "06 Jul 2025"
+local pkg_version    = "0.0.19"
+local distrib_date   = "23 May 2026"
 local stata_version  = "`c(version)'"
 local date_fmt       = string(date("`distrib_date'", "DMY"), "%tdDD/NN/CCYY")
 local pwd            = ustrregexra("`c(pwd)'", "\\", "/") + "/"
@@ -107,4 +107,4 @@ do "dev/benchmark/bench_e2e.do"
 
 **#*************************************************************** Run profilers
 
-// do "dev/profiler/profile_end_to_end.do"
+do "dev/profiler/profile_end_to_end.do"

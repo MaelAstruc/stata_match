@@ -46,6 +46,7 @@ if (`add_log' == 1) {
 
 // TODO: run "dev/test/test_variables.do"
 run "dev/test/test_patterns.do"
+
 // TODO: run "dev/test/test_arm.do"
 // TODO: run "dev/test/test_parser.do"
 // TODO: run "dev/test/test_algorithm.do"
