@@ -1,5 +1,5 @@
 v 3
 
-d 'PMATCH': Pattern matching in Stata
+d 'PATMATCH': Pattern matching in Stata
 
-l Github https://github.com/MaelAstruc/stata_match
+l Github https://github.com/MaelAstruc/patmatch

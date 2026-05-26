@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/profile.log
   log type:  text
- opened on:  23 May 2026, 12:30:55
+ opened on:  26 May 2026, 19:59:47
 
 . 
 . // Profile 100 000 integers with 1000 levels
@@ -16,87 +16,87 @@
 
 . 
 . dis "`c(current_time)'"
-12:30:58
+19:59:50
 
 . 
 . mata: profiler_print(PROFILER, 10)
-PROFILER 2304ms
- └─ pmatch 2304ms
-    ├─ init_variables 13ms
+PROFILER 2343ms
+ └─ patmatch 2343ms
+    ├─ init_variables 12ms
     │  └─ Variable::init 11ms
     │     └─ Variable::init_levels 11ms
     │        └─ Variable::init_levels_int 11ms
-    ├─ parse_string 121ms
+    ├─ parse_string 120ms
     │  └─ parse_arms 120ms
-    ├─ check_match 1368ms
-    │  ├─ check_useful 1112ms
-    │  │  ├─ is_useful 908ms
-    │  │  │  ├─ difference_pwild 907ms
-    │  │  │  │  └─ difference_por 907ms
-    │  │  │  │     └─ difference_prange 907ms
-    │  │  │  │        └─ difference_prange_por 906ms
-    │  │  │  │           └─ difference_list 906ms
-    │  └─ check_exhaustiveness 178ms
-    │     └─ is_useful 177ms
-    └─ eval_arms 802ms
+    ├─ check_match 1407ms
+    │  ├─ check_useful 1165ms
+    │  │  ├─ is_useful 951ms
+    │  │  │  ├─ difference_pwild 951ms
+    │  │  │  │  └─ difference_por 950ms
+    │  │  │  │     └─ difference_prange 950ms
+    │  │  │  │        └─ difference_prange_por 950ms
+    │  │  │  │           └─ difference_list 950ms
+    │  └─ check_exhaustiveness 166ms
+    │     └─ is_useful 165ms
+    └─ eval_arms 803ms
 
 . 
 . dis "`c(current_time)'"
-12:31:00
+19:59:52
 
 . 
 . mata: profiler_summarize(PROFILER)
-pmatch                                   depth 1            1x      2304ms
-check_match                              depth 2            1x      1368ms
-is_useful                                depth 4          305x      1155ms
-check_useful                             depth 3            1x      1112ms
-difference_prange                        depth 7            1x       907ms
-difference_por                           depth 6            1x       907ms
-difference_pwild                         depth 5            1x       907ms
-difference_list                          depth 9            1x       906ms
-difference_prange_por                    depth 8            1x       906ms
-eval_arms                                depth 2            1x       802ms
-difference_pconstant                     depth 10        4951x       422ms
-check_exhaustiveness                     depth 3            1x       178ms
-overlap_por                              depth 5          305x       130ms
-parse_string                             depth 2            1x       121ms
+patmatch                                 depth 1            1x      2343ms
+check_match                              depth 2            1x      1407ms
+is_useful                                depth 4          305x      1202ms
+check_useful                             depth 3            1x      1165ms
+difference_pwild                         depth 5            1x       951ms
+difference_list                          depth 9            1x       950ms
+difference_prange_por                    depth 8            1x       950ms
+difference_prange                        depth 7            1x       950ms
+difference_por                           depth 6            1x       950ms
+eval_arms                                depth 2            1x       803ms
+difference_pconstant                     depth 10        4951x       459ms
+check_exhaustiveness                     depth 3            1x       166ms
+overlap_por                              depth 5          305x       134ms
 parse_arms                               depth 3            1x       120ms
+parse_string                             depth 2            1x       120ms
+parse_arm                                depth 4          304x        47ms
+difference_prange                        depth 10         100x        45ms
 overlap_pconstant                        depth 5          302x        41ms
-parse_arm                                depth 4          304x        39ms
-difference_prange                        depth 10         100x        38ms
-parse_or                                 depth 5          304x        28ms
-compress_por                             depth 6          503x        27ms
-difference_prange_prange                 depth 11         100x        21ms
-compress_por                             depth 4          304x        17ms
-parse_pattern                            depth 6          506x        15ms
-includes_por_pconstant                   depth 6          201x        15ms
-init_variables                           depth 2            1x        13ms
+compress_por                             depth 6          503x        40ms
+parse_or                                 depth 5          304x        34ms
+difference_prange_prange                 depth 11         100x        24ms
+parse_pattern                            depth 6          506x        20ms
+includes_por_pconstant                   depth 6          201x        20ms
+compress_por                             depth 4          304x        19ms
+init_variables                           depth 2            1x        12ms
+parse_number                             depth 7          505x        12ms
 Variable::init_levels_int                depth 5            1x        11ms
 Variable::init_levels                    depth 4            1x        11ms
 Variable::init                           depth 3            1x        11ms
 overlap_por                              depth 6          202x        11ms
 Variable::init_levels_int_base           depth 6            1x        10ms
-parse_number                             depth 7          505x         6ms
-overlap_por_por                          depth 6            2x         4ms
-compress_por                             depth 12         100x         3ms
-consume                                  depth 5          304x         2ms
-Variable::should_tab                     depth 6            1x         1ms
+compress_por                             depth 12         100x         7ms
+consume                                  depth 5          304x         5ms
+parse_range                              depth 8          101x         3ms
+overlap_por_por                          depth 6            2x         2ms
 new_pwild                                depth 4            1x         1ms
-difference_prange_prange                 depth 7            1x         1ms
+Variable::should_tab                     depth 6            1x         1ms
 difference_prange                        depth 6            1x         1ms
-overlap_por                              depth 7            2x         1ms
 difference_por                           depth 5            1x         1ms
+overlap_por                              depth 7            2x         1ms
+Variable::init_type                      depth 4            1x        -0ms
 new_pwild                                depth 7            1x        -0ms
 drop_empty_patterns                      depth 10           1x        -0ms
 compress_por                             depth 5            1x        -0ms
-Variable::init_type                      depth 4            1x        -0ms
 compress_por                             depth 7            2x        -0ms
+difference_prange_prange                 depth 7            1x        -0ms
 compress_por                             depth 8            3x        -0ms
-parse_range                              depth 8          101x        -0ms
 
 . 
 . dis "`c(current_time)'"
-12:31:00
+19:59:52
 
 . 
 . mata: profiler_graph(PROFILER, 10)
@@ -114,77 +114,77 @@ file dev/logs/profile.png saved as PNG format
 . bench_obs_float,   obs(10000000) levels(1000) rep(1) nobench
 
 . mata: profiler_print(PROFILER, 10)
-PROFILER 85868ms
- └─ pmatch 85868ms
-    ├─ init_variables 2730ms
-    │  └─ Variable::init 2730ms
-    │     └─ Variable::init_levels 2730ms
-    │        └─ Variable::init_levels_float 2730ms
-    │           └─ Variable::init_levels_hash 2729ms
-    ├─ parse_string 109ms
-    │  └─ parse_arms 109ms
-    ├─ check_match 2167ms
-    │  ├─ check_useful 603ms
-    │  │  ├─ is_useful 340ms
-    │  │  │  ├─ difference_pwild 338ms
-    │  │  │  │  └─ difference_por 338ms
-    │  └─ check_exhaustiveness 1489ms
-    │     └─ is_useful 1488ms
-    │        ├─ overlap_por 522ms
-    │        │  └─ overlap_por_por 522ms
+PROFILER 88068ms
+ └─ patmatch 88068ms
+    ├─ init_variables 2794ms
+    │  └─ Variable::init 2794ms
+    │     └─ Variable::init_levels 2794ms
+    │        └─ Variable::init_levels_float 2794ms
+    │           └─ Variable::init_levels_hash 2793ms
+    ├─ parse_string 105ms
+    │  └─ parse_arms 105ms
+    ├─ check_match 2202ms
+    │  ├─ check_useful 630ms
+    │  │  ├─ is_useful 356ms
+    │  │  │  ├─ difference_pwild 356ms
+    │  │  │  │  └─ difference_por 355ms
+    │  └─ check_exhaustiveness 1500ms
+    │     └─ is_useful 1498ms
+    │        ├─ overlap_por 532ms
+    │        │  └─ overlap_por_por 532ms
     │        ├─ overlap_por 56ms
     │        │  └─ overlap_por_por 56ms
     │        │     └─ overlap_por_por 54ms
-    │        └─ difference_por 536ms
-    └─ eval_arms 80862ms
+    │        └─ difference_por 534ms
+    └─ eval_arms 82966ms
 
 . mata: profiler_summarize(PROFILER)
-pmatch                                   depth 1            1x     85868ms
-eval_arms                                depth 2            1x     80862ms
-Variable::init_levels_float              depth 5            1x      2730ms
-Variable::init_levels                    depth 4            1x      2730ms
-Variable::init                           depth 3            1x      2730ms
-init_variables                           depth 2            1x      2730ms
-Variable::init_levels_hash               depth 6            1x      2729ms
-check_match                              depth 2            1x      2167ms
-is_useful                                depth 4          305x      1959ms
-check_exhaustiveness                     depth 3            1x      1489ms
-overlap_por                              depth 5          406x       982ms
-overlap_por_por                          depth 6          204x       866ms
-check_useful                             depth 3            1x       603ms
-difference_por                           depth 5            1x       536ms
-overlap_por                              depth 7         1300x       422ms
-difference_pconstant                     depth 6         1000x       397ms
-difference_por                           depth 6            1x       338ms
-difference_pwild                         depth 5            1x       338ms
-overlap_por_por                          depth 7          103x       256ms
-difference_pconstant                     depth 7         1000x       243ms
-includes_por_pconstant                   depth 8         2300x       235ms
-overlap_por                              depth 8          404x       156ms
-includes_por_pconstant                   depth 7         1000x       132ms
-parse_arms                               depth 3            1x       109ms
-parse_string                             depth 2            1x       109ms
-includes_por_pconstant                   depth 9          404x        56ms
+patmatch                                 depth 1            1x     88068ms
+eval_arms                                depth 2            1x     82966ms
+Variable::init_levels_float              depth 5            1x      2794ms
+Variable::init_levels                    depth 4            1x      2794ms
+Variable::init                           depth 3            1x      2794ms
+init_variables                           depth 2            1x      2794ms
+Variable::init_levels_hash               depth 6            1x      2793ms
+check_match                              depth 2            1x      2202ms
+is_useful                                depth 4          305x      1972ms
+check_exhaustiveness                     depth 3            1x      1500ms
+overlap_por                              depth 5          406x       994ms
+overlap_por_por                          depth 6          204x       871ms
+check_useful                             depth 3            1x       630ms
+difference_por                           depth 5            1x       534ms
+overlap_por                              depth 7         1300x       448ms
+difference_pconstant                     depth 6         1000x       389ms
+difference_pwild                         depth 5            1x       356ms
+difference_por                           depth 6            1x       355ms
+includes_por_pconstant                   depth 8         2300x       270ms
+difference_pconstant                     depth 7         1000x       257ms
+overlap_por_por                          depth 7          103x       252ms
+overlap_por                              depth 8          404x       162ms
+includes_por_pconstant                   depth 7         1000x       135ms
+parse_arms                               depth 3            1x       105ms
+parse_string                             depth 2            1x       105ms
+includes_por_pconstant                   depth 9          404x        69ms
+parse_arm                                depth 4          304x        30ms
 compress_por                             depth 4          304x        30ms
-parse_arm                                depth 4          304x        26ms
-overlap_pconstant                        depth 5          201x        25ms
-includes_por_pconstant                   depth 6          201x        19ms
+overlap_pconstant                        depth 5          201x        28ms
+parse_or                                 depth 5          304x        24ms
+includes_por_pconstant                   depth 6          201x        22ms
 compress_por                             depth 6          403x        18ms
-parse_or                                 depth 5          304x        17ms
-compress_por                             depth 8          103x        13ms
-parse_pattern                            depth 6          506x        10ms
-parse_number                             depth 7          505x         6ms
-compress_por                             depth 7          101x         4ms
-overlap_por                              depth 6          101x         4ms
-consume                                  depth 5          304x         3ms
+compress_por                             depth 8          103x        11ms
+parse_pattern                            depth 6          506x        11ms
+overlap_por                              depth 6          101x         5ms
+parse_number                             depth 7          505x         5ms
+consume                                  depth 5          304x         2ms
+check_wildcard_por                       depth 5          101x         1ms
 Variable::should_tab                     depth 6            1x         1ms
-new_pwild                                depth 7            1x         1ms
 new_pwild                                depth 4            1x         1ms
-compress_por                             depth 5            1x        -0ms
+new_pwild                                depth 7            1x         1ms
+htable_expand                            depth 7            5x         1ms
+compress_por                             depth 7          101x         0ms
 Variable::init_type                      depth 4            1x        -0ms
-htable_expand                            depth 7            5x        -0ms
+compress_por                             depth 5            1x        -0ms
 parse_range                              depth 8          101x        -1ms
-check_wildcard_por                       depth 5          101x        -1ms
 
 . mata: profiler_graph(PROFILER, 1)
 
@@ -198,82 +198,82 @@ check_wildcard_por                       depth 5          101x        -1ms
 . bench_obs_string,  obs(1000000)  levels(1000) rep(1) nobench
 
 . mata: profiler_print(PROFILER, 10)
-PROFILER 9584ms
- └─ pmatch 9584ms
-    ├─ init_variables 410ms
-    │  └─ Variable::init 410ms
-    │     └─ Variable::init_levels 410ms
-    │        └─ Variable::init_levels_string 410ms
-    │           ├─ Variable::init_levels_hash 410ms
-    ├─ parse_string 47ms
-    │  └─ parse_arms 46ms
-    ├─ check_match 858ms
-    │  ├─ check_useful 782ms
-    │  │  ├─ is_useful 708ms
-    │  │  │  ├─ difference_pwild 707ms
-    │  │  │  │  └─ difference_por 707ms
-    │  │  │  │     └─ difference_prange 707ms
-    │  │  │  │        └─ difference_prange_por 707ms
-    │  │  │  │           └─ difference_list 707ms
-    │  └─ check_exhaustiveness 45ms
+PROFILER 9753ms
+ └─ patmatch 9753ms
+    ├─ init_variables 416ms
+    │  └─ Variable::init 416ms
+    │     └─ Variable::init_levels 416ms
+    │        └─ Variable::init_levels_string 416ms
+    │           ├─ Variable::init_levels_hash 416ms
+    ├─ parse_string 52ms
+    │  └─ parse_arms 51ms
+    ├─ check_match 860ms
+    │  ├─ check_useful 785ms
+    │  │  ├─ is_useful 711ms
+    │  │  │  ├─ difference_pwild 711ms
+    │  │  │  │  └─ difference_por 711ms
+    │  │  │  │     └─ difference_prange 711ms
+    │  │  │  │        └─ difference_prange_por 711ms
+    │  │  │  │           └─ difference_list 711ms
+    │  └─ check_exhaustiveness 46ms
     │     └─ is_useful 45ms
-    └─ eval_arms 8269ms
+    └─ eval_arms 8425ms
 
 . mata: profiler_summarize(PROFILER)
-pmatch                                   depth 1            1x      9584ms
-eval_arms                                depth 2            1x      8269ms
-check_match                              depth 2            1x       858ms
-check_useful                             depth 3            1x       782ms
-is_useful                                depth 4          202x       771ms
-difference_list                          depth 9            1x       707ms
-difference_prange_por                    depth 8            1x       707ms
-difference_prange                        depth 7            1x       707ms
-difference_por                           depth 6            1x       707ms
-difference_pwild                         depth 5            1x       707ms
-difference_prange                        depth 10        5698x       420ms
-Variable::init_levels_hash               depth 6            1x       410ms
-Variable::init_levels_string             depth 5            1x       410ms
-Variable::init_levels                    depth 4            1x       410ms
-Variable::init                           depth 3            1x       410ms
-init_variables                           depth 2            1x       410ms
-difference_prange_prange                 depth 11        4132x       112ms
-parse_string                             depth 2            1x        47ms
-parse_arms                               depth 3            1x        46ms
-check_exhaustiveness                     depth 3            1x        45ms
-difference_pconstant                     depth 10        2304x        40ms
-difference_prange_pconstant              depth 11        1566x        34ms
+patmatch                                 depth 1            1x      9753ms
+eval_arms                                depth 2            1x      8425ms
+check_match                              depth 2            1x       860ms
+check_useful                             depth 3            1x       785ms
+is_useful                                depth 4          202x       777ms
+difference_list                          depth 9            1x       711ms
+difference_prange_por                    depth 8            1x       711ms
+difference_prange                        depth 7            1x       711ms
+difference_por                           depth 6            1x       711ms
+difference_pwild                         depth 5            1x       711ms
+difference_prange                        depth 10        5698x       417ms
+Variable::init_levels_hash               depth 6            1x       416ms
+Variable::init_levels_string             depth 5            1x       416ms
+Variable::init_levels                    depth 4            1x       416ms
+Variable::init                           depth 3            1x       416ms
+init_variables                           depth 2            1x       416ms
+difference_prange_prange                 depth 11        4132x       107ms
+parse_string                             depth 2            1x        52ms
+parse_arms                               depth 3            1x        51ms
+check_exhaustiveness                     depth 3            1x        46ms
+difference_pconstant                     depth 10        2304x        46ms
+difference_prange_pconstant              depth 11        1566x        31ms
 overlap_por                              depth 5          211x        31ms
-parse_arm                                depth 4          201x        11ms
-compress_por                             depth 4          201x        10ms
-overlap_pconstant                        depth 5          190x         9ms
-parse_or                                 depth 5          201x         7ms
-overlap_por_por                          depth 6           20x         5ms
-parse_pattern                            depth 6          401x         5ms
-Variable::get_level_index                depth 7          400x         4ms
-includes_por_pconstant                   depth 6          199x         4ms
-overlap_por                              depth 7           35x         4ms
-compress_por                             depth 12         127x         3ms
-compress_por                             depth 6          291x         3ms
+parse_arm                                depth 4          201x        18ms
+overlap_pconstant                        depth 5          190x        14ms
+parse_or                                 depth 5          201x        11ms
+compress_por                             depth 4          201x         7ms
+overlap_por_por                          depth 6           20x         6ms
+parse_pattern                            depth 6          401x         6ms
+includes_por_pconstant                   depth 6          199x         5ms
+overlap_por                              depth 6           91x         3ms
 binary_search                            depth 8          400x         3ms
-htable_expand                            depth 7            5x         2ms
-overlap_por                              depth 6           91x         1ms
-difference_prange                        depth 6            1x         1ms
-difference_por                           depth 5            1x         1ms
-new_pwild                                depth 4            1x        -0ms
-Variable::quote_levels                   depth 6            1x        -0ms
-Variable::init_type                      depth 4            1x        -0ms
+compress_por                             depth 6          291x         2ms
+compress_por                             depth 7           19x         2ms
+consume                                  depth 5          201x         2ms
+overlap_por                              depth 7           35x         2ms
+compress_por                             depth 12         127x         1ms
+Variable::get_level_index                depth 7          400x         1ms
+htable_expand                            depth 7            5x         1ms
 includes_por_pconstant                   depth 9            1x        -0ms
 compress_por                             depth 5            1x        -0ms
+Variable::quote_levels                   depth 6            1x        -0ms
+new_pwild                                depth 4            1x        -0ms
+Variable::init_type                      depth 4            1x        -0ms
 new_pwild                                depth 7            1x        -0ms
 drop_empty_patterns                      depth 10           1x        -0ms
 difference_prange_prange                 depth 7            1x        -0ms
+difference_prange                        depth 6            1x        -0ms
 overlap_por                              depth 8            2x        -0ms
+difference_por                           depth 5            1x        -0ms
 overlap_por_por                          depth 7            1x        -0ms
 check_wildcard_por                       depth 5            9x        -0ms
 compress_por                             depth 8           13x        -0ms
-compress_por                             depth 7           19x        -0ms
 includes_por_pconstant                   depth 8           24x        -0ms
-consume                                  depth 5          201x        -0ms
 
 . mata: profiler_graph(PROFILER, 1)
 
@@ -287,5 +287,5 @@ file dev/logs/profile.png saved as PNG format
       name:  <unnamed>
        log:  C:\Users\malsouder\Documents\Projects\stata_match\dev/logs/profile.log
   log type:  text
- closed on:  23 May 2026, 12:34:38
+ closed on:  26 May 2026, 20:03:37
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

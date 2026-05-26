@@ -12,9 +12,9 @@ replace var_1 = "high"      if rep78 == 4
 replace var_1 = "very high" if rep78 == 5
 replace var_1 = "missing"   if rep78 == .
 
-* With the pmatch command
+* With the patmatch command
 
-pmatch var_2, variables(rep78) body( ///
+patmatch var_2, variables(rep78) body( ///
     1 = "very low",                 ///
     2 = "low",                      ///
     3 = "mid",                      ///
@@ -37,9 +37,9 @@ replace var_1 = "normal"    if price >= 6000 & price <  9000
 replace var_1 = "expensive" if price >= 9000 & price <= 16000
 replace var_1 = "missing"   if price == .
 
-* With the pmatch command
+* With the patmatch command
 
-pmatch var_2, variables(price) body( ///
+patmatch var_2, variables(price) body( ///
     min/!6000   = "cheap",          ///
     6000/!9000  = "normal",         ///
     9000/max    = "expensive",      ///
@@ -60,9 +60,9 @@ replace var_1 = "mid"     if rep78 == 3
 replace var_1 = "high"    if rep78 == 4 | rep78 == 5
 replace var_1 = "missing" if rep78 == .
 
-* With the pmatch command
+* With the patmatch command
 
-pmatch var_2, variables(rep78) body( ///
+patmatch var_2, variables(rep78) body( ///
     1 | 2  = "low",                 ///
     3      = "mid",                 ///
     4 | 5  = "high",                ///
@@ -81,9 +81,9 @@ gen var_1 = "other"
 replace var_1 = "very low" if rep78 == 1
 replace var_1 = "low"      if rep78 == 2
 
-* With the pmatch command
+* With the patmatch command
 
-pmatch var_2, variables(rep78) body( ///
+patmatch var_2, variables(rep78) body( ///
     1 = "very low",                 ///
     2 = "low",                      ///
     _ = "other",                    ///
@@ -103,9 +103,9 @@ replace var_1 = "case 2"  if rep78 < 3 & price >= 10000
 replace var_1 = "case 3"  if rep78 >= 3
 replace var_1 = "missing" if rep78 == . | price == .
 
-* With the pmatch command
+* With the patmatch command
 
-pmatch var_2, variables(rep78 price) body( ///
+patmatch var_2, variables(rep78 price) body( ///
     (min/!3, min/!10000) = "case 1",      ///
     (min/!3, 10000/max)  = "case 2",      ///
     (3/max,  _)          = "case 3",      ///
@@ -127,9 +127,9 @@ replace var_1 = "mid"       if rep78 == 3
 replace var_1 = "high"      if rep78 == 4
 replace var_1 = "very high" if rep78 == 5
 
-* With the pmatch command
+* With the patmatch command
 
-pmatch var_2, variables(rep78) body( ///
+patmatch var_2, variables(rep78) body( ///
     1 = "very low",                 ///
     2 = "low",                      ///
     3 = "mid",                      ///
@@ -154,9 +154,9 @@ replace var_1 = "normal"    if price >= 6000 & price <= 9000
 replace var_1 = "expensive" if price >= 9000 & price <= 16000
 replace var_1 = "missing"   if price == .
 
-* With the pmatch command
+* With the patmatch command
 
-pmatch var_2, variables(price) body( ///
+patmatch var_2, variables(price) body( ///
     min/6000  = "cheap",            ///
     6000/9000 = "normal",           ///
     9000/max  = "expensive",        ///
@@ -182,9 +182,9 @@ replace var_1 = "normal"    if price >= 6000 & price <= 9000
 replace var_1 = "expensive" if price >= 9000 & price <= 16000
 replace var_1 = "missing"   if price == .
 
-* With the pmatch command
+* With the patmatch command
 
-pmatch var_2, variables(price) body( ///
+patmatch var_2, variables(price) body( ///
     min/!6000  = "cheap",            ///
     6000/!9000 = "normal",           ///
     9000/max  = "expensive",        ///
@@ -210,7 +210,7 @@ gen int color = runiform(1, 4)
 label define color_label 1 "Red" 2 "Green" 3 "Blue"
 label values color color_label 
 
-pmatch color_hex, variables(color) body ( ///
+patmatch color_hex, variables(color) body ( ///
     1     = "#FF0000" , ///
     2     = "#00FF00" , ///
    "Blue" = "#0000FF" , ///

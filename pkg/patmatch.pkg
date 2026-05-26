@@ -1,0 +1,9 @@
+v 3
+
+d {bf:PATMATCH}: Pattern matching in Stata.
+d
+d Distribution-Date: 26/05/2026
+
+f patmatch.ado
+f patmatch.sthlp
+f patmatch.pdf

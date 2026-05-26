@@ -16,9 +16,9 @@ as I add new features.
 
 * Charge the package internals that are not installed
 
-capture program drop pmatch check_dtype check_replace
+capture program drop patmatch check_dtype check_replace
 mata: mata clear
-run "pkg/pmatch.ado"
+run "pkg/patmatch.ado"
 
 local add_log = ("`0'" == "add_log")
 

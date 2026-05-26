@@ -5,7 +5,7 @@ Benchmark the match function and compare to performance of base commands
 clear all
 
 run "dev/main_utils.do"
-run "dev/benchmark/pmatch_bench.ado"
+run "dev/benchmark/patmatch_bench.ado"
 
 capture log close
 log using "dev/logs/bench_e2e.log", replace

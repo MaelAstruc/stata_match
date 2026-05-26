@@ -1,0 +1,41 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: 'patmatch: Pattern Matching for Stata'
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Mael
+    family-names: Astruc--Le Souder
+    orcid: 'https://orcid.org/0000-0002-4229-7397'
+    affiliation: Bordeaux School of Economics
+repository-code: 'https://github.com/MaelAstruc/patmatch'
+abstract: >-
+  This package introduces the patmatch command, which
+  provides an alternative syntax to series of 'replace ...
+  if ...' statements. It limits repetitions and might feel
+  familiar for users coming from other programming languages
+  with pattern matching.
+
+
+  Beyond the new syntax, the patmatch command provides
+  run-time checks for the exhaustiveness and the usefulness
+  of the conditions provided. The exhaustiveness check means
+  that the command will tell you if some levels are not
+  covered and which ones are missing. The usefulness check
+  means that the command will tell you if the conditions you
+  specified in each arm are useful, or if some of them
+  overlap with previous ones.
+
+
+  The command is inspired by the Rust Programming Language
+  pattern syntax and algorithm.
+
+
+  For more information on the syntax and for examples, check
+  the documentation pdf.
+version: 1.0.0
+date-released: '2026-05-26'

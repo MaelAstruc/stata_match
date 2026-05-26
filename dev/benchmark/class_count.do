@@ -4,11 +4,11 @@ clear all
 
 local obs = 100
 
-capture program drop pmatch check_dtype check_replace
+capture program drop patmatch check_dtype check_replace
 mata: mata clear
 
 run "dev/main_utils.do"
-run "pkg/pmatch.ado"
+run "pkg/patmatch.ado"
 
 mata
 
@@ -282,7 +282,7 @@ replace y_base = "a" if x == 1
 replace y_base = "b" if x == 2 | x == 3 | x == 4
 replace y_base = "c" if x >= 5 & x <= 9
 
-pmatch y, v(x) b(    ///
+patmatch y, v(x) b(    ///
     1         = "a",  ///
     2 | 3 | 4 = "b",  ///
     5/9       = "c",  ///

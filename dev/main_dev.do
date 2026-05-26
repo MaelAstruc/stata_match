@@ -15,8 +15,8 @@ shell powershell -Command "while ((Get-Counter).CounterSamples.CookedValue[1] -g
 
 **#********************************************************************** Locals
 
-local pkg_version    = "0.0.19"
-local distrib_date   = "23 May 2026"
+local pkg_version    = "1.0.0"
+local distrib_date   = "26 May 2026"
 local stata_version  = "`c(version)'"
 local date_fmt       = string(date("`distrib_date'", "DMY"), "%tdDD/NN/CCYY")
 local pwd            = ustrregexra("`c(pwd)'", "\\", "/") + "/"
@@ -35,8 +35,8 @@ mata
         "src/usefulness.mata",
         "src/match_report.mata",
         "src/algorithm.mata",
-        "src/pmatch.mata",
-        "src/pmatch.ado"
+        "src/patmatch.mata",
+        "src/patmatch.ado"
     )
 end
 
@@ -65,10 +65,10 @@ mata: rm_tabs_dir("dev/test")
 
 // Build main files
 
-mata: combine_files(files, "pkg/pmatch.ado", st_local("pkg_version"), st_local("distrib_date"), "")
-mata: combine_files(files, "dev/benchmark/pmatch_bench.ado", st_local("pkg_version"), st_local("distrib_date"), "bench")
-mata: combine_files(files, "dev/profiler/pmatch_profiler.ado", st_local("pkg_version"), st_local("distrib_date"), "profiler")
-mata: write_pkg("pkg/pmatch.pkg", st_local("distrib_date"))
+mata: combine_files(files, "pkg/patmatch.ado", st_local("pkg_version"), st_local("distrib_date"), "")
+mata: combine_files(files, "dev/benchmark/patmatch_bench.ado", st_local("pkg_version"), st_local("distrib_date"), "bench")
+mata: combine_files(files, "dev/profiler/patmatch_profiler.ado", st_local("pkg_version"), st_local("distrib_date"), "profiler")
+mata: write_pkg("pkg/patmatch.pkg", st_local("distrib_date"))
 mata: write_sthlp_dir("docs", "pkg", st_local("pkg_version"), st_local("distrib_date"))
 
 // Translate all .sthlp help files to pdf
@@ -77,8 +77,8 @@ sthlp2pdf_dir "pkg"
 
 **#*********************************************************** Reinstall command
 
-capture net uninstall pmatch
-net install pmatch, replace from("`c(pwd)'/pkg")
+capture net uninstall patmatch
+net install patmatch, replace from("`c(pwd)'/pkg")
 
 **#******************************************************************* Run tests
 

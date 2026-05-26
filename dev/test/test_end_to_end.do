@@ -13,7 +13,7 @@ replace y1 = "a" if x1 == 1
 replace y1 = "b" if x1 == 2 | x1 == 3
 replace y1 = "c" if x1 >= 4 & x1 <= 5
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     1      = "a",  ///
     2 | 3  = "b",  ///
     4/5    = "c",  ///
@@ -36,7 +36,7 @@ replace y1 = "a" if x1 == 2
 replace y1 = "b" if x1 == 4 | x1 == 6
 replace y1 = "c" if x1 >= 8 & x1 <= 12
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     2      = "a",  ///
     4 | 6  = "b",  ///
     8/12   = "c",  ///
@@ -60,7 +60,7 @@ replace y1 = "a" if x1 == 1
 replace y1 = "b" if x1 == 2 | x1 == 3
 replace y1 = "c" if x1 >= 4 & x1 <= 5
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     1      = "a",  ///
     2 | 3  = "b",  ///
     4/5    = "c",  ///
@@ -143,7 +143,7 @@ replace y1 = "1d" if x1 == 1.0x-1d
 replace y1 = "1e" if x1 == 1.0x-1e
 replace y1 = "1f" if x1 == 1.0x-1f
 
-pmatch y2, v(x1) b(   ///
+patmatch y2, v(x1) b(   ///
     1.0x-0  = "0" , ///
     1.0x-1  = "1" , ///
     1.0x-2  = "2" , ///
@@ -265,7 +265,7 @@ assert y1 == "b" in 41
 assert y1 == "c" in 42/43
 assert y1 == "d" in 44
 
-pmatch y2, v(x1) b(   ///
+patmatch y2, v(x1) b(   ///
     1.0x-0                                     = "1", ///
     1.0x-9/1.0x-1                              = "2", ///
     1.0x-f/!1.0x-9                             = "3", ///
@@ -298,7 +298,7 @@ gen y1 = "c"
 replace y1 = "a" if x1 == "1"
 replace y1 = "b" if x1 == "2" | x1 == "3"
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     "1"        = "a",  ///
     "2" | "3"  = "b",  ///
     _          = "c"   ///
@@ -318,7 +318,7 @@ gen y1 = "c"
 replace y1 = "a" if x1 == "1"
 replace y1 = "b" if x1 == "2" | x1 == "3"
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     "1"        = "a",  ///
     "2" | "3"  = "b",  ///
     _          = "c"   ///
@@ -342,7 +342,7 @@ replace y1 = "c" if x1 >= 2 & x1 <= 3 & x2 == "1"
 replace y1 = "d" if x1 >= 2 & x1 <  3 & x2 == "2"
 replace y1 = "e" if x1 >  2 & x1 <= 3 & x2 == "2"
 
-pmatch y2, v(x1 x2) b( ///
+patmatch y2, v(x1 x2) b( ///
     (1,     "1")       = "a",  ///
     (1,     "2" | "3") = "b",  ///
     (2/3,   "1")       = "c",  ///
@@ -367,7 +367,7 @@ replace y1 = "a" if x1 == 1            & x2 == "1"
 replace y1 = "b" if (x1 == 1           & (x2 == "2" | x2 == "3")) | (x1 >= 2 & x1 <  3 & x2 == "2")
 replace y1 = "c" if (x1 >= 2 & x1 <= 3 & x2 == "1")               | (x1 >  2 & x1 <= 3  & x2 == "2")
 
-pmatch y2, v(x1 x2) b( ///
+patmatch y2, v(x1 x2) b( ///
     (1,     "1")                      = "a",  ///
     (1,     "2" | "3") | (2/!3,  "2") = "b",  ///
     (2/3,   "1")       | (2!/3,  "2") = "c",  ///
@@ -388,7 +388,7 @@ gen y1 = "c"
 replace y1 = "a" if x1 == 1
 replace y1 = "b" if x1 == 2 | x1 == 3
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     min    = "a",  ///
     2 | 3  = "b",  ///
     _      = "c"   ///
@@ -409,7 +409,7 @@ replace y1 = "a" if x1 == 1
 replace y1 = "b" if x1 == 2 | x1 == 3
 replace y1 = "c" if x1 == 4
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     1      = "a",  ///
     2 | 3  = "b",  ///
     max    = "c"   ///
@@ -429,7 +429,7 @@ gen y1 = "c"
 replace y1 = "a" if x1 == 1 | x1 == 2
 replace y1 = "b" if x1 == 3
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     min/2  = "a",  ///
     3      = "b",  ///
     _      = "c"   ///
@@ -449,7 +449,7 @@ gen y1 = ""
 replace y1 = "a" if x1 == 1 | x1 == 2
 replace y1 = "b" if x1 >= 3 & x1 <= 4
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     1 | 2   = "a",  ///
     3/max   = "b"   ///
 )
@@ -468,7 +468,7 @@ gen y1 = ""
 replace y1 = "a" if x1 == 1 | x1 == 2
 replace y1 = "b" if x1 == 3
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     1 | 2   = "a",  ///
     3   = "b"   ///
 )
@@ -487,8 +487,8 @@ gen y1 = ""
 replace y1 = "a" if x1 == 1 | x1 == 2
 replace y1 = "b" if x1 > 2
 
-// pmatch y2, v(x1) b( 1 | 2 = "a", 2/max = "b")
-pmatch y2, v(x1) b( ///
+// patmatch y2, v(x1) b( 1 | 2 = "a", 2/max = "b")
+patmatch y2, v(x1) b( ///
     1 | 2   = "a",  ///
     2/max   = "b"   ///
 )
@@ -506,7 +506,7 @@ gen int x1 = floor(runiform(1, 5))
 
 gen y1 = "a"
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     _   = "a",  ///
     1   = "b"   ///
 )
@@ -526,7 +526,7 @@ replace y1 = "a" if x1 == 1
 replace y1 = "b" if x1 == 2 | x1 == 3
 replace y1 = "c" if x1 >= 4 & x1 <= 5
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     1      = "a",  ///
     2 | 3  = "b",  ///
     4/5    = "c",  ///
@@ -548,7 +548,7 @@ replace y1 = "a" if x1 == 1
 replace y1 = "b" if x1 == 2 | x1 == 3
 replace y1 = "c" if x1 >= 5 & x1 <= 6
 
-pmatch y2, nocheck v(x1) b( ///
+patmatch y2, nocheck v(x1) b( ///
     min    = "a",  ///
     2 | 3  = "b",  ///
     5/max  = "c",  ///
@@ -570,7 +570,7 @@ replace y1 = "a" if x1 == 1
 replace y1 = "b" if x1 == 2 | x1 == 3
 replace y1 = "c" if x1 >= 5 & x1 <= 6
 
-pmatch y2, nocheck v(x1) b( ///
+patmatch y2, nocheck v(x1) b( ///
     min    = "a",  ///
     2 | 3  = "b",  ///
     5/max  = "c",  ///
@@ -592,7 +592,7 @@ replace y1 = "a" if x1 == "1"
 replace y1 = "b" if x1 == "2" | x1 == "3"
 replace y1 = "c" if x1 == "5" | x1 == "6"
 
-pmatch y2, nocheck v(x1) b( ///
+patmatch y2, nocheck v(x1) b( ///
     "1"        = "a",  ///
     "2" | "3"  = "b",  ///
     "5" | "5" | "6"  = "c",  ///
@@ -621,7 +621,7 @@ replace y1 = "a" if x2 == 1
 replace y1 = "b" if x2 == 2 | x2 == 3
 replace y1 = "c" if x2 == 4
 
-pmatch y2, v(x2) b( ///
+patmatch y2, v(x2) b( ///
     1        = "a",  ///
     "W" | 3  = "b",  ///
     "Y"      = "c",  ///
@@ -643,7 +643,7 @@ replace y1 = "a" if x1 == 1
 replace y1 = "b" if x1 == 2 | x1 == 3
 replace y1 = "c" if x1 == 4 | x1 == 5
 
-pmatch y2, v(x1) b( ///
+patmatch y2, v(x1) b( ///
     1      = "a",  ///
     2 | 3  = "b",  ///
     4 |5   = "c",  ///
@@ -665,7 +665,7 @@ replace y1 = 1 if x1 == 1
 replace y1 = 2 if x1 == 2 | x1 == 3
 replace y1 = 3 if x1 >= 4 & x1 <= 5
 
-pmatch byte y2, v(x1) b( ///
+patmatch byte y2, v(x1) b( ///
     1      = 1,          ///
     2 | 3  = 2,          ///
     4/5    = 3,          ///
@@ -687,7 +687,7 @@ replace y1 = 1 if x1 == 1
 replace y1 = 2 if x1 == 2 | x1 == 3
 replace y1 = 3 if x1 >= 4 & x1 <= 5
 
-pmatch int y2, v(x1) b( ///
+patmatch int y2, v(x1) b( ///
     1      = 1,         ///
     2 | 3  = 2,         ///
     4/5    = 3,         ///
@@ -709,7 +709,7 @@ replace y1 = 1 if x1 == 1
 replace y1 = 2 if x1 == 2 | x1 == 3
 replace y1 = 3 if x1 >= 4 & x1 <= 5
 
-pmatch long y2, v(x1) b( ///
+patmatch long y2, v(x1) b( ///
     1      = 1,         ///
     2 | 3  = 2,         ///
     4/5    = 3,         ///
@@ -731,7 +731,7 @@ replace y1 = 1 if x1 == 1
 replace y1 = 2 if x1 == 2 | x1 == 3
 replace y1 = 3 if x1 >= 4 & x1 <= 5
 
-pmatch float y2, v(x1) b( ///
+patmatch float y2, v(x1) b( ///
     1      = 1,           ///
     2 | 3  = 2,           ///
     4/5    = 3,           ///
@@ -753,7 +753,7 @@ replace y1 = 1 if x1 == 1
 replace y1 = 2 if x1 == 2 | x1 == 3
 replace y1 = 3 if x1 >= 4 & x1 <= 5
 
-pmatch double y2, v(x1) b( ///
+patmatch double y2, v(x1) b( ///
     1      = 1,            ///
     2 | 3  = 2,            ///
     4/5    = 3,            ///
@@ -775,7 +775,7 @@ replace y1 = "1" if x1 == 1
 replace y1 = "2" if x1 == 2 | x1 == 3
 replace y1 = "3" if x1 >= 4 & x1 <= 5
 
-pmatch str1 y2, v(x1) b( ///
+patmatch str1 y2, v(x1) b( ///
     1      = "1",        ///
     2 | 3  = "2",        ///
     4/5    = "3",        ///
@@ -797,7 +797,7 @@ replace y1 = "1" if x1 == 1
 replace y1 = "2" if x1 == 2 | x1 == 3
 replace y1 = "3" if x1 >= 4 & x1 <= 5
 
-pmatch strL y2, v(x1) b( ///
+patmatch strL y2, v(x1) b( ///
     1      = "1",        ///
     2 | 3  = "2",        ///
     4/5    = "3",        ///
@@ -819,7 +819,7 @@ replace y1 = "1" if x1 == 1
 replace y1 = "2" if x1 == 2 | x1 == 3
 replace y1 = "3" if x1 >= 4 & x1 <= 5
 
-pmatch strL y2, v(x1) b( ///
+patmatch strL y2, v(x1) b( ///
     1      = "1",        ///
     2 | 3  = "2",        ///
     4/5    = "3",        ///
@@ -841,7 +841,7 @@ replace y1 = "1" if x1 == 1
 replace y1 = "2" if x1 == 2 | x1 == 3
 replace y1 = "3" if x1 >= 4 & x1 <= 5
 
-pmatch strL y2, v(x1) b( ///
+patmatch strL y2, v(x1) b( ///
     1      = "1",        ///
     2 | 3  = "2",        ///
     4/5    = "3",        ///
@@ -863,7 +863,7 @@ replace y1 = "1" if x1 == 1
 replace y1 = "2" if x1 == 2 | x1 == 3
 replace y1 = "3" if x1 >= 4 & x1 <= 5
 
-pmatch strL y2, v(x1) b( ///
+patmatch strL y2, v(x1) b( ///
     1      = "1",        ///
     2 | 3  = "2",        ///
     4/5    = "3",        ///
@@ -885,7 +885,7 @@ replace y1 = "1" if x1 == 1
 replace y1 = "2" if x1 == 2 | x1 == 3
 replace y1 = "3" if x1 >= 4 & x1 <= 5
 
-pmatch strL y2, v(x1) b( ///
+patmatch strL y2, v(x1) b( ///
     1      = "1",        ///
     2 | 3  = "2",        ///
     4/5    = "3",        ///
@@ -907,7 +907,7 @@ replace y1 = "1" if x1 == 1
 replace y1 = "2" if x1 == 2 | x1 == 3
 replace y1 = "3" if x1 >= 4 & x1 <= 5
 
-pmatch strL y2, v(x1) b( ///
+patmatch strL y2, v(x1) b( ///
     1      = "1",        ///
     2 | 3  = "2",        ///
     4/5    = "3",        ///
@@ -929,7 +929,7 @@ replace y1 = "1" if x1 == 1
 replace y1 = "2" if x1 == 2 | x1 == 3
 replace y1 = "3" if x1 >= 4 & x1 <= 5
 
-pmatch strL y2, v(x1) b( ///
+patmatch strL y2, v(x1) b( ///
     1      = "1",        ///
     2 | 3  = "2",        ///
     4/5    = "3",        ///
@@ -951,7 +951,7 @@ replace y1 = "1" if x1 == 1
 replace y1 = "2" if x1 == 2 | x1 == 3
 replace y1 = "3" if x1 >= 4 & x1 <= 5
 
-pmatch strL y2, v(x1) b( ///
+patmatch strL y2, v(x1) b( ///
     1      = "1",        ///
     2 | 3  = "2",        ///
     4/5    = "3",        ///
@@ -973,7 +973,7 @@ replace y1 = "1" if x1 == "1"
 replace y1 = "2" if x1 == "2"
 replace y1 = "3" if x1 == "3"
 
-pmatch strL y2, v(x1) b( ///
+patmatch strL y2, v(x1) b( ///
     "1"    = "1",        ///
     "2"    = "2",        ///
     "3"    = "3",        ///
@@ -995,7 +995,7 @@ replace y1 = "1" if x1 == "1"
 replace y1 = "2" if x1 == "2"
 replace y1 = "3" if x1 == "3"
 
-pmatch strL y2, v(x1) b( ///
+patmatch strL y2, v(x1) b( ///
     "1"    = "1",        ///
     "2"    = "2",        ///
     "3"    = "3",        ///

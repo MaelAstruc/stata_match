@@ -1,15 +1,15 @@
 {marker syntax}{title:Title}
 
 {p2colset 5 16 18 2}{...}
-{p2col:{bf:pmatch} {hline 2}}Pattern matching{p_end}
+{p2col:{bf:patmatch} {hline 2}}Pattern matching{p_end}
 {p2colreset}{...}
 
 {marker syntax}{title:Syntax}
 
 {p 4 8}
-{cmd:pmatch} [{help data_types:{it:type}}] {varname}, {cmd:Variables}({varlist}) {cmd:Body(}{break}
-{cmd:[}{help pmatch##pattern:{it:pattern}} = {help exp},{cmd:]}{break}
-{cmd:[}{help pmatch##pattern:{it:pattern}} = {help exp},{cmd:]}{break}
+{cmd:patmatch} [{help data_types:{it:type}}] {varname}, {cmd:Variables}({varlist}) {cmd:Body(}{break}
+{cmd:[}{help patmatch##pattern:{it:pattern}} = {help exp},{cmd:]}{break}
+{cmd:[}{help patmatch##pattern:{it:pattern}} = {help exp},{cmd:]}{break}
 ...{p_end}
 {p 4}{cmd:)} [{it:replace} {it:nocheck}]{p_end}
         
@@ -20,7 +20,7 @@
 {cmd:Variables}({varlist}) contains the list of variables (B) you want to match on.
 
 {pstd}
-{cmd:Body}(...) contains the list of replacements you would like to do. It's composed of multiple arms. Each arm includes a {help pmatch##pattern:{it:pattern}} on the left hand side indicating the conditions of the replacement based on the values of the variables (B). It also contains an {help expression} on the right hand side to replace the values of your variable (A). They are separated by an equal sign {bf:=}.
+{cmd:Body}(...) contains the list of replacements you would like to do. It's composed of multiple arms. Each arm includes a {help patmatch##pattern:{it:pattern}} on the left hand side indicating the conditions of the replacement based on the values of the variables (B). It also contains an {help expression} on the right hand side to replace the values of your variable (A). They are separated by an equal sign {bf:=}.
 
 {synoptset 30 tabbed}{...}
 {synopthdr}
@@ -34,17 +34,17 @@
 {marker description}{title:Description}
 
 {pstd}
-The {cmd:pmatch} command provides an alternative syntax to series of '{bind:{cmd:replace ... if ...}}' statements. It limits repetitions and might feel familiar for users coming from other programming languages with pattern matching.
+The {cmd:patmatch} command provides an alternative syntax to series of '{bind:{cmd:replace ... if ...}}' statements. It limits repetitions and might feel familiar for users coming from other programming languages with pattern matching.
 
 {pstd}
-Beyond the new syntax, the {cmd:pmatch} command provides run-time checks for the exhaustiveness and the usefulness of the conditions provided. The exhaustiveness check means that the command will tell you if some levels are not covered and which ones are missing. The usefulness check means that the command will tell you if the conditions you specified in each arm are useful, or if some of them overlap with a previous ones.
+Beyond the new syntax, the {cmd:patmatch} command provides run-time checks for the exhaustiveness and the usefulness of the conditions provided. The exhaustiveness check means that the command will tell you if some levels are not covered and which ones are missing. The usefulness check means that the command will tell you if the conditions you specified in each arm are useful, or if some of them overlap with a previous ones.
 
 {pstd}
 The command is inspired by the {browse "https://www.rust-lang.org/":Rust} Programming Language {browse "https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html":pattern syntax} and {browse "https://doi.org/10.1017/S0956796807006223":algorithm}.
 
 
 {pstd}
-The different {help pmatch##examples:examples} illustrate how to use the different patterns detailed in the next section and what kind of information the checks provide.
+The different {help patmatch##examples:examples} illustrate how to use the different patterns detailed in the next section and what kind of information the checks provide.
 
 {marker syntax}{title:Patterns}
 
@@ -67,20 +67,20 @@ The different {help pmatch##examples:examples} illustrate how to use the differe
 
 {marker examples}{title:Examples}
 
-{phang}{help pmatch##constant_example:Example 1: Constant patterns}{p_end}
-{phang}{help pmatch##range_example:Example 2: Range patterns}{p_end}
-{phang}{help pmatch##or_example:Example 3: Or patterns}{p_end}
-{phang}{help pmatch##wildcard_example:Example 4: Wildcard patterns}{p_end}
-{phang}{help pmatch##tuple_example:Example 5: Tuple patterns}{p_end}
-{phang}{help pmatch##exhaustiveness_example:Example 6: Exhaustiveness}{p_end}
-{phang}{help pmatch##overlaps_example:Example 7: Overlaps}{p_end}
-{phang}{help pmatch##usefulness_example:Example 8: Usefulness}{p_end}
-{phang}{help pmatch##labelvalues_example:Example 9: Label values}{p_end}
+{phang}{help patmatch##constant_example:Example 1: Constant patterns}{p_end}
+{phang}{help patmatch##range_example:Example 2: Range patterns}{p_end}
+{phang}{help patmatch##or_example:Example 3: Or patterns}{p_end}
+{phang}{help patmatch##wildcard_example:Example 4: Wildcard patterns}{p_end}
+{phang}{help patmatch##tuple_example:Example 5: Tuple patterns}{p_end}
+{phang}{help patmatch##exhaustiveness_example:Example 6: Exhaustiveness}{p_end}
+{phang}{help patmatch##overlaps_example:Example 7: Overlaps}{p_end}
+{phang}{help patmatch##usefulness_example:Example 8: Usefulness}{p_end}
+{phang}{help patmatch##labelvalues_example:Example 9: Label values}{p_end}
 
 {marker constant_example}{title:Example 1: Constant patterns}
 
 {pstd}
-In this example, we use the values of the variable {bf:rep78} to create a new variables using the normal way ({bf:var_1}) and with the {cmd:pmatch} command ({bf:var_2}), using Constant patterns with the '{hi:x}' syntax.
+In this example, we use the values of the variable {bf:rep78} to create a new variables using the normal way ({bf:var_1}) and with the {cmd:patmatch} command ({bf:var_2}), using Constant patterns with the '{hi:x}' syntax.
 
         {hline}
         {cmd:sysuse auto, clear}
@@ -95,9 +95,9 @@ In this example, we use the values of the variable {bf:rep78} to create a new va
         {cmd:replace var_1 = "very high"     if rep78 == 5}
         {cmd:replace var_1 = "missing"       if rep78 == .}
         
-        * With the pmatch command
+        * With the patmatch command
         
-        {cmd:pmatch var_2, variables(rep78) body( ///}
+        {cmd:patmatch var_2, variables(rep78) body( ///}
         {cmd:    1 = "very low",                 ///}
         {cmd:    2 = "low",                      ///}
         {cmd:    3 = "mid",                      ///}
@@ -126,9 +126,9 @@ The Constant pattern is simple but not practical once we have many values or dec
         {cmd:replace var_1 = "expensive"    if price >= 9000 & price <= 16000}
         {cmd:replace var_1 = "missing"      if price == .}
         
-        * With the pmatch command
+        * With the patmatch command
         
-        {cmd:pmatch var_2, variables(price) body( ///}
+        {cmd:patmatch var_2, variables(price) body( ///}
         {cmd:    min/!6000   = "cheap",          ///}
         {cmd:    6000/!9000  = "normal",         ///}
         {cmd:    9000/max    = "expensive",      ///}
@@ -142,7 +142,7 @@ The Constant pattern is simple but not practical once we have many values or dec
 {marker or_example}{title:Example 3: Or patterns}
 
 {pstd}
-The Or pattern is used to combine multiple patterns with the '{hi:{help pmatch##pattern:{it:pattern}} | {it:...} | {help pmatch##pattern:{it:pattern}}}' syntax.{p_end}
+The Or pattern is used to combine multiple patterns with the '{hi:{help patmatch##pattern:{it:pattern}} | {it:...} | {help patmatch##pattern:{it:pattern}}}' syntax.{p_end}
 
         {hline}
         {cmd:sysuse auto, clear}
@@ -155,9 +155,9 @@ The Or pattern is used to combine multiple patterns with the '{hi:{help pmatch##
         {cmd:replace var_1 = "high"          if rep78 == 4 | rep78 == 5}
         {cmd:replace var_1 = "missing"       if rep78 == .}
         
-        * With the pmatch command
+        * With the patmatch command
         
-        {cmd:pmatch var_2, variables(rep78) body( ///}
+        {cmd:patmatch var_2, variables(rep78) body( ///}
         {cmd:    1 | 2   = "low",                ///}
         {cmd:    3       = "mid",                ///}
         {cmd:    4 | 5   = "high",               ///}
@@ -182,9 +182,9 @@ To define a default value, we can use the wildcard pattern '{hi:_}'. It covers a
         {cmd:replace var_1 = "very low"      if rep78 == 1}
         {cmd:replace var_1 = "low"           if rep78 == 2}
         
-        * With the pmatch command
+        * With the patmatch command
         
-        {cmd:pmatch var_2, variables(rep78) body( ///}
+        {cmd:patmatch var_2, variables(rep78) body( ///}
         {cmd:    1 = "very low",                 ///}
         {cmd:    2 = "low",                      ///}
         {cmd:    _ = "other",                    ///}
@@ -197,7 +197,7 @@ To define a default value, we can use the wildcard pattern '{hi:_}'. It covers a
 {marker tuple_example}{title:Example 5: Tuple patterns}
 
 {pstd}
-To pmatch on multiple variables at the same time, we can use the Tuple pattern with the '{hi:({help pmatch##pattern:{it:pattern}}, {it:...}, {help pmatch##pattern:{it:pattern}})}' syntax.
+To patmatch on multiple variables at the same time, we can use the Tuple pattern with the '{hi:({help patmatch##pattern:{it:pattern}}, {it:...}, {help patmatch##pattern:{it:pattern}})}' syntax.
 
         {hline}
         {cmd:sysuse auto, clear}
@@ -210,9 +210,9 @@ To pmatch on multiple variables at the same time, we can use the Tuple pattern w
         {cmd:replace var_1 = "case 3"        if rep78 >= 3}
         {cmd:replace var_1 = "missing"       if rep78 == . | price == .}
         
-        * With the pmatch command
+        * With the patmatch command
         
-        {cmd:pmatch var_2, variables(rep78 price) body(  ///}
+        {cmd:patmatch var_2, variables(rep78 price) body(  ///}
         {cmd:    (min/!3, min/!10000)   = "case 1",      ///}
         {cmd:    (min/!3, 10000/max)    = "case 2",      ///}
         {cmd:    (3/max, _)             = "case 3",      ///}
@@ -226,7 +226,7 @@ To pmatch on multiple variables at the same time, we can use the Tuple pattern w
 {marker exhaustiveness_example}{title:Example 6: Exhaustiveness}
 
 {pstd}
-Coming back to {help pmatch##constant_example:Example 1}, if we forgot to include the case where {bf:rep_78} is missing, the command will print a warning.
+Coming back to {help patmatch##constant_example:Example 1}, if we forgot to include the case where {bf:rep_78} is missing, the command will print a warning.
 
         {hline}
         {cmd:sysuse auto, clear}
@@ -240,9 +240,9 @@ Coming back to {help pmatch##constant_example:Example 1}, if we forgot to includ
         {cmd:replace var_1 = "high"          if rep78 == 4}
         {cmd:replace var_1 = "very high"     if rep78 == 5}
         
-        * With the pmatch command
+        * With the patmatch command
         
-        {cmd:pmatch var_2, variables(rep78) body( ///}
+        {cmd:patmatch var_2, variables(rep78) body( ///}
         {cmd:    1 = "very low",                 ///}
         {cmd:    2 = "low",                      ///}
         {cmd:    3 = "mid",                      ///}
@@ -263,7 +263,7 @@ Including a Wildcard pattern covers all the remaining cases by default. This sho
 {marker overlaps_example}{title:Example 7: Overlaps}
 
 {pstd}
-On the other hand, with {help pmatch##range_example:Example 2}, we can also do mistakes with the ranges and cover some cases multiple times.
+On the other hand, with {help patmatch##range_example:Example 2}, we can also do mistakes with the ranges and cover some cases multiple times.
 
         {hline}
         {cmd:sysuse auto, clear}
@@ -276,9 +276,9 @@ On the other hand, with {help pmatch##range_example:Example 2}, we can also do m
         {cmd:replace var_1 = "expensive"    if price >= 9000 & price <= 16000}
         {cmd:replace var_1 = "missing"      if price == .}
         
-        * With the pmatch command
+        * With the patmatch command
         
-        {cmd:pmatch var_2, variables(price) body( ///}
+        {cmd:patmatch var_2, variables(price) body( ///}
         {cmd:    min/6000   = "cheap",           ///}
         {cmd:    6000/9000  = "normal",          ///}
         {cmd:    9000/max   = "expensive",       ///}
@@ -310,9 +310,9 @@ Finally, we can also include conditions which are already checked by the previou
         {cmd:replace var_1 = "expensive"    if price >= 9000 & price <= 16000}
         {cmd:replace var_1 = "missing"      if price == .}
         
-        * With the pmatch command
+        * With the patmatch command
         
-        {cmd:pmatch var_2, variables(price) body( ///}
+        {cmd:patmatch var_2, variables(price) body( ///}
         {cmd:    min/!6000  = "cheap",           ///}
         {cmd:    6000/!9000 = "normal",          ///}
         {cmd:    9000/max   = "expensive",       ///}
@@ -348,7 +348,7 @@ Some quality of life bonus is the possibility to use label values instead of the
         
         {cmd:label define color_label 1 "Red" 2 "Green" 3 "Blue"}
         {cmd:label values color color_label}
-        {cmd:pmatch color_hex, variables(color) body ( ///}
+        {cmd:patmatch color_hex, variables(color) body ( ///}
         {cmd:    1      = "#FF0000" ,                 ///}
         {cmd:    2      = "#00FF00" ,                 ///}
         {cmd:    "Blue" = "#0000FF" ,                 ///}

@@ -1,8 +1,8 @@
-// Main function for the `pmatch` command
+// Main function for the `patmatch` command
 // The // bench_on() and // bench_off() functions are not used in the online code)
 
 mata
-void pmatch(
+void patmatch(
     `STRING' newvar,
     `STRING' vars_exp,
     `STRING' body,
@@ -13,7 +13,7 @@ void pmatch(
     `VARIABLES' variables
     `ARMS' arms, useful_arms
 
-    // profiler_on("pmatch")
+    // profiler_on("patmatch")
     
     // bench_on("total")
     

@@ -1,9 +1,0 @@
-v 3
-
-d {bf:PMATCH}: Pattern matching in Stata.
-d
-d Distribution-Date: 23/05/2026
-
-f pmatch.ado
-f pmatch.sthlp
-f pmatch.pdf

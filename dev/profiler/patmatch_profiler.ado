@@ -1,4 +1,4 @@
-*! version 0.0.19  23 May 2026
+*! version 1.0.0  26 May 2026
 
 **#************************************************************ src/declare.mata
 
@@ -4315,13 +4315,13 @@ class Usefulness scalar function is_useful(
 end
 
 
-**#************************************************************* src/pmatch.mata
+**#*********************************************************** src/patmatch.mata
 
-// Main function for the `pmatch` command
+// Main function for the `patmatch` command
 // The // bench_on() and // bench_off() functions are not used in the online code)
 
 mata
-void pmatch(
+void patmatch(
     `STRING' newvar,
     `STRING' vars_exp,
     `STRING' body,
@@ -4332,7 +4332,7 @@ void pmatch(
     `VARIABLES' variables
     `ARMS' arms, useful_arms
 
-    profiler_on("pmatch")
+    profiler_on("patmatch")
     
     // bench_on("total")
     
@@ -4361,12 +4361,12 @@ void pmatch(
 end
 
 
-**#************************************************************** src/pmatch.ado
+**#************************************************************ src/patmatch.ado
 
-// pmatch command
-// see "src/pmatch.mata" for the entry point in the algorithm
+// patmatch command
+// see "src/patmatch.mata" for the entry point in the algorithm
 
-program pmatch
+program patmatch
     syntax namelist(min=1 max=2), ///
         Variables(varlist min=1) Body(str asis) ///
         [REPLACE NOCHECK]
@@ -4383,7 +4383,7 @@ program pmatch
     check_replace `namelist', `replace'
     local gen_first = ("`replace'" == "")
 
-    mata: pmatch("`namelist'", "`variables'", `"`body'"', `check', `gen_first', "`dtype'")
+    mata: patmatch("`namelist'", "`variables'", `"`body'"', `check', `gen_first', "`dtype'")
 end
 
 // Util functions to check the inputs

@@ -1,7 +1,7 @@
-// pmatch command
-// see "src/pmatch.mata" for the entry point in the algorithm
+// patmatch command
+// see "src/patmatch.mata" for the entry point in the algorithm
 
-program pmatch
+program patmatch
     syntax namelist(min=1 max=2), ///
         Variables(varlist min=1) Body(str asis) ///
         [REPLACE NOCHECK]
@@ -18,7 +18,7 @@ program pmatch
     check_replace `namelist', `replace'
     local gen_first = ("`replace'" == "")
 
-    mata: pmatch("`namelist'", "`variables'", `"`body'"', `check', `gen_first', "`dtype'")
+    mata: patmatch("`namelist'", "`variables'", `"`body'"', `check', `gen_first', "`dtype'")
 end
 
 // Util functions to check the inputs

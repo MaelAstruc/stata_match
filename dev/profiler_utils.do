@@ -190,7 +190,7 @@ struct ProfilerNode vector build_profiler_tree(`PROFILER' profiler) {
     nodes[1].parent = 0
     nodes[1].children = J(`PROFILER_CHILDREN', 1, .)
     nodes[1].n_children = 0
-    nodes[1].time = 0.01 // Add 10us to be sure that PROFILER is before pmatch
+    nodes[1].time = 0.01 // Add 10us to be sure that PROFILER is before patmatch
     nodes[1].depth = 0
     
     filter = (1..rows(profiler.times))' :<= profiler.length

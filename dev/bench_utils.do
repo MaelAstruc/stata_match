@@ -213,8 +213,8 @@ program compare_num
     }
     if ("`nobench'" == "") mata: bench_off("base")
     
-    // Build pmatch command
-    local command `"pmatch y, v(x) b("'
+    // Build patmatch command
+    local command `"patmatch y, v(x) b("'
     forvalues i = 0/`n' {
         local command `"`command' `i'1 = "`i'0a","'
         local command `"`command' `i'2 | `i'3 | `i'4 = "`i'0b","'
@@ -223,7 +223,7 @@ program compare_num
     local command `"`command' _ = "d")"'
     local command `"`command' `nocheck'"'
     
-    // Run pmatch command
+    // Run patmatch command
     `command'
     
     assert y_base == y
@@ -268,8 +268,8 @@ program compare_str
     }
     if ("`nobench'" == "") mata: bench_off("base")
     
-    // Build pmatch command
-    local command `"pmatch y, v(x) b("'
+    // Build patmatch command
+    local command `"patmatch y, v(x) b("'
     forvalues i = 0/`n' {
         local command `"`command' "`i'1" = "`i'0a","'
         local command `"`command' "`i'2" | "`i'3" | "`i'4" = "`i'0b","'
@@ -277,7 +277,7 @@ program compare_str
     local command `"`command' _ = "c")"'
     local command `"`command' `nocheck'"'
     
-    // Run pmatch command
+    // Run patmatch command
     `command'
     
     assert y_base == y

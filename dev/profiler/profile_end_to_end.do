@@ -3,7 +3,7 @@
 clear all
 
 run "dev/main_utils.do"
-run "dev/profiler/pmatch_profiler.ado"
+run "dev/profiler/patmatch_profiler.ado"
 
 capture log close
 log using "dev/logs/profile.log", replace
